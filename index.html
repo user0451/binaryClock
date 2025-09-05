@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Binary Clock</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<!-- swap buttons to toggle switch -->
+	
+	<div class="clock">
+		<div class="hours">
+			<!-- hours 4-bit mode -->
+			<div class="digit">
+				<div class="bit" data-not6Bit="true" id="hoursTens8"></div>
+				<div class="bit" data-not6Bit="true" id="hoursTens4"></div>
+				<div class="bit hour1" id="hoursTens2"></div>
+				<div class="bit hour2" id="hoursTens1"></div>
+			</div>
+			<div class="digit">
+				<div class="bit hour3" id="hours8"></div>
+				<div class="bit hour4" id="hours4"></div>
+				<div class="bit hour5" id="hours2"></div>
+				<div class="bit hour6" id="hours1"></div>
+			</div>
+		</div>
+		<div class="minutes">
+			<!-- minutes 4-bit mode -->
+			<div class="digit">
+				<div class="bit" data-not6Bit="true" id="minutesTens8"></div>
+				<div class="bit" data-not6Bit="true" id="minutesTens4"></div>
+				<div class="bit minute1" id="minutesTens2"></div>
+				<div class="bit minute2" id="minutesTens1"></div>
+			</div>
+			<div class="digit">
+				<div class="bit minute3" id="minutes8"></div>
+				<div class="bit minute4" id="minutes4"></div>
+				<div class="bit minute5" id="minutes2"></div>
+				<div class="bit minute6" id="minutes1"></div>
+			</div>
+		</div>
+		<div class="seconds">
+						<!-- seconds 4-bit mode -->
+						<div class="digit">
+				<div class="bit" data-not6Bit="true" id="secondsTens8"></div>
+				<div class="bit" data-not6Bit="true" id="secondsTens4"></div>
+				<div class="bit second1" id="secondsTens2"></div>
+				<div class="bit second2" id="secondsTens1"></div>
+			</div>
+			<div class="digit">
+				<div class="bit second3" id="seconds8"></div>
+				<div class="bit second4" id="seconds4"></div>
+				<div class="bit second5" id="seconds2"></div>
+				<div class="bit second6" id="seconds1"></div>
+			</div>
+
+		</div>
+	</div>
+	<!-- The switch -->
+	<br>
+	<label class="switch">
+		<input type="checkbox" id="modeToggle" onchange="toggleMode()">
+		<span class="slider round"></span>
+		<span class="label-text" id="modeLabel">6-bit Mode</span>
+		
+	</label>
+	<!-- 12/24h switch -->
+	<label class="switch">
+		<input type="checkbox" id="timeFormatToggle" onchange="toggleTimeFormat()">
+		<span class="slider round"></span>
+		<span class="label-text" id="timeFormatLabel">24h Format</span>
+	</label>
+</body>
+	<script src="code.js"></script>
+</html>

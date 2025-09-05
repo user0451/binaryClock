@@ -1,0 +1,138 @@
+
+body {
+	background-color: black;
+}
+body, html {
+	margin: 0;
+	padding: 0;
+}
+body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	flex-direction: column;
+	color: lime;
+}
+
+.clock {
+	display: flex;
+	flex-direction: row;
+	gap: 2em;
+}
+
+.seconds, .minutes, .hours {
+	display: flex;
+	/* flex-direction: row; */
+/* TODO: maybe switch this value to column for 6-Bit Mode. We would also need to hide the 7th and 8th bits in this case */
+}
+
+
+.clock[data-mode="6bit"]  > div {
+	flex-direction: column;
+	[data-not6Bit] {
+		display: none;
+	}
+}
+.clock[data-mode="4bit"] > div {
+	flex-direction: row;
+	[data-not6Bit] {
+		display: block;
+	}
+}
+
+
+.digit {
+	display: flex;
+	flex-direction: column;
+	
+}
+.bit {
+	width: 50px;
+	height: 50px;
+	border-radius: 100%;
+	box-shadow: 0 0 10px grey;
+	margin: 8px;
+	background-color: black;
+}
+@keyframes pulse {
+	0% { box-shadow: 0 0 1px rgb(14, 253, 14); }
+	50% { box-shadow: 0 0 10px rgb(14, 253, 14); }
+	100% { box-shadow: 0 0 1px rgb(14, 253, 14); }
+}
+
+.seconds .bit.on {
+	background-color: lime;
+	animation: pulse 2s infinite;
+	/* box-shadow: 0 0 10px rgb(14, 253, 14); */
+}
+
+.minutes .bit.on {
+	background-color: blue;
+	box-shadow: 0 0 10px rgb(14, 253, 14);
+}
+
+.hours .bit.on{
+	background-color: red;
+	box-shadow: 0 0 10px rgb(14, 253, 14);
+}
+
+
+.digit-label {
+	text-align: center;
+	color: lime;
+	font-family: monospace;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 100px;
+  height: 34px;
+  margin-bottom: 1em;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: grey;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: lime;
+}
+
+input:checked + .slider:before {
+  transform: translateX(66px);
+}
+
+.label-text {
+  font-family: monospace;
+  vertical-align: middle;
+  top:30px;
+  position: relative;
+  
+}
