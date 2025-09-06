@@ -1,6 +1,6 @@
 
 body {
-	background-color: black;
+	background:radial-gradient(circle at center, black 0%, #111 100%);
 }
 body, html {
 	margin: 0;
@@ -23,12 +23,10 @@ body {
 
 .seconds, .minutes, .hours {
 	display: flex;
-	/* flex-direction: row; */
-/* TODO: maybe switch this value to column for 6-Bit Mode. We would also need to hide the 7th and 8th bits in this case */
 }
 
 
-.clock[data-mode="6bit"]  > div {
+.clock[data-mode="6bit"] > div {
 	flex-direction: column;
 	[data-not6Bit] {
 		display: none;
@@ -44,48 +42,42 @@ body {
 
 .digit {
 	display: flex;
-	flex-direction: column;
-	
+	flex-direction: column;	
 }
+
 .bit {
 	width: 50px;
 	height: 50px;
 	border-radius: 100%;
-	box-shadow: 0 0 10px grey;
-	margin: 8px;
+	box-shadow: 0 0 5px darkgrey;
+	border: 2px grey double;
+	margin: 5px;
 	background-color: black;
 }
-@keyframes pulse {
-	0% { box-shadow: 0 0 1px rgb(14, 253, 14); }
-	50% { box-shadow: 0 0 10px rgb(14, 253, 14); }
-	100% { box-shadow: 0 0 1px rgb(14, 253, 14); }
-}
+
 
 .seconds .bit.on {
 	background-color: lime;
-	animation: pulse 2s infinite;
-	/* box-shadow: 0 0 10px rgb(14, 253, 14); */
+	box-shadow: 0 0 5px rgb(14, 253, 14);
 }
 
 .minutes .bit.on {
 	background-color: blue;
-	box-shadow: 0 0 10px rgb(14, 253, 14);
+	box-shadow: 0 0 5px lightblue;
 }
 
 .hours .bit.on{
 	background-color: red;
-	box-shadow: 0 0 10px rgb(14, 253, 14);
+	box-shadow: 0 0 5px orange;
 }
 
 
-.digit-label {
-	text-align: center;
-	color: lime;
-	font-family: monospace;
-}
+
 .switch {
   position: relative;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100px;
   height: 34px;
   margin-bottom: 1em;
@@ -122,17 +114,15 @@ body {
 }
 
 input:checked + .slider {
-  background-color: lime;
+  background-color: rgb(137, 137, 5);
 }
 
 input:checked + .slider:before {
-  transform: translateX(66px);
+  transform: translateX(68px);
 }
 
 .label-text {
   font-family: monospace;
-  vertical-align: middle;
-  top:30px;
-  position: relative;
-  
+  cursor: pointer;
+  position: relative;  
 }

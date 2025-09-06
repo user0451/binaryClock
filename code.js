@@ -1,3 +1,7 @@
+//event listeners for switches
+document.getElementById("modeToggle").addEventListener("change", toggleMode);
+document.getElementById("timeFormatToggle").addEventListener("change", toggleTimeFormat);
+
 
 //12/24h switch
 var show24HourFormat = true; // true for 24h, false for 12h
@@ -5,11 +9,13 @@ function toggleTimeFormat() {
 	if (document.getElementById("timeFormatToggle").checked) {
 		// Switch to 12-hour format
 		show24HourFormat = false;
-		document.getElementById("timeFormatLabel").innerText = "12h Format";
+		document.getElementById("timeFormatLabel").innerText = "12";
+		localStorage.setItem("binaryClockFormat", "12");
 	} else {
 		// Switch to 24-hour format
 		show24HourFormat = true;
-		document.getElementById("timeFormatLabel").innerText = "24h Format";
+		document.getElementById("timeFormatLabel").innerText = "24";
+		localStorage.setItem("binaryClockFormat", "24");
 	}
 }
 
@@ -22,33 +28,29 @@ function clearCurrentInterval() {
 		currentInterval = null;
 	}
 }
+
 function toggleMode() {
+	clearCurrentInterval();
 	if (document.getElementById("modeToggle").checked) {
-		fourBitMode();
-		document.getElementById("modeLabel").innerText = "4-bit Mode";
+		showFourBitMode();
+		setMode("4-bit");
 	} else {
-		sixBitMode();
-		document.getElementById("modeLabel").innerText = "6-bit Mode";
+		showSixBitMode();
+		setMode("6-bit");
 	}
 }
 
-function fourBitMode() {
-	clearCurrentInterval();
-	showFourBitMode();
-}
-function sixBitMode() {
-	clearCurrentInterval();
-	showSixBitMode();
-}
 
-// Start in 6-bit mode by default
-sixBitMode();
+
+function setMode(mode) {
+	document.getElementById("modeLabel").innerText = mode;
+	localStorage.setItem("binaryClockMode", mode);
+}
 
 function showFourBitMode() {
 	// Set the mode to 4-bit
 	document.querySelector(".clock").setAttribute("data-mode", "4bit");
-	// document.querySelectorAll("[data-not6Bit]").forEach( (el) => { el.style.display = ""; } );
-	// Update the clock every 100 milliseconds
+	//changing the display to 4-bit mode means the css will take care of hiding the unnecessary bits and moving the others into place, so we just need to update the time here.
 	currentInterval = setInterval(() => {
 		let now = new Date();
 		let currentSecond = now.getSeconds(), currentMinute = now.getMinutes(); 
@@ -69,13 +71,12 @@ function showFourBitMode() {
 			document.getElementById("hours" + bit).classList.toggle("on", (hoursUnit & bit) != 0);
 		}
 		//console.log("FirstDigit =", tensOfSeconds.toString(2), "\nLastDigit =", secondsUnit.toString(2));
-	}, 100);
+	}, 250);
 }
 
 function showSixBitMode() {
 	// Set the mode to 6-bit
 	document.querySelector(".clock").setAttribute("data-mode", "6bit");
-	// document.querySelectorAll("[data-not6Bit]").forEach( (el) => { el.style.display = "none"; } );
 	// Update the clock every 100 milliseconds
 	currentInterval = setInterval(() => {
 		let now = new Date();
@@ -89,5 +90,15 @@ function showSixBitMode() {
 			document.getElementsByClassName("hour"+(i+1))[0].classList.toggle("on", (currentHour & bit) != 0);
 		}
 		// console.log("hours =",currentHour.toString(2),"\nminutes =",currentMinute.toString(2),"\nseconds =",currentSecond.toString(2));
-	}, 100);
+	}, 250);
+}
+
+// Start in 6-bit mode by default
+//check for stored value
+if (localStorage.getItem("binaryClockMode") === "4-bit") {
+	document.getElementById("modeToggle").checked = true;
+}
+toggleMode();
+if (localStorage.getItem("binaryClockFormat") === "12") {
+	document.getElementById("timeFormatToggle").checked = true;
 }

@@ -13,8 +13,8 @@
 		<div class="hours">
 			<!-- hours 4-bit mode -->
 			<div class="digit">
-				<div class="bit" data-not6Bit="true" id="hoursTens8"></div>
-				<div class="bit" data-not6Bit="true" id="hoursTens4"></div>
+				<div class="bit" data-not6Bit id="hoursTens8"></div>
+				<div class="bit" data-not6Bit id="hoursTens4"></div>
 				<div class="bit hour1" id="hoursTens2"></div>
 				<div class="bit hour2" id="hoursTens1"></div>
 			</div>
@@ -28,8 +28,8 @@
 		<div class="minutes">
 			<!-- minutes 4-bit mode -->
 			<div class="digit">
-				<div class="bit" data-not6Bit="true" id="minutesTens8"></div>
-				<div class="bit" data-not6Bit="true" id="minutesTens4"></div>
+				<div class="bit" data-not6Bit id="minutesTens8"></div>
+				<div class="bit" data-not6Bit id="minutesTens4"></div>
 				<div class="bit minute1" id="minutesTens2"></div>
 				<div class="bit minute2" id="minutesTens1"></div>
 			</div>
@@ -43,8 +43,8 @@
 		<div class="seconds">
 						<!-- seconds 4-bit mode -->
 						<div class="digit">
-				<div class="bit" data-not6Bit="true" id="secondsTens8"></div>
-				<div class="bit" data-not6Bit="true" id="secondsTens4"></div>
+				<div class="bit" data-not6Bit id="secondsTens8"></div>
+				<div class="bit" data-not6Bit id="secondsTens4"></div>
 				<div class="bit second1" id="secondsTens2"></div>
 				<div class="bit second2" id="secondsTens1"></div>
 			</div>
@@ -60,16 +60,16 @@
 	<!-- The switch -->
 	<br>
 	<label class="switch">
-		<input type="checkbox" id="modeToggle" onchange="toggleMode()">
+		<input type="checkbox" id="modeToggle">
 		<span class="slider round"></span>
-		<span class="label-text" id="modeLabel">6-bit Mode</span>
+		<span class="label-text" id="modeLabel">6-bit</span>
 		
 	</label>
 	<!-- 12/24h switch -->
 	<label class="switch">
-		<input type="checkbox" id="timeFormatToggle" onchange="toggleTimeFormat()">
+		<input type="checkbox" id="timeFormatToggle">
 		<span class="slider round"></span>
-		<span class="label-text" id="timeFormatLabel">24h Format</span>
+		<span class="label-text" id="timeFormatLabel">24</span>
 	</label>
 </body>
 	<script src="code.js"></script>
