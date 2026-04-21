@@ -1,6 +1,14 @@
 //event listeners for switches
 document.getElementById("modeToggle").addEventListener("change", toggleMode);
 document.getElementById("timeFormatToggle").addEventListener("change", toggleTimeFormat);
+document.getElementById("helpToggle").addEventListener("change", function() {
+	if (document.getElementById("helpToggle").checked) {
+		//TODO: change this to find all help panels and show them
+		document.querySelectorAll(".helpPanel").forEach(panel => panel.classList.add("show"));
+	} else {
+		document.querySelectorAll(".helpPanel").forEach(panel => panel.classList.remove("show"));
+	}
+});
 
 
 //12/24h switch
@@ -41,26 +49,24 @@ function toggleMode() {
 }
 
 
-
 function setMode(mode) {
 	document.getElementById("modeLabel").innerText = mode;
 	localStorage.setItem("binaryClockMode", mode);
 }
 
+// Cache the clock element for efficiency
+const clockElement = document.querySelector(".clock");
+
 function showFourBitMode() {
-	// Set the mode to 4-bit
-	document.querySelector(".clock").setAttribute("data-mode", "4bit");
+	clockElement.setAttribute("data-mode", "4bit");
 	//changing the display to 4-bit mode means the css will take care of hiding the unnecessary bits and moving the others into place, so we just need to update the time here.
 	currentInterval = setInterval(() => {
 		let now = new Date();
 		let currentSecond = now.getSeconds(), currentMinute = now.getMinutes(); 
-		let currentHour = show24HourFormat ? now.getHours() : now.getHours() % 12;
-		let tensOfSeconds = Math.floor(currentSecond / 10);
-		let secondsUnit = currentSecond % 10;
-		let tensOfMinutes = Math.floor(currentMinute / 10);
-		let minutesUnit = currentMinute % 10;
-		let tensOfHours = Math.floor(currentHour / 10);
-		let hoursUnit = currentHour % 10;
+		let tensOfSeconds = Math.floor(currentSecond / 10), secondsUnit = currentSecond % 10;
+		let tensOfMinutes = Math.floor(currentMinute / 10), minutesUnit = currentMinute % 10;
+		let currentHour = show24HourFormat ? now.getHours() : (now.getHours() % 12 || 12);
+		let tensOfHours = Math.floor(currentHour / 10), hoursUnit = currentHour % 10;
 		for (let i = 0; i < 4; i++) {
 			let bit = 1 << (3 - i);
 			document.getElementById("secondsTens" + bit).classList.toggle("on", (tensOfSeconds & bit) != 0);
@@ -76,13 +82,13 @@ function showFourBitMode() {
 
 function showSixBitMode() {
 	// Set the mode to 6-bit
-	document.querySelector(".clock").setAttribute("data-mode", "6bit");
+	clockElement.setAttribute("data-mode", "6bit");
 	// Update the clock every 100 milliseconds
 	currentInterval = setInterval(() => {
 		let now = new Date();
 		let currentSecond = now.getSeconds();
 		let currentMinute = now.getMinutes();
-		let currentHour = show24HourFormat ? now.getHours() : now.getHours() % 12;
+		let currentHour = show24HourFormat ? now.getHours() : (now.getHours() % 12 || 12);
 		for (let i = 0; i < 6; i++) {
 			let bit = 1 << (5 - i);
 			document.getElementsByClassName("second"+(i+1))[0].classList.toggle("on", (currentSecond & bit) != 0);
@@ -102,3 +108,4 @@ toggleMode();
 if (localStorage.getItem("binaryClockFormat") === "12") {
 	document.getElementById("timeFormatToggle").checked = true;
 }
+

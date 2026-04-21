@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Binary Clock V2</title>
+	<link rel="stylesheet" href="style2.css">
+	<script defer src="code2.js"></script>
+</head>
+<body>
+	<div class="clock" id="clock">
+		<div class="seconds" id="seconds">
+			<div class="bit" data-bit data-4BitOnly></div>
+			<div class="bit" data-bit data-4BitOnly></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+		</div>
+		<div class="minutes" id="minutes">
+			<div class="bit" data-bit data-4BitOnly></div>
+			<div class="bit" data-bit data-4BitOnly></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+		</div>
+		<div class="hours" id="hours">
+			<div class="bit" data-bit data-4BitOnly></div>
+			<div class="bit" data-bit data-4BitOnly></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+			<div class="bit" data-bit></div>
+		</div>
+	</div>
+	
+	<div class="test">
+		<div class="t" style="--i: 1;">
+			<div class="data"></div>
+		</div>
+		<div class="t" style="--i: 2;">
+			<div class="data"></div>
+		</div>
+		<div class="t" style="--i: 3;">
+			<div class="data"></div>
+		</div>
+		<div class="t" style="--i: 4;">
+			<div class="data"></div>
+		</div>
+		<div class="t" style="--i: 5;">
+			<div class="data"></div>
+		</div>
+		<div class="t" style="--i: 6;">
+			<div class="data"></div>
+		</div>
+		<div class="t" style="--i: 7;">
+			<div class="data"></div>
+		</div>
+		<div class="t" style="--i: 8;">
+			<div class="data"></div>
+		</div>
+	</div>
+
+	<div class="switch-container">
+		<label class="switch">
+			<input type="checkbox" id="modeToggle">
+			<span class="slider round"></span>
+			<span class="label-text" id="modeLabel">6-bit</span>
+			
+		</label>
+		<!-- 12/24h switch -->
+		<label class="switch">
+			<input type="checkbox" id="timeFormatToggle">
+			<span class="slider round"></span>
+			<span class="label-text" id="timeFormatLabel">24</span>
+		</label>
+	</div>
+</body>

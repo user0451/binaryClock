@@ -1,7 +1,4 @@
 
-body {
-	background:radial-gradient(circle at center, black 0%, #111 100%);
-}
 body, html {
 	margin: 0;
 	padding: 0;
@@ -13,36 +10,100 @@ body {
 	height: 100vh;
 	flex-direction: column;
 	color: lime;
+	animation: pageFadeIn 1s ease-in-out;	
+	background: black;
+	background:radial-gradient(circle at center, black 0%, #111 100%);
+	
 }
 
+@keyframes pageFadeIn {
+	0% { opacity:0; }
+	50% { opacity:0.25; }
+	100% { opacity:1; }
+  }
+
+
+
+ 
+  
 .clock {
 	display: flex;
 	flex-direction: row;
-	gap: 2em;
+  align-items: center;
+  justify-content: center;
+	gap: 0em;
+
 }
 
 .seconds, .minutes, .hours {
 	display: flex;
 }
-
+.clock > div {
+	margin: 1em;
+  transition: transform 2.6s cubic-bezier(0.4, 0.2, 0.2, 1), opacity 0.6s;
+}
 
 .clock[data-mode="6bit"] > div {
+  transform: translateY(-.5em);
+  opacity: 1;
 	flex-direction: column;
 	[data-not6Bit] {
-		display: none;
+		transform: scale(0);
+		transition: transform 0.5s ease-in-out;
 	}
 }
+
 .clock[data-mode="4bit"] > div {
+  transform: translateX(0);
+  opacity: 1;
 	flex-direction: row;
 	[data-not6Bit] {
-		display: block;
+		transform: scale(1);
+		transition: transform .75s cubic-bezier(0.175, 0.385, 0.5, 1.55);
 	}
 }
+ .helpPanel {    
+    display: none;
+    animation: out 1s forwards ease;
+  }
+
+.show{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: in 1s forwards ease;
+  
+}
+
+@keyframes in {
+		from { 
+			width: 0;
+      opacity: 0;
+		}
+		to { 
+			width: 100px;
+			opacity: 1;
+		}
+	}
+
+@keyframes out {
+    from { 
+      display: block;
+      opacity: 1;
+      width: 100px;
+    }
+    to { 
+      display: none;
+      width: 1px;
+      opacity: 0;
+    }
+  }
+
 
 
 .digit {
 	display: flex;
-	flex-direction: column;	
+	flex-direction: column;
 }
 
 .bit {

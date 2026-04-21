@@ -1,0 +1,254 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  list-style: none;
+  font: unset;
+  border: none;
+  background: none;
+}
+
+*:focus-visible {
+  padding: 5px;
+  outline: 5px dotted blueviolet;
+  outline-offset: 4px;
+}
+
+:root {
+  --offset: 175px;
+  --list-offset: -210px;
+}
+
+body {
+	font-family: monospace;
+	background-color: black;
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+}
+
+
+
+/* let's try a grid approach */
+.clock {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	grid-template-rows: repeat(1, 1fr);
+	place-items: center;
+	
+	gap: 2em;
+}
+
+.bit[data-bit] {
+	width: 50px;
+	height: 50px;
+	border-radius: 100%;
+	box-shadow: 0 0 5px darkgrey;
+	border: 2px grey double;
+	margin: 5px;
+	background-color: black;
+}
+.seconds .bit[data-bit="1"] {
+	background-color: lime;
+	box-shadow: 0 0 5px rgb(14, 253, 14);
+}
+.minutes .bit[data-bit="1"] {
+	background-color: blue;
+	box-shadow: 0 0 5px lightblue;
+}
+.hours .bit[data-bit="1"] {
+	background-color: red;
+	box-shadow: 0 0 5px orange;
+}
+.bit:after {
+	content: attr(data-bit);
+	color: white;
+	font-size: .8rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	font-weight: bold;
+}
+
+/* now position them in the grid */
+.seconds {
+	grid-column: 1;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	place-items: center;
+
+}
+.minutes {
+	grid-column: 3;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	place-items: center;
+}
+.hours {
+	grid-column: 5;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	place-items: center;
+}
+
+
+.clock[data-mode="6bit"] > div {
+	/* rearrange the grid */
+	grid-template-columns: 1fr;
+	place-items: center;
+	[data-4BitOnly] {
+		/* transform: scale(0);
+		transition: transform 0.5s ease-in-out;
+		display: none; */
+		
+		display: none;
+		visibility: hidden;
+		/* animation: animBitSwitch 2s linear forwards; */
+	}
+}
+.clock[data-mode="4bit"] > div {
+	grid-template-columns: repeat(2, 1fr);
+	[data-4BitOnly] {
+		/* transform: scale(1);
+		transition: transform 0.5s cubic-bezier(0.175, 0.385, 0.5, 1.55); */
+		display: block;
+		visibility: visible;
+		/* animation: animBitSwitch 2s linear reverse; */
+	}
+}
+
+@keyframes animBitSwitch {
+	/* animation for bit switch */
+	0% { transform: scale(1); 
+			}
+	50% { transform: scale(.4);
+		display: block;
+			visibility: visible;   }
+	100% { 
+		transform: scale(0); 
+
+	 }
+}
+
+:root {
+  --colour1: hsl(268, 11%, 69%);
+  --colour2: hsl(263, 45%, 56%);
+  --colour3: hsl(268, 10%, 30%);
+  --colour4: hsl(169, 100%, 27%);
+  --colour5: hsl(171, 100%, 38%);
+}
+.test  {
+	width: 150px;
+	aspect-ratio: 1;
+	border: 10px solid var(--colour3);
+	background-color: var(--colour5);
+	border-radius: 50%;
+	cursor: pointer;
+	
+	font-size: 2rem;
+	box-shadow: 0 0 10px 13px rgba(0, 0, 0, 0.2), 
+				5px 10px 10px 10px rgba(0, 0, 0, 0.4);
+	
+	position: relative;
+}
+.t{
+	--size: 75px;
+	position: absolute;
+	inset: 0;
+    margin:auto;
+	width: var(--size);
+	aspect-ratio: 1;
+
+	transition: all 1s cubic-bezier(0.68, -0.6, 0.32, 1.6)
+				calc(calc(var(--i) * 1s) / 7 + .20s);
+}
+
+.test:focus-within .t{
+	transform: 
+			translate(
+				calc(75px * cos(calc(var(--i) * 30deg))), 
+				calc(sin(calc(var(--i) * 30deg)) * 75px)
+			);
+}
+
+.data {
+
+	z-index: -1;
+	width: var(--size);
+	aspect-ratio: 1;
+	background: var(--colour5);
+	border-radius: 50px;
+	border: 5px solid var(--colour3);
+	transition: all .2s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+}
+
+
+
+.switch-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	margin-top: 2rem;
+}
+
+.switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 34px;
+  margin-bottom: 1em;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: grey;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: rgb(137, 137, 5);
+}
+
+input:checked + .slider:before {
+  transform: translateX(68px);
+}
+
+.label-text {
+  font-family: monospace;
+  cursor: pointer;
+  position: relative;  
+}

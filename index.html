@@ -6,9 +6,7 @@
 	<title>Binary Clock</title>
 	<link rel="stylesheet" href="style.css">
 </head>
-<body>
-	<!-- swap buttons to toggle switch -->
-	
+<body>	
 	<div class="clock">
 		<div class="hours">
 			<!-- hours 4-bit mode -->
@@ -25,6 +23,9 @@
 				<div class="bit hour6" id="hours1"></div>
 			</div>
 		</div>
+		<div class="helpPanel">
+			<p>test</p>
+		</div>
 		<div class="minutes">
 			<!-- minutes 4-bit mode -->
 			<div class="digit">
@@ -40,9 +41,16 @@
 				<div class="bit minute6" id="minutes1"></div>
 			</div>
 		</div>
+		<div class="helpPanel">
+			<div>
+				<p>test</p>
+				<p>test</p>
+				<p>test</p>
+			</div>
+		</div>
 		<div class="seconds">
-						<!-- seconds 4-bit mode -->
-						<div class="digit">
+			<!-- seconds 4-bit mode -->
+			<div class="digit">
 				<div class="bit" data-not6Bit id="secondsTens8"></div>
 				<div class="bit" data-not6Bit id="secondsTens4"></div>
 				<div class="bit second1" id="secondsTens2"></div>
@@ -58,19 +66,28 @@
 		</div>
 	</div>
 	<!-- The switch -->
-	<br>
-	<label class="switch">
-		<input type="checkbox" id="modeToggle">
-		<span class="slider round"></span>
-		<span class="label-text" id="modeLabel">6-bit</span>
-		
-	</label>
-	<!-- 12/24h switch -->
-	<label class="switch">
-		<input type="checkbox" id="timeFormatToggle">
-		<span class="slider round"></span>
-		<span class="label-text" id="timeFormatLabel">24</span>
-	</label>
+
+	<div id="switch-container">
+		<br>
+		<label class="switch">
+			<input type="checkbox" id="modeToggle">
+			<span class="slider round"></span>
+			<span class="label-text" id="modeLabel">6-bit</span>
+			
+		</label>
+		<!-- 12/24h switch -->
+		<label class="switch">
+			<input type="checkbox" id="timeFormatToggle">
+			<span class="slider round"></span>
+			<span class="label-text" id="timeFormatLabel">24</span>
+		</label>
+		<!-- Help switch - show help panel -->
+		<label class="switch" id="t">
+			<input type="checkbox" id="helpToggle">
+			<span class="slider round"></span>
+			<span class="label-text" id="helpLabel">Help</span>
+		</label>
+	</div>
 </body>
 	<script src="code.js"></script>
 </html>
