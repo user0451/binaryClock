@@ -1,0 +1,80 @@
+.clock[data-mode="6bit"] .digit.tens {
+	display: contents;
+	transform: none;
+}
+
+.clock[data-mode="6bit"] .digit.units {
+	display: contents;
+	transform: none;
+}
+
+.clock[data-mode="6bit"] .timeGroup {
+	position: relative;
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: repeat(6, var(--bit-size));
+	--effective-row-gap: var(--bit-gap);
+	row-gap: var(--effective-row-gap);
+	justify-items: center;
+}
+
+body.help-visible .clock[data-mode="6bit"] .timeGroup {
+	--effective-row-gap: calc(var(--bit-gap) + (var(--bit-size) * 0.12));
+}
+
+.clock[data-mode="6bit"] .hour1,
+.clock[data-mode="6bit"] .minute1,
+.clock[data-mode="6bit"] .second1 {
+	grid-row: 1;
+}
+
+.clock[data-mode="6bit"] .hour2,
+.clock[data-mode="6bit"] .minute2,
+.clock[data-mode="6bit"] .second2 {
+	grid-row: 2;
+}
+
+.clock[data-mode="6bit"] .hour3,
+.clock[data-mode="6bit"] .minute3,
+.clock[data-mode="6bit"] .second3 {
+	grid-row: 3;
+}
+
+.clock[data-mode="6bit"] .hour4,
+.clock[data-mode="6bit"] .minute4,
+.clock[data-mode="6bit"] .second4 {
+	grid-row: 4;
+}
+
+.clock[data-mode="6bit"] .hour5,
+.clock[data-mode="6bit"] .minute5,
+.clock[data-mode="6bit"] .second5 {
+	grid-row: 5;
+}
+
+.clock[data-mode="6bit"] .hour6,
+.clock[data-mode="6bit"] .minute6,
+.clock[data-mode="6bit"] .second6 {
+	grid-row: 6;
+}
+
+.clock[data-mode="6bit"] [data-not6Bit] {
+	position: absolute;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(-0.65rem) scale(0.2);
+	filter: blur(0.12rem);
+	pointer-events: none;
+}
+
+.clock[data-mode="4bit"] .digit.tens,
+.clock[data-mode="4bit"] .digit.units {
+	transform: translateX(0) translateY(0);
+}
+
+.clock[data-mode="4bit"] [data-not6Bit] {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0) scale(1);
+	filter: blur(0);
+}

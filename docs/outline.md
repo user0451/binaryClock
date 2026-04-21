@@ -1,73 +1,56 @@
-This project is a binary clock display. It will display a clock as a series of binary lights, representing seconds, minutes and hours.
-We will have a toggle switch, which switches between 4-bit and 6-bit mode.
+# Binary Clock V1 Outline
 
-## 4-bit mode: 
-4-bits are used for the tens and another 4-bits are used for the units. So we will have 3 groups of 2x 4-bits, reading from left to right, with least significant bit at the bottom:
-```
-xx xx xx
-xx xx xx
-xx xx xx
-xx xx xx
-hh mm ss
-```
+## Scope Boundary
+- Canonical implementation target is V1 only: `index.html`, `style.css`, `code.js`.
+- V2 files (`index2.html`, `style2.css`, `code2.js`) remain unchanged and are reference-only for future cutover planning.
 
-## 6-bit mode: 
-6-bits are used for each hours, minutes and seconds
-```
-x x x
-x x x
-x x x
-x x x
-x x x
-x x x
-h m s
-```
-And a 12/24 hour switch...
+## Display Modes
+- `6-bit` mode shows one 6-bit value per time column (hours, minutes, seconds).
+- `4-bit` mode uses decimal split (tens + units) while preserving original V1 bit IDs.
+- Mode transitions are CSS-first and animate with transform/opacity/scale, avoiding display/flex-direction snaps.
 
-So, our 4-bit time 12:34:56 would be:
-```
-00 00 00
-00 01 11
-01 10 01
-10 10 10
----------
-12:34:56
-```
-and 6-bits:
- ```
- 0  1  1
- 0  0  1
- 1  0  1
- 1  0  0
- 0  1  0
- 0  0  0
------
-12:34:56
-```
-It's mostly going to be about the CSS. Maybe we have a grid with some circles in. Make each circle one colour for on and another colour for off. Maybe set a data-attribute value (which will be 1 or 0) and in css, we set the colour of  the circle based on the attribute value.
+## Inline Help System
+- Two inline help columns stay mounted in layout:
+	- between Hours and Minutes
+	- between Minutes and Seconds
+- Help visibility is controlled by state class (`body.help-visible`) rather than display toggling.
+- Help panels animate open/close with animatable properties (`opacity`, `transform`, `clip-path`, `max-width`/`max-height`).
+- Each help panel shows:
+	- bit weights per row
+	- live per-row contribution values for both adjacent columns
+	- live totals in clock format (for example `12 : 34`)
 
-In JS, we need to change the data-attributes based on the current time:
+## Controls
+- Control row includes:
+	- 4/6 bit mode toggle
+	- 12/24 hour toggle
+	- help toggle
+	- theme dropdown
+- State is persisted with localStorage keys:
+	- `binaryClockMode`
+	- `binaryClockFormat`
+	- `binaryClockHelp`
+	- `binaryClockTheme`
 
-6-bits: hour.toString(2), minute.toString(2) and second.toString(2).
-4-bits: hmm... we'll need to seperate the digits into tens and units:
-```js
-let currentHour = new Date().getSeconds();
-let tens = parseInt(currentHour / 10);
-let units  = currentHour % 10;
-console.log("FirstDigit =",tens.toString(2),"\nLastDigit =",units.toString(2));
-```
-![[binaryClock.mp4]]
+## Theme System
+- Theme is applied via root attribute: `html[data-theme="..."]`.
+- Delivered themes:
+	- Classic RGB Neon
+	- Amber Terminal
+	- Ice Glass
+	- Matrix Pulse
+	- Sunset Bloom
+- Themes vary in more than color: texture, border treatment, glow character, type feel, and optional pulse behavior.
 
-I want to add a help section to the clock, which will explain how to read the clock and the basics of binary.  I want to show the value of the bits and the fact that we need to add them to each other:
+## Responsive Behavior
+- Core sizing is tokenized with CSS variables and `clamp()`.
+- Desktop keeps horizontal inline-help composition.
+- Tablet tightens spacing.
+- Mobile stacks clock groups and converts help reveal to vertical expansion so controls/help remain reachable.
+- Viewport sizing uses `min-height: 100vh` plus `100dvh` support.
 
-```
- 0    32   32
- 0    0    16
- 8    0    8
- 4    0    0
- 0    2    0
- 0    0    0
------
-12 : 34 : 56
-```
+## Accessibility and Motion
+- Keyboard focus rings are visible for toggles and dropdown.
+- Controls and theme picker meet touch target sizing intent on small screens.
+- Reduced motion path is supported through `prefers-reduced-motion`, minimizing decorative animation while preserving state readability.
 

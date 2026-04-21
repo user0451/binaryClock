@@ -1,0 +1,81 @@
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+:root {
+	--bit-size: clamp(2.35rem, 5.1vw, 4.9rem);
+	--bit-gap: clamp(0.36rem, 1.2vw, 0.74rem);
+	--clock-gap: clamp(1rem, 2.8vw, 2.8rem);
+	--group-gap: clamp(0.85rem, 2vw, 1.7rem);
+	--control-height: clamp(2.1rem, 4.4vw, 2.4rem);
+	--control-width: clamp(6rem, 12vw, 7rem);
+	--switch-knob: calc(var(--control-height) - 0.4rem);
+	--motion-base: 320ms;
+	--motion-slow: 520ms;
+	--ease-primary: cubic-bezier(0.2, 0.78, 0.18, 1);
+	--ease-soft: cubic-bezier(0.25, 0.1, 0.2, 1);
+	--ease-bubble-in: cubic-bezier(0.15, 0.86, 0.24, 1.12);
+	--ease-bubble-out: cubic-bezier(0.22, 0.76, 0.2, 1.06);
+	--bubble-travel: 1;
+
+	--surface-bg: radial-gradient(circle at 18% 15%, #171127 0%, #070709 62%, #000 100%);
+	--surface-card: rgba(15, 14, 24, 0.52);
+	--surface-edge: rgba(255, 255, 255, 0.16);
+	--text-main: #f5f7ff;
+	--text-muted: #b6b9cc;
+	--control-bg: rgba(255, 255, 255, 0.08);
+	--control-active: #f9f6ff;
+	--focus-ring: #ffd756;
+	--help-plus-color: rgba(226, 231, 255, 0.6);
+	--help-plus-glow: rgba(255, 255, 255, 0.14);
+
+	--digital-panel-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+	--digital-panel-border: rgba(255, 255, 255, 0.24);
+	--digital-pill-bg: rgba(0, 0, 0, 0.4);
+	--digital-pill-border: rgba(255, 255, 255, 0.22);
+	--digital-label: rgba(220, 226, 255, 0.85);
+	--digital-value: rgba(251, 253, 255, 1);
+	--digital-meridiem-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
+	--digital-meridiem-border: rgba(255, 255, 255, 0.28);
+	--digital-meridiem-text: rgba(244, 247, 255, 0.94);
+
+	--hours-on: #ff516b;
+	--minutes-on: #4c6bff;
+	--seconds-on: #4dff6f;
+	--hours-glow: rgba(255, 81, 107, 0.5);
+	--minutes-glow: rgba(76, 107, 255, 0.5);
+	--seconds-glow: rgba(77, 255, 111, 0.45);
+	--bit-off: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.35));
+	--bit-off-border: rgba(206, 214, 255, 0.28);
+	--bit-on-shadow-shape: 0 0 24px;
+	--pulse-speed: 2.8s;
+	--font-main: "Trebuchet MS", "Segoe UI", sans-serif;
+	--font-mono: "Consolas", "Courier New", monospace;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	min-height: 100vh;
+	min-height: 100dvh;
+	font-family: var(--font-main);
+	color: var(--text-main);
+	background: var(--surface-bg);
+	display: grid;
+	place-items: center;
+	padding: clamp(0.45rem, 1.3vw, 1.4rem);
+}
+
+.appShell {
+	width: min(100%, 120rem);
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: clamp(0.8rem, 1.8vw, 1.4rem);
+	justify-items: center;
+}

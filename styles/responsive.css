@@ -1,0 +1,157 @@
+@media (max-width: 56.25rem) {
+	.clock {
+		gap: clamp(0.32rem, 0.8vw, 0.6rem);
+	}
+
+	.settingsTrigger {
+		top: auto;
+		right: 50%;
+		transform: translateX(50%);
+		bottom: calc(env(safe-area-inset-bottom, 0px) + 0.8rem);
+	}
+
+	.settingsTrigger:hover {
+		transform: translateX(50%);
+	}
+}
+
+@media (max-width: 40rem) {
+	:root {
+		--bit-size: clamp(2.85rem, 16.5vmin, 4.55rem);
+		--bit-gap: clamp(0.18rem, 0.8vmin, 0.38rem);
+		--group-gap: clamp(0.22rem, 1.1vmin, 0.55rem);
+		--clock-gap: clamp(0.65rem, 2.2vmin, 1.2rem);
+	}
+
+	body {
+		padding: clamp(0.25rem, 1.4vw, 0.6rem);
+	}
+
+	.clock {
+		display: flex;
+		flex-wrap: nowrap;
+		justify-content: center;
+		align-items: center;
+		gap: var(--clock-gap);
+		width: 100%;
+		max-width: none;
+		margin-inline: auto;
+		overflow: hidden;
+		padding: clamp(0.45rem, 1.8vw, 0.85rem);
+		scroll-snap-type: none;
+	}
+
+	.timeGroup {
+		flex: 0 0 auto;
+		scroll-snap-align: none;
+	}
+
+	.timeGroup+.timeGroup {
+		padding-left: 0;
+		margin-left: 0;
+	}
+
+	.timeGroup+.timeGroup::before {
+		left: calc(var(--clock-gap) * -0.5);
+		top: 4%;
+		height: 92%;
+	}
+
+	#switch-container {
+		width: min(94vw, 21rem);
+	}
+
+	.switch,
+	.themeSelect,
+	#themeSelect {
+		width: min(100%, 16.6rem);
+	}
+
+	.themeSelect {
+		justify-content: space-between;
+	}
+}
+
+@media (min-width: 56.251rem) {
+	body {
+		padding-bottom: clamp(6.2rem, 9vh, 8.4rem);
+	}
+
+	.settingsTrigger {
+		display: none;
+	}
+
+	#settingsOverlay {
+		opacity: 1;
+		pointer-events: auto;
+		background: none;
+		place-items: end center;
+		padding: 0;
+		z-index: 22;
+	}
+
+	#switch-container {
+		position: fixed;
+		left: 50%;
+		bottom: clamp(0.8rem, 2vh, 1.35rem);
+		transform: translateX(-50%);
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: nowrap;
+		gap: clamp(0.55rem, 1.2vw, 1rem);
+		width: auto;
+		min-width: min(95vw, 58rem);
+		padding: clamp(0.6rem, 1vw, 0.9rem);
+	}
+
+	.settingsHeader,
+	.settingsClose {
+		display: none;
+	}
+
+	.switch,
+	.themeSelect {
+		width: clamp(7.1rem, 9vw, 9.6rem);
+	}
+
+	.themeSelect {
+		width: clamp(10.5rem, 14.5vw, 13.2rem);
+	}
+
+	#themeSelect {
+		width: 100%;
+		min-width: 0;
+	}
+}
+
+@media (min-width: 90rem) {
+	:root {
+		--bit-size: clamp(4rem, 4.7vw, 6.3rem);
+		--bit-gap: clamp(0.62rem, 0.95vw, 1rem);
+		--group-gap: clamp(1.1rem, 1.9vw, 2.2rem);
+		--clock-gap: clamp(4rem, 8vw, 8rem);
+		--control-height: clamp(2.5rem, 2.2vw, 2.9rem);
+		--control-width: clamp(7.8rem, 8.4vw, 9.2rem);
+		--bubble-travel: 1.95;
+	}
+
+	.appShell {
+		width: min(98vw, 136rem);
+	}
+
+	.clock {
+		padding: clamp(1.7rem, 2.8vw, 3rem);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	*,
+	*::before,
+	*::after {
+		animation: none !important;
+		transition-duration: 1ms !important;
+		scroll-behavior: auto !important;
+	}
+}

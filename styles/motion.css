@@ -1,0 +1,183 @@
+body.mode-transitioning .helpRows4,
+body.mode-transitioning .helpRows6 {
+	opacity: 0 !important;
+	transform: scale(0.72);
+}
+
+body.mode-transitioning.to-6bit [data-not6Bit] {
+	opacity: 0 !important;
+	visibility: hidden !important;
+	transform: scale(0) !important;
+	filter: none !important;
+	animation: none !important;
+	transition: none !important;
+	pointer-events: none !important;
+}
+
+body.mode-transitioning .clock {
+	pointer-events: none;
+	perspective: 1000px;
+	overflow: hidden;
+}
+
+body.mode-transitioning .timeGroup {
+	transition-duration: var(--motion-slow);
+	transform-style: preserve-3d;
+}
+
+body.mode-transitioning .bit {
+	will-change: transform, opacity, filter;
+	transition-duration: 980ms, 940ms, var(--motion-base), var(--motion-base), var(--motion-base), 980ms;
+}
+
+body.help-visible.mode-transitioning .bit::after {
+	animation: helpValueFade 980ms var(--ease-soft) both;
+	animation-delay: calc((var(--column-offset) * 0.35) + (var(--rand-delay-in) * 0.4));
+}
+
+body.mode-transitioning.to-6bit .clock[data-mode="6bit"] .bit {
+	transition-delay: calc(var(--column-offset) + var(--mode-delay-in) + var(--rand-delay-in)), calc(var(--column-offset) + var(--mode-delay-in) + var(--rand-delay-in)), 0ms, 0ms, 0ms, calc(var(--column-offset) + var(--mode-delay-in) + var(--rand-delay-in));
+}
+
+body.mode-transitioning.to-4bit .clock[data-mode="4bit"] .bit {
+	transition-delay: calc(var(--column-offset) + var(--mode-delay-out) + var(--rand-delay-out)), calc(var(--column-offset) + var(--mode-delay-out) + var(--rand-delay-out)), 0ms, 0ms, 0ms, calc(var(--column-offset) + var(--mode-delay-out) + var(--rand-delay-out));
+}
+
+body.mode-transitioning.to-6bit .clock[data-mode="6bit"] .timeGroup {
+	transform: translateY(-0.18rem);
+}
+
+body.mode-transitioning.to-4bit .clock[data-mode="4bit"] .timeGroup {
+	transform: translateY(0.1rem);
+}
+
+body.mode-transitioning.to-6bit .clock[data-mode="6bit"] .bit {
+	animation: bitFlyIn 1480ms var(--ease-bubble-in) both;
+	animation-delay: calc(var(--column-offset) + var(--mode-delay-in) + var(--rand-delay-in));
+}
+
+body.mode-transitioning.to-4bit .clock[data-mode="4bit"] .bit {
+	animation: bitFoldIn 1360ms var(--ease-bubble-out) both;
+	animation-delay: calc(var(--column-offset) + var(--mode-delay-out) + var(--rand-delay-out));
+}
+
+@keyframes digitalRollOutUp {
+	0% {
+		transform: translateY(-50%);
+		opacity: 1;
+	}
+
+	100% {
+		transform: translateY(-155%);
+		opacity: 0;
+	}
+}
+
+@keyframes digitalRollInUp {
+	0% {
+		transform: translateY(55%);
+		opacity: 0;
+	}
+
+	100% {
+		transform: translateY(-50%);
+		opacity: 1;
+	}
+}
+
+@keyframes bitFlyIn {
+	0% {
+		transform: translate3d(calc(var(--mode-shift-x) * var(--bubble-travel)), calc(var(--mode-shift-y) * var(--bubble-travel)), calc(-150px * var(--bubble-travel))) scale(0.62) rotateX(27deg) rotateY(-13deg);
+		filter: blur(0.14rem) saturate(1.4);
+		opacity: 0.1;
+	}
+
+	38% {
+		transform: translate3d(calc(var(--mode-shift-x) * var(--bubble-travel) * -0.26), calc(var(--mode-shift-y) * var(--bubble-travel) * -0.28), calc(48px * var(--bubble-travel))) scale(1.14) rotateX(-10deg) rotateY(5deg);
+		opacity: 1;
+	}
+
+	62% {
+		transform: translate3d(calc(var(--mode-shift-x) * var(--bubble-travel) * 0.16), calc(var(--mode-shift-y) * var(--bubble-travel) * 0.14), calc(-18px * var(--bubble-travel))) scale(0.92) rotateX(4deg) rotateY(-2deg);
+		filter: blur(0.03rem) saturate(1.1);
+	}
+
+	78% {
+		transform: translate3d(calc(var(--mode-shift-x) * var(--bubble-travel) * -0.08), calc(var(--mode-shift-y) * var(--bubble-travel) * -0.08), calc(12px * var(--bubble-travel))) scale(1.05) rotateX(-2deg) rotateY(1deg);
+	}
+
+	90% {
+		transform: translate3d(calc(var(--mode-shift-x) * var(--bubble-travel) * 0.04), calc(var(--mode-shift-y) * var(--bubble-travel) * 0.04), calc(-4px * var(--bubble-travel))) scale(0.985);
+	}
+
+	100% {
+		transform: translate3d(0, 0, 0) scale(1) rotateX(0) rotateY(0);
+		filter: blur(0) saturate(1);
+		opacity: 1;
+	}
+}
+
+@keyframes bitFoldIn {
+	0% {
+		transform: translate3d(calc(var(--mode-shift-x) * var(--bubble-travel) * -1), calc(var(--mode-shift-y) * var(--bubble-travel) * -1), calc(74px * var(--bubble-travel))) scale(1.12) rotateX(-12deg) rotateY(7deg);
+		opacity: 0.2;
+		filter: blur(0.1rem) saturate(1.25);
+	}
+
+	34% {
+		transform: translate3d(calc(var(--mode-shift-x) * var(--bubble-travel) * 0.22), calc(var(--mode-shift-y) * var(--bubble-travel) * 0.2), calc(-24px * var(--bubble-travel))) scale(0.9) rotateX(7deg) rotateY(-3deg);
+		opacity: 1;
+	}
+
+	58% {
+		transform: translate3d(calc(var(--mode-shift-x) * var(--bubble-travel) * -0.14), calc(var(--mode-shift-y) * var(--bubble-travel) * -0.14), calc(16px * var(--bubble-travel))) scale(1.06) rotateX(-3deg) rotateY(2deg);
+	}
+
+	76% {
+		transform: translate3d(calc(var(--mode-shift-x) * var(--bubble-travel) * 0.08), calc(var(--mode-shift-y) * var(--bubble-travel) * 0.08), calc(-8px * var(--bubble-travel))) scale(0.97) rotateX(2deg) rotateY(-1deg);
+	}
+
+	90% {
+		transform: translate3d(calc(var(--mode-shift-x) * var(--bubble-travel) * -0.04), calc(var(--mode-shift-y) * var(--bubble-travel) * -0.04), calc(4px * var(--bubble-travel))) scale(1.012);
+	}
+
+	100% {
+		transform: translate3d(0, 0, 0) scale(1) rotateX(0) rotateY(0);
+		filter: blur(0) saturate(1);
+		opacity: 1;
+	}
+}
+
+@keyframes helpValueFade {
+	0% {
+		opacity: 0.92;
+		transform: translate(-50%, -50%) scale(1);
+	}
+
+	35% {
+		opacity: 0;
+		transform: translate(-50%, -50%) scale(0.72);
+	}
+
+	70% {
+		opacity: 0.35;
+		transform: translate(-50%, -50%) scale(0.88);
+	}
+
+	100% {
+		opacity: 0.92;
+		transform: translate(-50%, -50%) scale(1);
+	}
+}
+
+@keyframes matrixPulse {
+
+	0%,
+	100% {
+		filter: brightness(1);
+	}
+
+	50% {
+		filter: brightness(1.2);
+	}
+}

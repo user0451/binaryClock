@@ -1,0 +1,384 @@
+.clock {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--clock-gap);
+	position: relative;
+	width: max-content;
+	max-width: 100%;
+	padding: clamp(1.45rem, 3.2vw, 3rem) clamp(1rem, 2.6vw, 2.3rem);
+	border-radius: 1.2rem;
+	background: var(--surface-card);
+	border: 1px solid var(--surface-edge);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 14px 40px rgba(0, 0, 0, 0.35);
+}
+
+.timeGroup {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--group-gap);
+	position: relative;
+	transition: transform var(--motion-slow) var(--ease-primary), opacity var(--motion-base) var(--ease-soft);
+}
+
+.timeGroup+.timeGroup {
+	padding-left: 0;
+	margin-left: 0;
+}
+
+.timeGroup+.timeGroup::before {
+	content: "";
+	position: absolute;
+	left: calc(var(--clock-gap) * -0.5);
+	top: 6%;
+	height: 88%;
+	width: 1px;
+	background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.24) 20%, rgba(255, 255, 255, 0.24) 80%, transparent);
+	box-shadow: 0 0 8px rgba(255, 255, 255, 0.12);
+}
+
+.digit {
+	display: flex;
+	flex-direction: column;
+	--effective-bit-gap: var(--bit-gap);
+	gap: var(--effective-bit-gap);
+	position: relative;
+	transition: transform var(--motion-slow) var(--ease-primary), opacity var(--motion-base) var(--ease-soft);
+}
+
+body.help-visible .clock[data-mode="4bit"] .digit {
+	--effective-bit-gap: calc(var(--bit-gap) + (var(--bit-size) * 0.16));
+}
+
+.bit {
+	width: var(--bit-size);
+	height: var(--bit-size);
+	--row-index: 3;
+	--mode-delay-in: 0ms;
+	--mode-delay-out: 0ms;
+	--rand-delay-in: 0ms;
+	--rand-delay-out: 0ms;
+	--column-offset: 0ms;
+	--mode-shift-x: 0px;
+	--mode-shift-y: 0px;
+	border-radius: 999px;
+	border: 1px solid var(--bit-off-border);
+	background: var(--bit-off);
+	box-shadow: inset 0 -0.35rem 0.6rem rgba(0, 0, 0, 0.25);
+	transform-origin: center;
+	transition: transform var(--motion-base) var(--ease-primary), opacity var(--motion-base) var(--ease-soft), background-color var(--motion-base) var(--ease-soft), box-shadow var(--motion-base) var(--ease-soft), border-color var(--motion-base) var(--ease-soft), filter var(--motion-base) var(--ease-soft);
+	position: relative;
+}
+
+.helpRows4,
+.helpRows6 {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 300ms var(--ease-soft), transform 320ms var(--ease-primary);
+	transform: scale(0.98);
+	z-index: 3;
+}
+
+.helpPlusRow {
+	position: absolute;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-family: var(--font-mono);
+	font-size: clamp(0.6rem, calc(var(--bit-size) * 0.3), 1.5rem);
+	line-height: 1;
+	color: var(--help-plus-color);
+	text-shadow: 0 0 8px var(--help-plus-glow);
+}
+
+.helpRows4 .helpPlusRow[data-pos="1"] {
+	top: calc((var(--bit-size) * 1) + (var(--effective-bit-gap) * 0.5));
+}
+
+.helpRows4 .helpPlusRow[data-pos="2"] {
+	top: calc((var(--bit-size) * 2) + (var(--effective-bit-gap) * 1.5));
+}
+
+.helpRows4 .helpPlusRow[data-pos="3"] {
+	top: calc((var(--bit-size) * 3) + (var(--effective-bit-gap) * 2.5));
+}
+
+.helpRows6 .helpPlusRow[data-pos="1"] {
+	top: calc((var(--bit-size) * 1) + (var(--effective-row-gap) * 0.5));
+}
+
+.helpRows6 .helpPlusRow[data-pos="2"] {
+	top: calc((var(--bit-size) * 2) + (var(--effective-row-gap) * 1.5));
+}
+
+.helpRows6 .helpPlusRow[data-pos="3"] {
+	top: calc((var(--bit-size) * 3) + (var(--effective-row-gap) * 2.5));
+}
+
+.helpRows6 .helpPlusRow[data-pos="4"] {
+	top: calc((var(--bit-size) * 4) + (var(--effective-row-gap) * 3.5));
+}
+
+.helpRows6 .helpPlusRow[data-pos="5"] {
+	top: calc((var(--bit-size) * 5) + (var(--effective-row-gap) * 4.5));
+}
+
+body.help-visible .clock[data-mode="4bit"] .helpRows4,
+body.help-visible .clock[data-mode="6bit"] .helpRows6 {
+	opacity: 0.58;
+	transform: scale(1);
+}
+
+.totalsPanel {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: clamp(0.32rem, 1vw, 0.72rem);
+	width: fit-content;
+	max-width: 100%;
+	opacity: 0;
+	pointer-events: none;
+	transform: translateY(-0.2rem) scale(0.98);
+	transition: opacity var(--motion-base) var(--ease-soft), transform var(--motion-base) var(--ease-primary);
+	background: var(--digital-panel-bg);
+	border: 1px solid var(--digital-panel-border);
+	border-radius: 0.95rem;
+	padding: clamp(0.4rem, 1vw, 0.7rem) clamp(0.6rem, 1.5vw, 1rem);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 26px rgba(0, 0, 0, 0.28);
+}
+
+body.digital-visible .totalsPanel {
+	opacity: 1;
+	pointer-events: auto;
+	transform: translateY(0) scale(1);
+}
+
+.totalsRow {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: clamp(0.45rem, 1.3vw, 0.95rem);
+	flex-wrap: wrap;
+}
+
+.totalCell {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 0.28rem 0.48rem;
+	border-radius: 999px;
+	background: var(--digital-pill-bg);
+	border: 1px solid var(--digital-pill-border);
+	font-family: var(--font-mono);
+	line-height: 1;
+}
+
+.totalLabel {
+	font-size: clamp(0.58rem, 1vw, 0.88rem);
+	letter-spacing: 0.08em;
+	color: var(--digital-label);
+}
+
+.totalValue {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.02em;
+	height: 1em;
+	overflow: hidden;
+	font-size: clamp(0.9rem, calc(var(--bit-size) * 0.26), 1.52rem);
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	color: var(--digital-value);
+	width: 2.35ch;
+	min-width: 2.35ch;
+	text-align: center;
+}
+
+.totalValue .digitSlot {
+	position: relative;
+	display: inline-block;
+	width: 1ch;
+	height: 1em;
+	overflow: hidden;
+}
+
+.totalValue .digitLayer {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 50%;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	transform: translateY(-50%);
+	will-change: transform, opacity;
+	pointer-events: none;
+}
+
+.totalValue .digitLayer.out {
+	animation: digitalRollOutUp 360ms var(--ease-primary) both;
+}
+
+.totalValue .digitLayer.in {
+	animation: digitalRollInUp 360ms var(--ease-primary) both;
+}
+
+.meridiemBadge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	white-space: nowrap;
+	font-family: var(--font-mono);
+	font-size: clamp(0.68rem, 1.1vw, 0.95rem);
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	line-height: 1;
+	color: var(--digital-meridiem-text);
+	max-width: 0;
+	padding: 0.34rem 0;
+	border-radius: 999px;
+	border: 0 solid var(--digital-meridiem-border);
+	background: var(--digital-meridiem-bg);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 8px 18px rgba(0, 0, 0, 0.24);
+	opacity: 0;
+	pointer-events: none;
+	transform: translateY(-0.18rem) scale(0.98);
+	transition: max-width 240ms var(--ease-primary), padding 240ms var(--ease-primary), border-width 240ms var(--ease-primary), opacity 240ms var(--ease-soft), transform 260ms var(--ease-primary);
+}
+
+.meridiemBadge.is-visible {
+	max-width: 6.5ch;
+	padding: 0.34rem 0.58rem;
+	border-width: 1px;
+	opacity: 0.96;
+	transform: translateY(0) scale(1);
+}
+
+.bit::after {
+	content: attr(data-help);
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%) scale(0.84);
+	padding: calc(var(--bit-size) * 0.05) calc(var(--bit-size) * 0.09);
+	border-radius: 999px;
+	font-family: var(--font-mono);
+	font-size: clamp(0.58rem, calc(var(--bit-size) * 0.26), 1.35rem);
+	line-height: 1;
+	letter-spacing: 0.04em;
+	color: rgba(247, 249, 255, 0.94);
+	background: rgba(0, 0, 0, 0.45);
+	border: 1px solid rgba(255, 255, 255, 0.22);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 320ms var(--ease-soft), transform 360ms var(--ease-primary), background-color 220ms var(--ease-soft);
+}
+
+body.help-visible .bit::after {
+	opacity: 0.92;
+	transform: translate(-50%, -50%) scale(1);
+}
+
+body.help-visible .bit[data-active-help="false"]::after {
+	opacity: 0.55;
+}
+
+body.help-visible .bit.on::after {
+	background: rgba(0, 0, 0, 0.55);
+}
+
+.hour1,
+.minute1,
+.second1 {
+	--row-index: 1;
+	--mode-delay-in: 0ms;
+	--mode-delay-out: 210ms;
+	--mode-shift-x: -14px;
+	--mode-shift-y: -30px;
+}
+
+.hour2,
+.minute2,
+.second2 {
+	--row-index: 2;
+	--mode-delay-in: 150ms;
+	--mode-delay-out: 40ms;
+	--mode-shift-x: 12px;
+	--mode-shift-y: -20px;
+}
+
+.hour3,
+.minute3,
+.second3 {
+	--row-index: 3;
+	--mode-delay-in: 55ms;
+	--mode-delay-out: 165ms;
+	--mode-shift-x: -9px;
+	--mode-shift-y: -9px;
+}
+
+.hour4,
+.minute4,
+.second4 {
+	--row-index: 4;
+	--mode-delay-in: 195ms;
+	--mode-delay-out: 85ms;
+	--mode-shift-x: 10px;
+	--mode-shift-y: 9px;
+}
+
+.hour5,
+.minute5,
+.second5 {
+	--row-index: 5;
+	--mode-delay-in: 95ms;
+	--mode-delay-out: 135ms;
+	--mode-shift-x: -8px;
+	--mode-shift-y: 20px;
+}
+
+.hour6,
+.minute6,
+.second6 {
+	--row-index: 6;
+	--mode-delay-in: 235ms;
+	--mode-delay-out: 0ms;
+	--mode-shift-x: 12px;
+	--mode-shift-y: 30px;
+}
+
+.hours .bit {
+	--column-offset: 0ms;
+}
+
+.minutes .bit {
+	--column-offset: 90ms;
+}
+
+.seconds .bit {
+	--column-offset: 45ms;
+}
+
+.hours .bit.on {
+	background: radial-gradient(circle at 30% 28%, #ffd4dc 3%, var(--hours-on) 68%);
+	border-color: #f8aab8;
+	box-shadow: var(--bit-on-shadow-shape) var(--hours-glow), inset 0 0 0.65rem rgba(255, 255, 255, 0.35);
+}
+
+.minutes .bit.on {
+	background: radial-gradient(circle at 30% 28%, #d6ddff 3%, var(--minutes-on) 68%);
+	border-color: #aab8ff;
+	box-shadow: var(--bit-on-shadow-shape) var(--minutes-glow), inset 0 0 0.65rem rgba(255, 255, 255, 0.3);
+}
+
+.seconds .bit.on {
+	background: radial-gradient(circle at 30% 28%, #d6ffe0 3%, var(--seconds-on) 68%);
+	border-color: #a8ffbc;
+	box-shadow: var(--bit-on-shadow-shape) var(--seconds-glow), inset 0 0 0.65rem rgba(255, 255, 255, 0.28);
+}
