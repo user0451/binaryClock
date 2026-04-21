@@ -3,6 +3,10 @@
 		gap: clamp(0.32rem, 0.8vw, 0.6rem);
 	}
 
+	.clock[data-mode="6bit"] .timeGroup {
+		width: var(--bit-size);
+	}
+
 	.settingsTrigger {
 		top: auto;
 		right: 50%;
@@ -17,14 +21,23 @@
 
 @media (max-width: 40rem) {
 	:root {
-		--bit-size: clamp(2.85rem, 16.5vmin, 4.55rem);
+		--bit-size: clamp(2.5rem, 14.2vmin, 4.15rem);
 		--bit-gap: clamp(0.18rem, 0.8vmin, 0.38rem);
 		--group-gap: clamp(0.22rem, 1.1vmin, 0.55rem);
 		--clock-gap: clamp(0.65rem, 2.2vmin, 1.2rem);
 	}
 
 	body {
-		padding: clamp(0.25rem, 1.4vw, 0.6rem);
+		padding: clamp(0.3rem, 2.2vw, 0.7rem);
+	}
+
+	.appShell {
+		width: min(100%, 34rem);
+		min-height: 100dvh;
+		padding: clamp(0.24rem, 1.4vw, 0.48rem);
+		gap: clamp(0.32rem, 1.1vh, 0.62rem);
+		align-content: center;
+		justify-items: center;
 	}
 
 	.clock {
@@ -33,12 +46,14 @@
 		justify-content: center;
 		align-items: center;
 		gap: var(--clock-gap);
-		width: 100%;
-		max-width: none;
+		width: min(100%, 31.5rem);
+		max-width: calc(100vw - clamp(0.8rem, 6vw, 2rem));
 		margin-inline: auto;
 		overflow: hidden;
-		padding: clamp(0.45rem, 1.8vw, 0.85rem);
+		padding: clamp(0.34rem, 1.2vw, 0.62rem);
+		min-height: clamp(17.6rem, 62dvh, 34rem);
 		scroll-snap-type: none;
+		border-radius: clamp(0.6rem, 2.4vw, 0.95rem);
 	}
 
 	.timeGroup {
@@ -57,8 +72,17 @@
 		height: 92%;
 	}
 
+	#settingsOverlay {
+		place-items: end center;
+		padding: clamp(0.45rem, 1.8vw, 0.8rem);
+	}
+
 	#switch-container {
-		width: min(94vw, 21rem);
+		width: min(98vw, 30rem);
+		max-height: min(88dvh, 44rem);
+		overflow: auto;
+		padding: clamp(0.7rem, 2.8vw, 1rem);
+		border-radius: clamp(0.75rem, 2.6vw, 1rem);
 	}
 
 	.switch,
@@ -69,6 +93,15 @@
 
 	.themeSelect {
 		justify-content: space-between;
+	}
+
+	body.settings-open {
+		overflow: hidden;
+	}
+
+	.totalsPanel {
+		justify-self: center;
+		margin-inline: auto;
 	}
 }
 

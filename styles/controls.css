@@ -85,6 +85,11 @@ body.settings-open #settingsOverlay {
 	box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
 }
 
+body.settings-open .settingsTrigger {
+	opacity: 0;
+	pointer-events: none;
+}
+
 .switch {
 	position: relative;
 	display: inline-flex;
