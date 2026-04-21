@@ -368,3 +368,119 @@ html[data-theme="christmas-glow"] {
 html[data-theme="christmas-glow"] .bit.on {
 	animation: christmasTwinkle 3.3s steps(16, end) infinite;
 }
+
+html[data-theme="galactic-disco-inferno"] {
+	--surface-bg: radial-gradient(circle at 18% 8%, #2a1154 0%, #15082e 46%, #04030a 100%);
+	--surface-card: rgba(35, 18, 74, 0.44);
+	--text-main: #f5e8ff;
+	--text-muted: #c8afe5;
+	--control-active: #95f7ff;
+	--focus-ring: #ffe68d;
+	--hours-on: #ff74d4;
+	--minutes-on: #5ec6ff;
+	--seconds-on: #a0ff77;
+	--hours-glow: rgba(255, 116, 212, 0.5);
+	--minutes-glow: rgba(94, 198, 255, 0.48);
+	--seconds-glow: rgba(160, 255, 119, 0.44);
+	--bit-off: linear-gradient(160deg, rgba(195, 139, 255, 0.16), rgba(11, 6, 27, 0.64));
+	--bit-off-border: rgba(170, 237, 255, 0.34);
+	--digital-panel-bg: linear-gradient(160deg, rgba(255, 119, 213, 0.2), rgba(95, 199, 255, 0.12));
+	--digital-panel-border: rgba(180, 239, 255, 0.36);
+	--digital-pill-bg: rgba(15, 10, 34, 0.74);
+	--digital-pill-border: rgba(180, 239, 255, 0.3);
+	--digital-label: rgba(229, 205, 255, 0.9);
+	--digital-value: rgba(250, 243, 255, 1);
+	--help-plus-color: rgba(222, 192, 255, 0.62);
+	--help-plus-glow: rgba(133, 223, 255, 0.24);
+}
+
+html[data-theme="galactic-disco-inferno"] .bit.on {
+	animation: galacticBurst 3.4s steps(18, end) infinite;
+}
+
+html[data-theme="enchanted-forest-glow"] {
+	--surface-bg: radial-gradient(circle at 20% 8%, #243b1f 0%, #152413 52%, #0a1209 100%);
+	--surface-card: rgba(27, 42, 22, 0.5);
+	--text-main: #e5f2de;
+	--text-muted: #b3cfaa;
+	--control-active: #ffe1a1;
+	--focus-ring: #c9f2a3;
+	--hours-on: #8fda74;
+	--minutes-on: #4eb588;
+	--seconds-on: #e4c76e;
+	--hours-glow: rgba(143, 218, 116, 0.44);
+	--minutes-glow: rgba(78, 181, 136, 0.42);
+	--seconds-glow: rgba(228, 199, 110, 0.42);
+	--bit-off: linear-gradient(160deg, rgba(138, 186, 116, 0.17), rgba(9, 18, 9, 0.62));
+	--bit-off-border: rgba(173, 214, 144, 0.3);
+	--digital-panel-bg: linear-gradient(160deg, rgba(121, 180, 101, 0.2), rgba(19, 35, 17, 0.44));
+	--digital-panel-border: rgba(175, 215, 147, 0.32);
+	--digital-pill-bg: rgba(14, 24, 13, 0.76);
+	--digital-pill-border: rgba(175, 215, 147, 0.28);
+	--digital-label: rgba(188, 220, 170, 0.9);
+	--digital-value: rgba(236, 247, 226, 1);
+	--help-plus-color: rgba(196, 226, 178, 0.58);
+	--help-plus-glow: rgba(120, 185, 98, 0.2);
+}
+
+html[data-theme="enchanted-forest-glow"] .bit.on {
+	animation: forestPulse 4s ease-in-out infinite;
+}
+
+html[data-theme="midnight-mirage"] {
+	--surface-bg: radial-gradient(circle at 24% 10%, #152044 0%, #0b1230 52%, #03060f 100%);
+	--surface-card: rgba(18, 30, 65, 0.5);
+	--text-main: #dce5ff;
+	--text-muted: #a8b6df;
+	--control-active: #d4dcff;
+	--focus-ring: #9ac4ff;
+	--hours-on: #8ea0ff;
+	--minutes-on: #73c8ff;
+	--seconds-on: #a6b7ff;
+	--hours-glow: rgba(142, 160, 255, 0.44);
+	--minutes-glow: rgba(115, 200, 255, 0.42);
+	--seconds-glow: rgba(166, 183, 255, 0.4);
+	--bit-off: linear-gradient(160deg, rgba(123, 146, 255, 0.18), rgba(4, 10, 27, 0.64));
+	--bit-off-border: rgba(154, 177, 255, 0.32);
+	--digital-panel-bg: linear-gradient(160deg, rgba(137, 157, 255, 0.22), rgba(6, 14, 38, 0.44));
+	--digital-panel-border: rgba(166, 186, 255, 0.34);
+	--digital-pill-bg: rgba(8, 16, 39, 0.78);
+	--digital-pill-border: rgba(165, 186, 255, 0.28);
+	--digital-label: rgba(182, 197, 255, 0.9);
+	--digital-value: rgba(236, 241, 255, 1);
+	--help-plus-color: rgba(184, 198, 255, 0.58);
+	--help-plus-glow: rgba(131, 157, 255, 0.2);
+}
+
+html[data-theme="midnight-mirage"] .bit.on {
+	animation: midnightBreath 4.6s ease-in-out infinite;
+}
+
+html[data-theme="retro-pixel-crunch"] {
+	--surface-bg: radial-gradient(circle at 18% 8%, #3e2b10 0%, #22231f 52%, #0d0f14 100%);
+	--surface-card: rgba(47, 38, 21, 0.46);
+	--text-main: #fff4ce;
+	--text-muted: #dec68b;
+	--control-active: #ffe47b;
+	--focus-ring: #ff8b5c;
+	--hours-on: #ff9f40;
+	--minutes-on: #54b3ff;
+	--seconds-on: #ffe04f;
+	--hours-glow: rgba(255, 159, 64, 0.46);
+	--minutes-glow: rgba(84, 179, 255, 0.44);
+	--seconds-glow: rgba(255, 224, 79, 0.42);
+	--bit-off: repeating-linear-gradient(45deg, rgba(255, 195, 111, 0.16), rgba(255, 195, 111, 0.16) 3px, rgba(13, 16, 22, 0.68) 3px, rgba(13, 16, 22, 0.68) 6px);
+	--bit-off-border: rgba(255, 212, 123, 0.3);
+	--digital-panel-bg: linear-gradient(160deg, rgba(255, 187, 92, 0.22), rgba(15, 18, 29, 0.42));
+	--digital-panel-border: rgba(255, 213, 126, 0.34);
+	--digital-pill-bg: rgba(18, 22, 33, 0.78);
+	--digital-pill-border: rgba(255, 213, 126, 0.28);
+	--digital-label: rgba(244, 221, 158, 0.9);
+	--digital-value: rgba(255, 244, 211, 1);
+	--help-plus-color: rgba(245, 220, 160, 0.58);
+	--help-plus-glow: rgba(255, 165, 103, 0.22);
+}
+
+html[data-theme="retro-pixel-crunch"] .bit.on {
+	animation: retroStep 2.8s steps(12, end) infinite;
+}

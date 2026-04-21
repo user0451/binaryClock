@@ -59,6 +59,8 @@ body.help-visible .clock[data-mode="4bit"] .digit {
 	--mode-delay-out: 0ms;
 	--rand-delay-in: 0ms;
 	--rand-delay-out: 0ms;
+	--rand-ease-in: var(--ease-bubble-in);
+	--rand-ease-out: var(--ease-bubble-out);
 	--column-offset: 0ms;
 	--mode-shift-x: 0px;
 	--mode-shift-y: 0px;
@@ -123,6 +125,48 @@ body.help-visible .clock[data-mode="4bit"] .digit {
 
 .helpRows6 .helpPlusRow[data-pos="5"] {
 	top: calc((var(--bit-size) * 5) + (var(--effective-row-gap) * 4.5));
+}
+
+body.bits-horizontal .clock[data-mode="6bit"] .helpRows6 .helpPlusRow {
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+
+body.bits-horizontal .clock[data-mode="6bit"] .helpRows6 .helpPlusRow[data-pos="1"] {
+	left: calc((var(--bit-size) * 1) + (var(--effective-row-gap) * 0.5));
+}
+
+body.bits-horizontal .clock[data-mode="6bit"] .helpRows6 .helpPlusRow[data-pos="2"] {
+	left: calc((var(--bit-size) * 2) + (var(--effective-row-gap) * 1.5));
+}
+
+body.bits-horizontal .clock[data-mode="6bit"] .helpRows6 .helpPlusRow[data-pos="3"] {
+	left: calc((var(--bit-size) * 3) + (var(--effective-row-gap) * 2.5));
+}
+
+body.bits-horizontal .clock[data-mode="6bit"] .helpRows6 .helpPlusRow[data-pos="4"] {
+	left: calc((var(--bit-size) * 4) + (var(--effective-row-gap) * 3.5));
+}
+
+body.bits-horizontal .clock[data-mode="6bit"] .helpRows6 .helpPlusRow[data-pos="5"] {
+	left: calc((var(--bit-size) * 5) + (var(--effective-row-gap) * 4.5));
+}
+
+body.bits-horizontal .clock[data-mode="4bit"] .helpRows4 .helpPlusRow {
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+
+body.bits-horizontal .clock[data-mode="4bit"] .helpRows4 .helpPlusRow[data-pos="1"] {
+	left: calc((var(--bit-size) * 1) + (var(--effective-bit-gap) * 0.5));
+}
+
+body.bits-horizontal .clock[data-mode="4bit"] .helpRows4 .helpPlusRow[data-pos="2"] {
+	left: calc((var(--bit-size) * 2) + (var(--effective-bit-gap) * 1.5));
+}
+
+body.bits-horizontal .clock[data-mode="4bit"] .helpRows4 .helpPlusRow[data-pos="3"] {
+	left: calc((var(--bit-size) * 3) + (var(--effective-bit-gap) * 2.5));
 }
 
 body.help-visible .clock[data-mode="4bit"] .helpRows4,
@@ -201,7 +245,9 @@ body.digital-visible .totalsPanel {
 
 .totalValue .digitSlot {
 	position: relative;
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	width: 1ch;
 	height: 1em;
 	overflow: hidden;

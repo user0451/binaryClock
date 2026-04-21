@@ -16,12 +16,19 @@ export function setDigitalLabel() {
 	}
 }
 
+export function setOrientationLabel() {
+	if (controls.orientationLabel) {
+		controls.orientationLabel.innerText = state.bitOrientation === "horizontal" ? "Horizontal" : "Vertical";
+	}
+}
+
 export function persistState() {
 	localStorage.setItem(STORAGE_KEYS.mode, state.mode);
 	localStorage.setItem(STORAGE_KEYS.format, state.show24HourFormat ? "24" : "12");
 	localStorage.setItem(STORAGE_KEYS.help, state.helpVisible ? "on" : "off");
 	localStorage.setItem(STORAGE_KEYS.digital, state.digitalVisible ? "on" : "off");
-	localStorage.setItem(STORAGE_KEYS.theme, state.theme);
+	localStorage.setItem(STORAGE_KEYS.theme, state.randomMode ? "random-shuffle" : state.theme);
+	localStorage.setItem(STORAGE_KEYS.bitOrientation, state.bitOrientation);
 }
 
 export function applyHelpState() {
@@ -35,8 +42,24 @@ export function applyDigitalState() {
 	}
 }
 
+export function applyBitOrientationState() {
+	document.body.classList.toggle("bits-horizontal", state.bitOrientation === "horizontal");
+	setOrientationLabel();
+}
+
 export function applyTheme() {
 	document.documentElement.setAttribute("data-theme", state.theme);
+	document.body.classList.toggle("random-shuffle-active", state.randomMode);
+	if (controls.shuffleButton) {
+		controls.shuffleButton.setAttribute("aria-pressed", state.randomMode ? "true" : "false");
+		controls.shuffleButton.innerText = "Theme";
+		controls.shuffleButton.title = state.randomMode
+			? "Shuffle on. Themes rotate automatically every 10 minutes. Click to stop."
+			: "Shuffle off. Click to rotate themes automatically every 10 minutes.";
+		controls.shuffleButton.setAttribute("aria-label", state.randomMode
+			? "Shuffle is on. Click to stop automatic 10 minute theme rotation."
+			: "Shuffle is off. Click to start automatic 10 minute theme rotation.");
+	}
 	if (controls.themeSelect.value !== state.theme) {
 		controls.themeSelect.value = state.theme;
 	}
@@ -68,19 +91,29 @@ export function restoreState() {
 	state.digitalVisible = digital === "on";
 
 	const theme = localStorage.getItem(STORAGE_KEYS.theme);
-	if (theme) {
+	if (theme === "random-shuffle") {
+		state.randomMode = true;
+	} else if (theme) {
 		state.theme = theme;
+	}
+
+	const bitOrientation = localStorage.getItem(STORAGE_KEYS.bitOrientation);
+	if (bitOrientation === "horizontal" || bitOrientation === "vertical") {
+		state.bitOrientation = bitOrientation;
 	}
 
 	controls.modeToggle.checked = state.mode === "4-bit";
 	controls.timeFormatToggle.checked = !state.show24HourFormat;
 	controls.helpToggle.checked = state.helpVisible;
 	controls.digitalToggle.checked = state.digitalVisible;
+	controls.orientationToggle.checked = state.bitOrientation === "horizontal";
 	setModeLabel();
 	setTimeFormatLabel();
 	setDigitalLabel();
+	setOrientationLabel();
 	applyHelpState();
 	applyDigitalState();
+	applyBitOrientationState();
 	applyTheme();
 	clockElement.setAttribute("data-mode", state.mode === "4-bit" ? "4bit" : "6bit");
 }

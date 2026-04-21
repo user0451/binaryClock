@@ -1,15 +1,21 @@
 export const state = {
 	mode: "6-bit",
+	bitOrientation: "vertical",
 	show24HourFormat: true,
 	helpVisible: false,
 	digitalVisible: false,
 	theme: "classic-rgb-neon",
+	randomMode: false,
+	randomThemeIntervalId: null,
 	modeTransitioning: false,
 	transitionTargetMode: null,
 	transitionTimeoutId: null,
 	transitionArmId: null,
 	transitionActivateId: null,
 	themeMotionTimeoutId: null,
+	orientationTransitionTimeoutId: null,
+	orientationTransitionArmId: null,
+	orientationTransitionActivateId: null,
 	pendingTick: null,
 	intervalId: null
 };

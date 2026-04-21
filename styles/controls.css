@@ -6,7 +6,7 @@
 	align-items: center;
 	justify-content: center;
 	padding: clamp(0.8rem, 1.6vw, 1.2rem);
-	min-width: min(92vw, 26rem);
+	min-width: min(92vw, 30rem);
 	background: linear-gradient(165deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
 	border: 1px solid rgba(255, 255, 255, 0.2);
 	border-radius: 0.95rem;
@@ -161,6 +161,11 @@ body.settings-open .settingsTrigger {
 	border-radius: 0.65rem;
 	border: 1px solid rgba(255, 255, 255, 0.24);
 	background: linear-gradient(160deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.03));
+	transform-origin: center;
+}
+
+body.random-shuffle-active .themeSelect {
+	animation: shuffleContainerRotate 5.4s ease-in-out infinite;
 }
 
 #themeSelect {
@@ -172,6 +177,7 @@ body.settings-open .settingsTrigger {
 	border-radius: 0.45rem;
 	padding: 0.45rem 0.5rem;
 	min-height: 44px;
+	min-width: 14rem;
 }
 
 #themeSelect:focus,
@@ -179,4 +185,46 @@ body.settings-open .settingsTrigger {
 #themeSelect:focus-visible {
 	outline: 2px solid var(--focus-ring);
 	outline-offset: 2px;
+}
+
+.shuffle-btn {
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	color: var(--text-main);
+	pointer-events: auto;
+	white-space: nowrap;
+	transition: color var(--motion-base) var(--ease-soft), text-shadow var(--motion-base) var(--ease-soft);
+}
+
+.shuffle-btn:hover {
+	color: rgba(255, 255, 255, 0.9);
+}
+
+body.random-shuffle-active .shuffle-btn {
+	color: var(--seconds-on);
+	text-shadow: 0 0 0.55rem var(--seconds-glow);
+}
+
+@keyframes shuffleContainerRotate {
+
+	0%,
+	100% {
+		transform: rotate(0deg);
+	}
+
+	25% {
+		transform: rotate(0.65deg);
+	}
+
+	75% {
+		transform: rotate(-0.65deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.random-shuffle-active .themeSelect {
+		animation: none;
+	}
 }

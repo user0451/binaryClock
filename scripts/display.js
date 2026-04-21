@@ -1,6 +1,8 @@
-import { FOUR_BIT_WEIGHTS, HELP_WEIGHTS } from "./config.js";
+import { FOUR_BIT_WEIGHTS, HELP_WEIGHTS, TRANSITION_EASINGS } from "./config.js";
 import { allBitNodes, meridiemBadge, sixBitNodes, totalsNodes } from "./dom.js";
 import { state } from "./state.js";
+
+const rollingTimers = new WeakMap();
 
 function randomDelayMs(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -11,8 +13,12 @@ export function applyModeJitterDelays() {
 		const wave = (index % 3) * 18;
 		const inDelay = randomDelayMs(0, 170) + wave;
 		const outDelay = randomDelayMs(0, 180) + ((2 - (index % 3)) * 14);
+		const easeIn = TRANSITION_EASINGS[Math.floor(Math.random() * TRANSITION_EASINGS.length)];
+		const easeOut = TRANSITION_EASINGS[Math.floor(Math.random() * TRANSITION_EASINGS.length)];
 		node.style.setProperty("--rand-delay-in", `${inDelay}ms`);
 		node.style.setProperty("--rand-delay-out", `${outDelay}ms`);
+		node.style.setProperty("--rand-ease-in", easeIn);
+		node.style.setProperty("--rand-ease-out", easeOut);
 	});
 }
 
@@ -95,17 +101,21 @@ function setRollingDigit(slot, nextDigit) {
 		return;
 	}
 
-	if (slot._rollTimeoutId) {
-		window.clearTimeout(slot._rollTimeoutId);
-		slot._rollTimeoutId = null;
+	const pendingTimer = rollingTimers.get(slot);
+	if (pendingTimer) {
+		window.clearTimeout(pendingTimer);
+		rollingTimers.delete(slot);
 	}
+
+	slot.querySelectorAll(".digitLayer").forEach((layer) => layer.remove());
 
 	slot.dataset.digit = nextDigit;
 	slot.innerHTML = `<span class="digitLayer out">${current}</span><span class="digitLayer in">${nextDigit}</span>`;
-	slot._rollTimeoutId = window.setTimeout(() => {
+	const timerId = window.setTimeout(() => {
 		slot.textContent = nextDigit;
-		slot._rollTimeoutId = null;
+		rollingTimers.delete(slot);
 	}, 380);
+	rollingTimers.set(slot, timerId);
 }
 
 function setRollingText(node, nextValue) {

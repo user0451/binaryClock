@@ -4,11 +4,13 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="An animated, CSS-forward binary clock with learning overlays, a rolling digital readout, theme switching, and responsive controls.">
-	<meta name="keywords" content="binary clock, CSS animation, JavaScript clock, responsive design, web accessibility, clock themes, digital clock, learning tool">
+	<meta name="description"
+		content="An animated, CSS-forward binary clock with learning overlays, a rolling digital readout, theme switching, and responsive controls.">
+	<meta name="keywords"
+		content="binary clock, CSS animation, JavaScript clock, responsive design, web accessibility, clock themes, digital clock, learning tool">
 	<meta name="author" content="hue kares @ Spinning Rock">
 	<link rel="canonical" href="https://spinningrock.net/binary/">
-	<meta name="robots" content="index, follow">	
+	<meta name="robots" content="index, follow">
 	<title>Binary Clock</title>
 	<script>
 		(function () {
@@ -166,13 +168,20 @@
 					<span class="slider round" aria-hidden="true"></span>
 					<span class="label-text" id="digitalLabel">Digital</span>
 				</label>
+				<label class="switch" for="orientationToggle">
+					<input type="checkbox" id="orientationToggle">
+					<span class="slider round" aria-hidden="true"></span>
+					<span class="label-text" id="orientationLabel">Vertical</span>
+				</label>
 				<label class="switch" for="helpToggle">
 					<input type="checkbox" id="helpToggle">
 					<span class="slider round" aria-hidden="true"></span>
 					<span class="label-text" id="helpLabel">Help</span>
 				</label>
-				<label class="themeSelect" for="themeSelect">
-					<span class="label-text">Theme</span>
+				<div class="themeSelect">
+					<button type="button" id="shuffleButton" class="shuffle-btn label-text"
+						title="Shuffle off. Click to rotate themes automatically every 10 minutes."
+						aria-pressed="false">Theme</button>
 					<select id="themeSelect" aria-label="Clock visual theme">
 						<option value="classic-rgb-neon">Classic RGB Neon</option>
 						<option value="amber-terminal">Amber Terminal</option>
@@ -186,8 +195,12 @@
 						<option value="gloomy-mist">Gloomy Mist</option>
 						<option value="sunny-pop">Sunny Pop</option>
 						<option value="christmas-glow">Christmas Glow</option>
+						<option value="galactic-disco-inferno">Galactic Disco Inferno</option>
+						<option value="enchanted-forest-glow">Enchanted Forest Glow</option>
+						<option value="midnight-mirage">Midnight Mirage</option>
+						<option value="retro-pixel-crunch">Retro Pixel Crunch</option>
 					</select>
-				</label>
+				</div>
 			</section>
 		</div>
 	</main>

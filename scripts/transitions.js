@@ -1,8 +1,8 @@
-import { MODE_TRANSITION_WINDOW_MS, THEME_MOTION_WINDOW_MS } from "./config.js";
-import { clockElement } from "./dom.js";
+import { MODE_TRANSITION_WINDOW_MS, ORIENTATION_TRANSITION_WINDOW_MS, THEME_MOTION_WINDOW_MS } from "./config.js";
+import { clockElement, controls } from "./dom.js";
 import { applyModeJitterDelays, getCurrentTimeValues, runTick, updateTimeDisplay, updateTimeDisplayForMode } from "./display.js";
 import { state } from "./state.js";
-import { persistState, setModeLabel } from "./ui.js";
+import { persistState, setModeLabel, setOrientationLabel } from "./ui.js";
 
 function clearTransitionClasses() {
 	document.body.classList.remove("mode-transitioning", "to-4bit", "to-6bit");
@@ -64,7 +64,6 @@ function finishModeTransition(targetMode) {
 	state.modeTransitioning = false;
 	state.transitionTargetMode = null;
 	clearTransitionClasses();
-	setModeLabel();
 	persistState();
 
 	const latest = state.pendingTick || getCurrentTimeValues();
@@ -100,6 +99,41 @@ function abortModeTransition() {
 	runTick();
 }
 
+export function transitionToOrientation(targetOrientation) {
+	if (state.orientationTransitionTimeoutId) {
+		window.clearTimeout(state.orientationTransitionTimeoutId);
+		state.orientationTransitionTimeoutId = null;
+		document.body.classList.remove("orientation-transitioning", "to-horizontal", "to-vertical");
+	}
+	if (state.orientationTransitionArmId) {
+		window.cancelAnimationFrame(state.orientationTransitionArmId);
+		state.orientationTransitionArmId = null;
+	}
+	if (state.orientationTransitionActivateId) {
+		window.cancelAnimationFrame(state.orientationTransitionActivateId);
+		state.orientationTransitionActivateId = null;
+	}
+
+	applyModeJitterDelays();
+
+	const dirClass = targetOrientation === "horizontal" ? "to-horizontal" : "to-vertical";
+	void clockElement.offsetWidth;
+	document.body.classList.add("orientation-transitioning", dirClass);
+
+	state.orientationTransitionArmId = window.requestAnimationFrame(() => {
+		state.orientationTransitionActivateId = window.requestAnimationFrame(() => {
+			document.body.classList.toggle("bits-horizontal", targetOrientation === "horizontal");
+			state.orientationTransitionArmId = null;
+			state.orientationTransitionActivateId = null;
+		});
+	});
+
+	state.orientationTransitionTimeoutId = window.setTimeout(() => {
+		state.orientationTransitionTimeoutId = null;
+		document.body.classList.remove("orientation-transitioning", "to-horizontal", "to-vertical");
+	}, ORIENTATION_TRANSITION_WINDOW_MS);
+}
+
 export function transitionToMode(targetMode) {
 	if (state.modeTransitioning) {
 		abortModeTransition();
@@ -114,6 +148,7 @@ export function transitionToMode(targetMode) {
 	applyModeJitterDelays();
 	state.modeTransitioning = true;
 	state.transitionTargetMode = targetMode;
+	controls.modeLabel.textContent = targetMode;
 	document.body.classList.add("mode-transitioning", targetMode === "4-bit" ? "to-4bit" : "to-6bit");
 
 	const instantValues = getCurrentTimeValues();
