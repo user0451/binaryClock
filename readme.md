@@ -7,54 +7,67 @@ https://spinningrock.net/binary/
 
 ## Current State
 - Two display modes: 6-bit and 4-bit.
+- Two bit orientations: vertical (default) and horizontal.
 - Two time formats: 24-hour and 12-hour.
 - Optional learning overlays and optional digital panel.
-- Theme picker with 12 built-in themes.
-- Responsive behavior for desktop and mobile.
+- Theme picker with 16 built-in themes, plus a shuffle mode that rotates automatically every 10 minutes.
+- Page-load assembly animation and per-bit randomised easing on mode/theme transitions.
+- Responsive behaviour for desktop and mobile.
 - State persistence in localStorage.
 
 ## Modes
-- **6-bit mode**: Each time unit (hours, minutes, seconds) is represented by 6 bits, allowing for a direct binary representation of values up to 63. This mode emphasizes the binary nature of the clock and is ideal for users familiar with binary counting.
-- **4-bit mode**: Each time unit is split into two columns representing the tens and units place. This mode is more pedagogical, designed to teach binary concepts by breaking down each time unit into its decimal place values. For example, the hours are represented with a tens column (0, 10) and a units column (0-9), with the tens place only using 2 bits since the maximum hour value is 23.
+- **6-bit mode**: Each time unit (hours, minutes, seconds) is represented by 6 bits, allowing for a direct binary representation of values up to 63. This mode emphasises the binary nature of the clock and is ideal for users familiar with binary counting.
+- **4-bit mode**: Each time unit is split into two columns representing the tens and units place. This mode is more pedagogical, designed to teach binary concepts by breaking down each time unit into its decimal place values. For example, the hours are represented with a tens column (0–2) and a units column (0–9), with the tens place only using 2 bits since the maximum hour value is 23.
 
 ### Where to Start
 - Hardcore: 6-bit mode only.
-- Average: 6-bit mode with digital clock on.
-- Beginner: 4-bit mode with digital clock and help values on.
-12/24-hour format is a personal preference.
+- Average: 6-bit mode with the digital panel on.
+- Beginner: 4-bit mode with digital and help values on.
+- 12/24-hour format is a personal preference.
 
 ## Run
 No build step is required.
 
 1. Open [index.html](index.html) in a browser.
-2. The app bootstraps through [code.js](code.js), which initializes [scripts/main.js](scripts/main.js).
+2. The app bootstraps through [code.js](code.js), which initialises [scripts/main.js](scripts/main.js).
 
 ## Controls
-- `6-bit / 4-bit`: switches binary representation mode with staged transition choreography.
-- `24 / 12`: switches time format.
-- `Help`: toggles inline binary help values.
-- `Digital`: toggles the digital companion panel.
-- `Theme`: applies visual style presets.
+- **6-bit / 4-bit**: switches binary representation mode with animated transition choreography. The label updates instantly on click.
+- **24 / 12**: switches time format.
+- **Digital**: toggles the rolling digital companion panel.
+- **Vertical / Horizontal**: switches bit orientation. Bits animate between layouts using the same jitter-delay infrastructure as mode transitions.
+- **Help**: toggles inline binary weight annotations and the totals panel.
+- **Theme (button)**: click to toggle automatic shuffle mode — the container sways gently while shuffle is active. Tooltip and `aria-pressed` state reflect the current mode.
+- **Theme (dropdown)**: selects a specific theme. Picking any theme manually stops the shuffle.
 
-## Display Behavior
+## Display Behaviour
 
 ### 6-bit Mode
-- Hours, minutes, and seconds are each shown as six binary rows; most significant bit at the top.
+- Hours, minutes, and seconds are each shown as six binary rows; most significant bit at the top (or left in horizontal orientation).
 - Help values map to row weights: 32, 16, 8, 4, 2, 1.
 
 ### 4-bit Mode
-- Each unit is split into tens and units columns.
-- Tens and units both show weighted help contributions in help mode.
-- Hours tens place only uses 2 bits (0, 10) since the max is 23.
+- Each time unit is split into tens and units digits, each up to 4 bits.
+- Tens and units show weighted help contributions in help mode.
+- Hours tens only uses 2 active bits (max value 2).
+- In horizontal orientation, tens stacks above units; bits within each digit run left to right.
+
+### Orientation
+- **Vertical** (default): bits stack top to bottom within each time unit; time groups are arranged in a row.
+- **Horizontal**: bits run left to right; time groups are stacked vertically with a divider line between them.
+- Switching orientation triggers the full jitter-delay bit animation with randomised easing, mirroring the mode-switch choreography.
 
 ### Digital Panel
-- Rolling two-slot H/M/S values with per-slot animation.
+- Rolling two-slot H:M:S values with per-slot digit animation.
 - In 24-hour mode, hours are zero-padded.
 - In 12-hour mode, hours do not show a leading zero.
 - AM/PM badge is visible only in 12-hour mode.
 
+### Page Load
+- On first render, all clock bits play a staggered assembly animation (`bitAssemble`) before the clock starts ticking, giving the initial experience a satisfying "power on" feel.
+
 ## Themes
-Current built-in themes:
+16 built-in themes, plus shuffle mode:
 
 1. Classic RGB Neon
 2. Amber Terminal
@@ -68,78 +81,78 @@ Current built-in themes:
 10. Gloomy Mist
 11. Sunny Pop
 12. Christmas Glow
+13. Galactic Disco Inferno
+14. Enchanted Forest Glow
+15. Midnight Mirage
+16. Retro Pixel Crunch
 
-I ran out of silly names! Most themes include custom `bit.on` motion tuned to a subtle profile.
+Most themes include a custom `bit.on` animation tuned to a subtle theme-appropriate motion profile. **Shuffle mode** rotates through all 16 themes every 10 minutes; the theme selector container gently sways while active. Picking any theme manually disables shuffle.
+
+## Animations
+- **Mode transitions**: bits fly out and back in with per-bit randomised `--rand-delay-in/out` and `--rand-ease-in/out` CSS custom properties, drawn from a pool of easing curves. The direction of animation adapts to whether the target mode is 6-bit or 4-bit, and to the current bit orientation.
+- **Orientation transitions**: same jitter infrastructure fires when switching vertical ↔ horizontal. `bitFlyInHorizontal` is used when entering horizontal; `bitFlyIn` returns to vertical.
+- **Theme motion bursts**: triggered on theme change; uses the same bit animation window without changing the mode.
+- **Page assembly**: `bitAssemble` plays on all bits during the `page-assembling` body-class window (1800 ms) at startup.
+- All bit animations respect `column-offset` and `--rand-delay-*` for a staggered, non-uniform feel.
+- `prefers-reduced-motion` suppresses the shuffle-container sway animation.
 
 ## Responsive Behaviour
-- Desktop: settings are shown as a bottom control bar.
-- Small screens: a settings trigger opens a panel overlay.
+- Desktop: settings trigger opens a centred overlay panel.
+- Small screens: same approach; the clock panel is bounded with left/right margins.
 - While settings are open, background scrolling is locked.
-- The clock panel is centered and bounded on small screens with left/right margins.
 
 ## Persistence
 Saved keys in localStorage:
 
-- `binaryClockMode`
-- `binaryClockFormat`
-- `binaryClockHelp`
-- `binaryClockDigital`
-- `binaryClockTheme`
+| Key | Values |
+|---|---|
+| `binaryClockMode` | `6-bit` / `4-bit` |
+| `binaryClockFormat` | `24` / `12` |
+| `binaryClockHelp` | `on` / `off` |
+| `binaryClockDigital` | `on` / `off` |
+| `binaryClockTheme` | theme value or `random-shuffle` |
+| `binaryClockBitOrientation` | `vertical` / `horizontal` |
 
 ## Project Structure
 - [index.html](index.html): markup and controls.
 - [style.css](style.css): stylesheet imports.
-- [styles/base.css](styles/base.css): tokens and foundational layout.
-- [styles/clock.css](styles/clock.css): clock and digital panel styling.
-- [styles/modes.css](styles/modes.css): 4-bit/6-bit structural mode rules.
+- [styles/base.css](styles/base.css): CSS custom property tokens and foundational layout.
+- [styles/clock.css](styles/clock.css): clock bit and digital panel styling.
+- [styles/modes.css](styles/modes.css): 4-bit/6-bit layout rules and horizontal orientation rules.
 - [styles/motion.css](styles/motion.css): transition and keyframe choreography.
-- [styles/themes.css](styles/themes.css): theme variables and theme-specific motion.
-- [styles/controls.css](styles/controls.css): settings UI.
+- [styles/themes.css](styles/themes.css): per-theme CSS variable definitions and theme-specific bit animations.
+- [styles/controls.css](styles/controls.css): settings UI, toggle switches, shuffle button.
 - [styles/responsive.css](styles/responsive.css): breakpoints and reduced-motion handling.
-- [scripts/main.js](scripts/main.js): event wiring and app lifecycle.
-- [scripts/display.js](scripts/display.js): time logic, bit painting, help, and digital rolling text.
-- [scripts/transitions.js](scripts/transitions.js): mode/theme transition state machine.
-- [scripts/ui.js](scripts/ui.js): UI state application and persistence hooks.
-- [scripts/config.js](scripts/config.js): constants and storage keys.
+- [scripts/main.js](scripts/main.js): event wiring, app lifecycle, shuffle interval management.
+- [scripts/display.js](scripts/display.js): time logic, bit painting, help annotations, digital rolling text, jitter delay assignment.
+- [scripts/transitions.js](scripts/transitions.js): mode transition and orientation transition state machines, theme motion burst.
+- [scripts/ui.js](scripts/ui.js): UI state application, label updates, persistence hooks, restore-on-load.
+- [scripts/state.js](scripts/state.js): global singleton state object.
+- [scripts/dom.js](scripts/dom.js): cached DOM element references.
+- [scripts/config.js](scripts/config.js): constants, timing windows, storage keys, easing pool, shuffleable theme list.
 
 ## Future
-- Add more themes!
+- expose the shuffle time interval in the UI for user control.
 - Add an optional seconds progress ring around the clock face.
 - Add a mode with only hours and minutes for a more minimalist look.
 - Add a mode with a binary progress bar for each time unit instead of discrete bits.
 - Add a "learn" mode with interactive quizzes to test binary understanding.
-- Reverse ordered bit modes
-- Horizontal bit layout modes
-- My responsive breakpoint game is weak, maybe add some intermediate breakpoints for tablets and landscape phones. The entire current responsive implementation is quite poor; I went down the wrong avenue...
-- The transition animations could do with another pass, to make them less predictable and more dynamic. Maybe add some randomization to the timing and easing profiles for each bit during mode/theme switches.
-- Add animations on page load to make the clock bits "assemble" into place when the app first loads, for a more engaging initial experience.
+- Reverse bit order mode (LSB at top).
+- My responsive breakpoint game is weak — add intermediate breakpoints for tablets and landscape phones. The entire current responsive implementation is quite poor; I went down the wrong avenue.
 - Add a "colorblind mode" with high-contrast patterns instead of colors for better accessibility.
-- Maybe add a "darken inactive bits" toggle for better focus on the current time.
-- Add some fun easter egg themes that can be unlocked by clicking the title a certain number of times or something stupid that noone will ever see.
+- Add a "darken inactive bits" toggle for better focus on the active bits.
+- Add some fun easter egg themes unlocked by clicking the title a certain number of times, for nobody to ever discover.
 - Add a "custom theme" mode where users can pick their own colors and animation profiles.
-- Add a "party mode" with rapidly changing colors and fast animations for fun.
-- Add a "stealth mode" with very subtle animations and a muted color palette for low-visibility environments.
-- Add a "retro mode" with pixelated fonts and chunky bits for a vintage computer vibe.
-- Add a "nature mode" with earthy colors and organic motion profiles for a calming effect.
-- Add a "space mode" with starry backgrounds and cosmic color schemes for astronomy enthusiasts.
-- Add a "holiday mode" that automatically changes themes based on the time of year (e.g. spooky themes in October, festive themes in December, otherwise defaulting to four seasonal themes).
-- Add a night mode that gradually darkens the color scheme as the night progresses, based on the user's local time. The bits could transition to deeper blues and purples after sunset for a more soothing nighttime experience.
-- Add a "random mode" that picks a new theme every time you load the page for a fun surprise.
-- think of stupid names for the new themes in keeping with the current theme naming convention. Maybe "Galactic Disco Inferno" for the space mode, "Pixelated Pumpkin Patch" for the retro mode, "Enchanted Forest Glow" for the nature mode, "Spooky Spectral Shift" for the holiday mode, and "Midnight Mirage" for the night mode. I have no creativity left.
-- Add some fun sound effects that can be toggled on or off, like a satisfying "click" when bits change state or a gentle "whoosh" during mode transitions. Maybe even a little "tick-tock" sound that syncs with the seconds for a more immersive clock experience. I don't want to do this, but it would be a fun addition if I had any audio skills at all.
-- Add some fun particle effects that trigger during mode switches or when the time changes, like little bursts of binary digits or colorful sparks that fly out from the clock face. This would add a playful touch and make the clock feel more dynamic and alive.
-- Add a "celebration mode" that triggers on special occasions like New Year's Eve, where the clock could explode into a burst of confetti and fireworks when the time hits midnight. This would be a fun way to ring in the new year with a bit of flair!
-- Add a "meditation mode" that gradually transitions the clock into a calming, slow-moving display with soft colors and gentle animations, designed to help users relax and unwind while still keeping track of the time. This could be a nice feature for people who want a more soothing clock experience during stressful days.
-- Maybe we could add things like a countdown timers or alarm functionality, where users can set a specific time and the clock would count down to it with a visual representation of the remaining time in binary. When the timer hits zero, it could trigger a fun animation or sound effect to celebrate the achievement. This would add a practical use case for the clock while still keeping it playful and engaging.
+- Add a "holiday mode" that automatically changes themes based on the time of year (spooky in October, festive in December, otherwise seasonal defaults).
+- Add a night mode that gradually darkens the color scheme as the night progresses, based on the user's local time.
+- Add sound effects that can be toggled — a satisfying click when bits change, a whoosh during transitions, maybe a tick-tock synced to seconds. I don't want to do this, but it would be fun if I had any audio skills at all.
+- Add particle effects during mode switches or time changes — little bursts of binary digits or colorful sparks from the clock face.
+- Add a celebration mode for special occasions like New Year's Eve, where midnight triggers confetti and general chaos.
+- Countdown timers or alarm functionality with a binary countdown and a fun completion animation.
 
-
-## known Issues
-- The mobile responsive behavior is pretty basic and could use some work. The settings panel is a bit clunky and the clock face could be better optimized for small screens. I need to rethink the layout and interactions for mobile to make it use the available space more effectively and provide a smoother user experience.
-- 4-bit/6-bit switch labels should change on click, not after animations complete. This is a minor UX issue that I haven't gotten around to fixing yet. It would have been quicker to fix it than to type this out...
-- Maybe vertically center the digital clock digits...
-- and vertically center the help values too; although I think I prefer the top alignment for this...
-- The digital clock rolling animation can be a bit janky if you switch modes/themes rapidly. I may need to add some debouncing or state checks to prevent animation conflicts. But, I'm not sure I care enough...
-- The transition animations could use some work to make them less predictable and more dynamic. Maybe adding some randomization to the timing and easing profiles for each bit during mode/theme switches would help.
+## Known Issues
+- The mobile responsive behaviour is pretty basic. The settings panel is clunky and the clock face could be better optimised for small screens. The entire layout needs a rethink for mobile.
+- The transition animations could always use another pass. There's more randomisation now, but the timing windows still feel a bit uniform under certain conditions.
 
 ## License
 Steal whatever you like, but don't blame me if it explodes. If you make something cool with this code, let me know!

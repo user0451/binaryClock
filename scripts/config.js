@@ -46,4 +46,4 @@ export const TRANSITION_EASINGS = [
 	"cubic-bezier(0.55, 0.06, 0.68, 0.19)",
 	"cubic-bezier(0.22, 1.36, 0.7, 1.01)",
 	"cubic-bezier(0.51, 0.92, 0.24, 1.15)"
-];
+]; // some weirdness inspired by https://easings.net/en
