@@ -13,6 +13,10 @@ html[data-theme="classic-rgb-neon"] {
 	--help-plus-glow: rgba(156, 173, 255, 0.16);
 }
 
+html[data-theme="classic-rgb-neon"] .bit.on {
+	animation: classicNeonDrift 3.8s ease-in-out infinite;
+}
+
 html[data-theme="amber-terminal"] {
 	--surface-bg: radial-gradient(circle at 25% 15%, #231703 0%, #130f05 56%, #0a0906 100%);
 	--surface-card: rgba(32, 24, 9, 0.48);
@@ -40,6 +44,10 @@ html[data-theme="amber-terminal"] {
 	--digital-meridiem-text: rgba(255, 235, 177, 1);
 	--help-plus-color: rgba(255, 211, 128, 0.55);
 	--help-plus-glow: rgba(255, 181, 70, 0.18);
+}
+
+html[data-theme="amber-terminal"] .bit.on {
+	animation: amberSpark 3.4s steps(24, end) infinite;
 }
 
 html[data-theme="ice-glass"] {
@@ -74,6 +82,10 @@ html[data-theme="ice-glass"] {
 	--help-plus-glow: rgba(84, 160, 194, 0.18);
 }
 
+html[data-theme="ice-glass"] .bit.on {
+	animation: iceRipple 4.2s ease-in-out infinite;
+}
+
 html[data-theme="matrix-pulse"] {
 	--surface-bg: radial-gradient(circle at 15% 0%, #03220d 0%, #041209 58%, #010403 100%);
 	--surface-card: rgba(9, 32, 17, 0.54);
@@ -105,7 +117,7 @@ html[data-theme="matrix-pulse"] {
 }
 
 html[data-theme="matrix-pulse"] .bit.on {
-	animation: matrixPulse var(--pulse-speed) ease-in-out infinite;
+	animation: matrixPulse 3.8s ease-in-out infinite;
 }
 
 html[data-theme="sunset-bloom"] {
@@ -136,4 +148,401 @@ html[data-theme="sunset-bloom"] {
 	--digital-meridiem-text: rgba(255, 241, 234, 1);
 	--help-plus-color: rgba(255, 209, 190, 0.56);
 	--help-plus-glow: rgba(255, 151, 121, 0.18);
+}
+
+html[data-theme="sunset-bloom"] .bit.on {
+	animation: sunsetPulse 3.8s ease-in-out infinite;
+}
+
+html[data-theme="cyberpunk-grid"] {
+	--surface-bg: radial-gradient(circle at 24% 8%, #34032d 0%, #120526 44%, #04030d 100%);
+	--surface-card: rgba(27, 10, 45, 0.48);
+	--text-main: #ffd4fd;
+	--text-muted: #ff90de;
+	--control-active: #8dfff2;
+	--focus-ring: #42ffe9;
+	--hours-on: #ff4ed2;
+	--minutes-on: #43e1ff;
+	--seconds-on: #f4ff5e;
+	--hours-glow: rgba(255, 78, 210, 0.5);
+	--minutes-glow: rgba(67, 225, 255, 0.48);
+	--seconds-glow: rgba(244, 255, 94, 0.42);
+	--bit-off: repeating-linear-gradient(45deg, rgba(255, 78, 210, 0.12), rgba(255, 78, 210, 0.12) 2px, rgba(4, 2, 16, 0.66) 2px, rgba(4, 2, 16, 0.66) 6px);
+	--bit-off-border: rgba(117, 255, 243, 0.36);
+	--digital-panel-bg: linear-gradient(160deg, rgba(255, 83, 215, 0.16), rgba(76, 227, 255, 0.08));
+	--digital-panel-border: rgba(138, 255, 245, 0.35);
+	--digital-pill-bg: rgba(14, 7, 28, 0.7);
+	--digital-pill-border: rgba(127, 252, 243, 0.3);
+	--digital-label: rgba(255, 176, 237, 0.92);
+	--digital-value: rgba(255, 242, 252, 1);
+	--help-plus-color: rgba(255, 167, 234, 0.64);
+	--help-plus-glow: rgba(68, 231, 255, 0.22);
+}
+
+html[data-theme="cyberpunk-grid"] .bit.on {
+	animation: cyberJolt 3.2s ease-in-out infinite;
+}
+
+html[data-theme="metallic-core"] {
+	--surface-bg: radial-gradient(circle at 20% 10%, #4f5157 0%, #2b2f36 46%, #14171d 100%);
+	--surface-card: rgba(72, 77, 86, 0.34);
+	--surface-edge: rgba(238, 244, 255, 0.24);
+	--text-main: #f2f5fb;
+	--text-muted: #c8cdd9;
+	--control-active: #f4f8ff;
+	--focus-ring: #fff0ad;
+	--hours-on: #ff8e58;
+	--minutes-on: #72b4ff;
+	--seconds-on: #d6ecff;
+	--hours-glow: rgba(255, 142, 88, 0.42);
+	--minutes-glow: rgba(114, 180, 255, 0.4);
+	--seconds-glow: rgba(214, 236, 255, 0.4);
+	--bit-off: linear-gradient(145deg, rgba(255, 255, 255, 0.24), rgba(79, 86, 100, 0.44) 44%, rgba(22, 26, 34, 0.72));
+	--bit-off-border: rgba(233, 239, 255, 0.36);
+	--bit-on-shadow-shape: 0 0 28px;
+	--digital-panel-bg: linear-gradient(160deg, rgba(242, 248, 255, 0.2), rgba(99, 108, 122, 0.18));
+	--digital-panel-border: rgba(232, 239, 255, 0.36);
+	--digital-pill-bg: rgba(36, 42, 52, 0.72);
+	--digital-pill-border: rgba(228, 235, 255, 0.3);
+	--digital-label: rgba(226, 233, 249, 0.92);
+	--digital-value: rgba(250, 252, 255, 1);
+	--help-plus-color: rgba(236, 240, 253, 0.62);
+	--help-plus-glow: rgba(181, 194, 224, 0.24);
+}
+
+html[data-theme="metallic-core"] .bit.on {
+	animation: metallicSheen 3.6s ease-in-out infinite;
+}
+
+html[data-theme="monochrome-noir"] {
+	--surface-bg: radial-gradient(circle at 20% 10%, #2b2b2d 0%, #17181a 54%, #08090a 100%);
+	--surface-card: rgba(30, 31, 35, 0.46);
+	--surface-edge: rgba(220, 224, 232, 0.2);
+	--text-main: #f1f2f5;
+	--text-muted: #b9bec8;
+	--control-bg: rgba(255, 255, 255, 0.1);
+	--control-active: #f8f8f8;
+	--focus-ring: #fbf8cf;
+	--hours-on: #f7f7f7;
+	--minutes-on: #cfd3d9;
+	--seconds-on: #9ca2ac;
+	--hours-glow: rgba(247, 247, 247, 0.35);
+	--minutes-glow: rgba(207, 211, 217, 0.32);
+	--seconds-glow: rgba(156, 162, 172, 0.3);
+	--bit-off: linear-gradient(145deg, rgba(228, 232, 240, 0.09), rgba(0, 0, 0, 0.56));
+	--bit-off-border: rgba(199, 205, 218, 0.28);
+	--font-main: "Franklin Gothic Medium", "Arial Narrow", sans-serif;
+	--digital-panel-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(56, 59, 66, 0.18));
+	--digital-panel-border: rgba(213, 218, 229, 0.3);
+	--digital-pill-bg: rgba(25, 27, 31, 0.78);
+	--digital-pill-border: rgba(209, 215, 227, 0.24);
+	--digital-label: rgba(212, 218, 232, 0.88);
+	--digital-value: rgba(247, 249, 254, 1);
+	--help-plus-color: rgba(213, 218, 228, 0.58);
+	--help-plus-glow: rgba(151, 159, 175, 0.2);
+}
+
+html[data-theme="monochrome-noir"] .bit.on {
+	animation: noirBreath 4.4s ease-in-out infinite;
+}
+
+html[data-theme="electric-storm"] {
+	--surface-bg: radial-gradient(circle at 16% 8%, #0f1742 0%, #070d26 54%, #02040d 100%);
+	--surface-card: rgba(14, 24, 61, 0.48);
+	--text-main: #dbe2ff;
+	--text-muted: #a6b1e4;
+	--control-active: #e8eeff;
+	--focus-ring: #f7ff95;
+	--hours-on: #8b9dff;
+	--minutes-on: #55c7ff;
+	--seconds-on: #f7f86b;
+	--hours-glow: rgba(139, 157, 255, 0.48);
+	--minutes-glow: rgba(85, 199, 255, 0.46);
+	--seconds-glow: rgba(247, 248, 107, 0.4);
+	--bit-off: linear-gradient(160deg, rgba(129, 154, 255, 0.2), rgba(3, 9, 27, 0.62));
+	--bit-off-border: rgba(177, 192, 255, 0.34);
+	--digital-panel-bg: linear-gradient(160deg, rgba(143, 161, 255, 0.24), rgba(4, 13, 38, 0.42));
+	--digital-panel-border: rgba(175, 189, 255, 0.34);
+	--digital-pill-bg: rgba(7, 15, 41, 0.76);
+	--digital-pill-border: rgba(174, 191, 255, 0.3);
+	--digital-label: rgba(189, 201, 255, 0.92);
+	--digital-value: rgba(237, 242, 255, 1);
+	--help-plus-color: rgba(197, 208, 255, 0.6);
+	--help-plus-glow: rgba(134, 188, 255, 0.24);
+}
+
+html[data-theme="electric-storm"] .bit.on {
+	animation: electricArc 3.1s steps(14, end) infinite;
+}
+
+html[data-theme="gloomy-mist"] {
+	--surface-bg: radial-gradient(circle at 18% 10%, #1d2428 0%, #151a1f 50%, #090c10 100%);
+	--surface-card: rgba(22, 28, 33, 0.52);
+	--surface-edge: rgba(159, 174, 183, 0.22);
+	--text-main: #d9e2e6;
+	--text-muted: #9aa9b0;
+	--control-active: #e2eaed;
+	--focus-ring: #cad6da;
+	--hours-on: #9cb2bb;
+	--minutes-on: #89a3ad;
+	--seconds-on: #b7c4ca;
+	--hours-glow: rgba(156, 178, 187, 0.38);
+	--minutes-glow: rgba(137, 163, 173, 0.34);
+	--seconds-glow: rgba(183, 196, 202, 0.34);
+	--bit-off: linear-gradient(160deg, rgba(161, 177, 186, 0.13), rgba(8, 11, 14, 0.62));
+	--bit-off-border: rgba(164, 180, 189, 0.24);
+	--digital-panel-bg: linear-gradient(160deg, rgba(157, 175, 184, 0.16), rgba(19, 25, 29, 0.42));
+	--digital-panel-border: rgba(164, 180, 189, 0.28);
+	--digital-pill-bg: rgba(15, 20, 24, 0.8);
+	--digital-pill-border: rgba(164, 180, 189, 0.24);
+	--digital-label: rgba(186, 199, 206, 0.9);
+	--digital-value: rgba(225, 234, 238, 1);
+	--help-plus-color: rgba(174, 189, 196, 0.54);
+	--help-plus-glow: rgba(111, 128, 136, 0.2);
+}
+
+html[data-theme="gloomy-mist"] .bit.on {
+	animation: gloomyGlow 4.8s ease-in-out infinite;
+}
+
+html[data-theme="sunny-pop"] {
+	--surface-bg: radial-gradient(circle at 22% 8%, #fff9bc 0%, #ffd373 42%, #ff9f5d 100%);
+	--surface-card: rgba(255, 246, 207, 0.44);
+	--surface-edge: rgba(175, 96, 26, 0.28);
+	--text-main: #4a270d;
+	--text-muted: #7b4520;
+	--control-bg: rgba(255, 255, 255, 0.55);
+	--control-active: #fff8d5;
+	--focus-ring: #ff5b3c;
+	--hours-on: #ff7045;
+	--minutes-on: #ffb34e;
+	--seconds-on: #ffe365;
+	--hours-glow: rgba(255, 112, 69, 0.44);
+	--minutes-glow: rgba(255, 179, 78, 0.42);
+	--seconds-glow: rgba(255, 227, 101, 0.42);
+	--bit-off: linear-gradient(160deg, rgba(255, 255, 255, 0.72), rgba(255, 188, 102, 0.34));
+	--bit-off-border: rgba(193, 108, 49, 0.34);
+	--font-main: "Tahoma", "Verdana", sans-serif;
+	--digital-panel-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.78), rgba(255, 185, 111, 0.34));
+	--digital-panel-border: rgba(191, 108, 50, 0.34);
+	--digital-pill-bg: rgba(255, 245, 211, 0.84);
+	--digital-pill-border: rgba(191, 108, 50, 0.28);
+	--digital-label: rgba(114, 57, 23, 0.86);
+	--digital-value: rgba(77, 37, 13, 1);
+	--digital-meridiem-bg: linear-gradient(160deg, rgba(255, 250, 222, 0.9), rgba(255, 188, 108, 0.46));
+	--digital-meridiem-border: rgba(191, 108, 50, 0.3);
+	--digital-meridiem-text: rgba(91, 46, 17, 1);
+	--help-plus-color: rgba(149, 82, 34, 0.58);
+	--help-plus-glow: rgba(255, 158, 79, 0.25);
+}
+
+html[data-theme="sunny-pop"] .bit.on {
+	animation: sunnyBounce 3.2s ease-in-out infinite;
+}
+
+html[data-theme="christmas-glow"] {
+	--surface-bg: radial-gradient(circle at 18% 8%, #113420 0%, #0b1f2a 44%, #120811 100%);
+	--surface-card: rgba(20, 35, 29, 0.5);
+	--text-main: #ffe9e4;
+	--text-muted: #d9b6b0;
+	--control-active: #f7f7ef;
+	--focus-ring: #ffdd7f;
+	--hours-on: #ff5d66;
+	--minutes-on: #5bff8e;
+	--seconds-on: #fff0a6;
+	--hours-glow: rgba(255, 93, 102, 0.5);
+	--minutes-glow: rgba(91, 255, 142, 0.45);
+	--seconds-glow: rgba(255, 240, 166, 0.42);
+	--bit-off: repeating-linear-gradient(45deg, rgba(255, 93, 102, 0.09), rgba(255, 93, 102, 0.09) 3px, rgba(7, 14, 21, 0.58) 3px, rgba(7, 14, 21, 0.58) 7px);
+	--bit-off-border: rgba(253, 220, 174, 0.34);
+	--digital-panel-bg: linear-gradient(160deg, rgba(255, 96, 104, 0.2), rgba(91, 255, 142, 0.16));
+	--digital-panel-border: rgba(255, 223, 170, 0.36);
+	--digital-pill-bg: rgba(19, 18, 24, 0.74);
+	--digital-pill-border: rgba(255, 223, 170, 0.32);
+	--digital-label: rgba(255, 220, 208, 0.92);
+	--digital-value: rgba(255, 245, 232, 1);
+	--help-plus-color: rgba(255, 221, 192, 0.62);
+	--help-plus-glow: rgba(255, 156, 116, 0.24);
+}
+
+html[data-theme="christmas-glow"] .bit.on {
+	animation: christmasTwinkle 3.3s steps(16, end) infinite;
+}
+
+@keyframes classicNeonDrift {
+	0%,
+	100% {
+		transform: scale(1);
+		filter: saturate(1) brightness(1);
+	}
+
+	45% {
+		transform: scale(1.02);
+		filter: saturate(1.12) brightness(1.06);
+	}
+}
+
+@keyframes amberSpark {
+	0%,
+	100% {
+		filter: brightness(1) sepia(0.12);
+	}
+
+	14% {
+		filter: brightness(1.12) sepia(0.17);
+	}
+
+	16% {
+		filter: brightness(0.98) sepia(0.1);
+	}
+
+	63% {
+		filter: brightness(1.09) sepia(0.15);
+	}
+}
+
+@keyframes iceRipple {
+	0%,
+	100% {
+		transform: scale(1);
+		filter: brightness(1) saturate(1);
+	}
+
+	50% {
+		transform: scale(1.02);
+		filter: brightness(1.08) saturate(1.06);
+	}
+}
+
+@keyframes sunsetPulse {
+	0%,
+	100% {
+		transform: scale(1);
+		filter: brightness(1);
+	}
+
+	35% {
+		transform: scale(1.025);
+		filter: brightness(1.08) saturate(1.04);
+	}
+
+	70% {
+		transform: scale(0.99);
+		filter: brightness(0.99) saturate(0.98);
+	}
+}
+
+@keyframes cyberJolt {
+	0%,
+	100% {
+		filter: saturate(1) brightness(1);
+		transform: translateY(0) scale(1);
+	}
+
+	10% {
+		transform: translateY(-0.5px) scale(1.015);
+	}
+
+	12% {
+		transform: translateY(0) scale(0.997);
+		filter: saturate(1.15) brightness(1.08);
+	}
+
+	54% {
+		filter: saturate(1.12) brightness(1.07);
+	}
+}
+
+@keyframes metallicSheen {
+	0%,
+	100% {
+		filter: brightness(1) contrast(1);
+	}
+
+	40% {
+		filter: brightness(1.08) contrast(1.03);
+	}
+
+	58% {
+		filter: brightness(0.99) contrast(1.02);
+	}
+}
+
+@keyframes noirBreath {
+	0%,
+	100% {
+		opacity: 0.97;
+		filter: grayscale(0.16) brightness(1);
+	}
+
+	50% {
+		opacity: 1;
+		filter: grayscale(0.08) brightness(1.04);
+	}
+}
+
+@keyframes electricArc {
+	0%,
+	100% {
+		filter: brightness(1) saturate(1);
+	}
+
+	13% {
+		filter: brightness(1.14) saturate(1.1);
+	}
+
+	17% {
+		filter: brightness(0.98) saturate(0.98);
+	}
+
+	44% {
+		filter: brightness(1.1) saturate(1.08);
+	}
+}
+
+@keyframes gloomyGlow {
+	0%,
+	100% {
+		filter: brightness(0.98);
+	}
+
+	52% {
+		filter: brightness(1.04);
+	}
+}
+
+@keyframes sunnyBounce {
+	0%,
+	100% {
+		transform: translateY(0) scale(1);
+		filter: brightness(1);
+	}
+
+	38% {
+		transform: translateY(-1.2px) scale(1.02);
+		filter: brightness(1.08);
+	}
+
+	68% {
+		transform: translateY(0.3px) scale(0.995);
+	}
+}
+
+@keyframes christmasTwinkle {
+	0%,
+	100% {
+		filter: brightness(1) saturate(1);
+	}
+
+	22% {
+		filter: brightness(1.13) saturate(1.1);
+	}
+
+	26% {
+		filter: brightness(0.98) saturate(0.96);
+	}
+
+	62% {
+		filter: brightness(1.1) saturate(1.08);
+	}
 }

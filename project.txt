@@ -1,3 +1,5 @@
+Early Plan:
+
 This project is a binary clock display. It will display a clock as a series of binary lights, representing seconds, minutes and hours.
 We will have a toggle switch, which switches between 4-bit and 6-bit mode.
 
