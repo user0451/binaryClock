@@ -103,3 +103,41 @@ Saved keys in localStorage:
 - [scripts/ui.js](scripts/ui.js): UI state application and persistence hooks.
 - [scripts/config.js](scripts/config.js): constants and storage keys.
 
+** Future
+- Add more themes!
+- Add an optional seconds progress ring around the clock face.
+- Add a mode with only hours and minutes for a more minimalist look.
+- Add a mode with a binary progress bar for each time unit instead of discrete bits.
+- Add a "learn" mode with interactive quizzes to test binary understanding.
+- Reverse ordered bit modes
+- Horizontal bit layout modes
+- My responsive breakpoint game is weak, maybe add some intermediate breakpoints for tablets and landscape phones. The entire current responsive implementation is quite poor; I went down the wrong avenue...
+- The transition animations could do with another pass, to make them less predictable and more dynamic. Maybe add some randomization to the timing and easing profiles for each bit during mode/theme switches.
+- Add animations on page load to make the clock bits "assemble" into place when the app first loads, for a more engaging initial experience.
+- Add a "colorblind mode" with high-contrast patterns instead of colors for better accessibility.
+- Maybe add a "darken inactive bits" toggle for better focus on the current time.
+- Add some fun easter egg themes that can be unlocked by clicking the title a certain number of times or something stupid that noone will ever see.
+- Add a "custom theme" mode where users can pick their own colors and animation profiles.
+- Add a "party mode" with rapidly changing colors and fast animations for fun.
+- Add a "stealth mode" with very subtle animations and a muted color palette for low-visibility environments.
+- Add a "retro mode" with pixelated fonts and chunky bits for a vintage computer vibe.
+- Add a "nature mode" with earthy colors and organic motion profiles for a calming effect.
+- Add a "space mode" with starry backgrounds and cosmic color schemes for astronomy enthusiasts.
+- Add a "holiday mode" that automatically changes themes based on the time of year (e.g. spooky themes in October, festive themes in December, otherwise defaulting to four seasonal themes).
+- Add a night mode that gradually darkens the color scheme as the night progresses, based on the user's local time. The bits could transition to deeper blues and purples after sunset for a more soothing nighttime experience.
+- Add a "random mode" that picks a new theme every time you load the page for a fun surprise.
+- think of stupid names for the new themes in keeping with the current theme naming convention. Maybe "Galactic Disco Inferno" for the space mode, "Pixelated Pumpkin Patch" for the retro mode, "Enchanted Forest Glow" for the nature mode, "Spooky Spectral Shift" for the holiday mode, and "Midnight Mirage" for the night mode. I have no creativity left.
+
+
+
+## known Issues
+- The transition choreography is pretty complex and has some edge cases where bits can get stuck in the wrong state if you switch modes/themes rapidly. I haven't fully ironed out all the timing issues yet, but it seems to work fine as long as you don't spam the controls too much.
+- The mobile responsive behavior is pretty basic and could use some work. The settings panel is a bit clunky and the clock face could be better optimized for small screens. I may add some intermediate breakpoints for tablets and landscape phones.
+- 4-bit/6-bit switch labels should change on click, not after animations complete. This is a minor UX issue that I haven't gotten around to fixing yet. It would have been quicker to fix it than to type this out...
+- Maybe vertically center the digital clock digits...
+- and vertically center the help values too; although I think I prefer the top alignment for this...
+- The digital clock rolling animation can be a bit janky if you switch modes/themes rapidly. I may need to add some debouncing or state checks to prevent animation conflicts. But, I'm not sure I care enough...
+
+
+## License
+Steal whatever you like, it's yours; but don't blame me if it explodes. If you make something cool with this code, let me know!
