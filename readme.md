@@ -6,7 +6,6 @@ https://spinningrock.net/binary/
 
 
 ## Current State
-- Live clock updates every 250ms.
 - Two display modes: 6-bit and 4-bit.
 - Two time formats: 24-hour and 12-hour.
 - Optional learning overlays and optional digital panel.
@@ -103,7 +102,7 @@ Saved keys in localStorage:
 - [scripts/ui.js](scripts/ui.js): UI state application and persistence hooks.
 - [scripts/config.js](scripts/config.js): constants and storage keys.
 
-** Future
+## Future
 - Add more themes!
 - Add an optional seconds progress ring around the clock face.
 - Add a mode with only hours and minutes for a more minimalist look.
