@@ -2,6 +2,9 @@
 
 An animated, CSS-forward binary clock with learning overlays, a rolling digital readout, theme switching, and responsive controls.
 
+https://spinningrock.net/binary/
+
+
 ## Current State
 - Live clock updates every 250ms.
 - Two display modes: 6-bit and 4-bit.
@@ -41,7 +44,6 @@ No build step is required.
 - Help values map to row weights: 32, 16, 8, 4, 2, 1.
 
 ### 4-bit Mode
-- I see this as a more pedagogical mode, designed to teach binary concepts by breaking down each time unit into its decimal place values.
 - Each unit is split into tens and units columns.
 - Tens and units both show weighted help contributions in help mode.
 - Hours tens place only uses 2 bits (0, 10) since the max is 23.
