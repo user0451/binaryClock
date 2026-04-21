@@ -71,7 +71,7 @@ Current built-in themes:
 
 I ran out of silly names! Most themes include custom `bit.on` motion tuned to a subtle profile.
 
-## Responsive Behavior
+## Responsive Behaviour
 - Desktop: settings are shown as a bottom control bar.
 - Small screens: a settings trigger opens a panel overlay.
 - While settings are open, background scrolling is locked.
@@ -126,17 +126,20 @@ Saved keys in localStorage:
 - Add a night mode that gradually darkens the color scheme as the night progresses, based on the user's local time. The bits could transition to deeper blues and purples after sunset for a more soothing nighttime experience.
 - Add a "random mode" that picks a new theme every time you load the page for a fun surprise.
 - think of stupid names for the new themes in keeping with the current theme naming convention. Maybe "Galactic Disco Inferno" for the space mode, "Pixelated Pumpkin Patch" for the retro mode, "Enchanted Forest Glow" for the nature mode, "Spooky Spectral Shift" for the holiday mode, and "Midnight Mirage" for the night mode. I have no creativity left.
-
+- Add some fun sound effects that can be toggled on or off, like a satisfying "click" when bits change state or a gentle "whoosh" during mode transitions. Maybe even a little "tick-tock" sound that syncs with the seconds for a more immersive clock experience. I don't want to do this, but it would be a fun addition if I had any audio skills at all.
+- Add some fun particle effects that trigger during mode switches or when the time changes, like little bursts of binary digits or colorful sparks that fly out from the clock face. This would add a playful touch and make the clock feel more dynamic and alive.
+- Add a "celebration mode" that triggers on special occasions like New Year's Eve, where the clock could explode into a burst of confetti and fireworks when the time hits midnight. This would be a fun way to ring in the new year with a bit of flair!
+- Add a "meditation mode" that gradually transitions the clock into a calming, slow-moving display with soft colors and gentle animations, designed to help users relax and unwind while still keeping track of the time. This could be a nice feature for people who want a more soothing clock experience during stressful days.
+- Maybe we could add things like a countdown timers or alarm functionality, where users can set a specific time and the clock would count down to it with a visual representation of the remaining time in binary. When the timer hits zero, it could trigger a fun animation or sound effect to celebrate the achievement. This would add a practical use case for the clock while still keeping it playful and engaging.
 
 
 ## known Issues
-- The transition choreography is pretty complex and has some edge cases where bits can get stuck in the wrong state if you switch modes/themes rapidly. I haven't fully ironed out all the timing issues yet, but it seems to work fine as long as you don't spam the controls too much.
-- The mobile responsive behavior is pretty basic and could use some work. The settings panel is a bit clunky and the clock face could be better optimized for small screens. I may add some intermediate breakpoints for tablets and landscape phones.
+- The mobile responsive behavior is pretty basic and could use some work. The settings panel is a bit clunky and the clock face could be better optimized for small screens. I need to rethink the layout and interactions for mobile to make it use the available space more effectively and provide a smoother user experience.
 - 4-bit/6-bit switch labels should change on click, not after animations complete. This is a minor UX issue that I haven't gotten around to fixing yet. It would have been quicker to fix it than to type this out...
 - Maybe vertically center the digital clock digits...
 - and vertically center the help values too; although I think I prefer the top alignment for this...
 - The digital clock rolling animation can be a bit janky if you switch modes/themes rapidly. I may need to add some debouncing or state checks to prevent animation conflicts. But, I'm not sure I care enough...
-
+- The transition animations could use some work to make them less predictable and more dynamic. Maybe adding some randomization to the timing and easing profiles for each bit during mode/theme switches would help.
 
 ## License
-Steal whatever you like, it's yours; but don't blame me if it explodes. If you make something cool with this code, let me know!
+Steal whatever you like, but don't blame me if it explodes. If you make something cool with this code, let me know!
