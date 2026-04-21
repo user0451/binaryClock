@@ -11,6 +11,16 @@ An animated, CSS-forward binary clock with learning overlays, a rolling digital 
 - Responsive behavior for desktop and mobile.
 - State persistence in localStorage.
 
+## Modes
+- **6-bit mode**: Each time unit (hours, minutes, seconds) is represented by 6 bits, allowing for a direct binary representation of values up to 63. This mode emphasizes the binary nature of the clock and is ideal for users familiar with binary counting.
+- **4-bit mode**: Each time unit is split into two columns representing the tens and units place. This mode is more pedagogical, designed to teach binary concepts by breaking down each time unit into its decimal place values. For example, the hours are represented with a tens column (0, 10) and a units column (0-9), with the tens place only using 2 bits since the maximum hour value is 23.
+
+### Where to Start
+- Hardcore: 6-bit mode only.
+- Average: 6-bit mode with digital clock on.
+- Beginner: 4-bit mode with digital clock and help values on.
+12/24-hour format is a personal preference.
+
 ## Run
 No build step is required.
 
@@ -34,7 +44,7 @@ No build step is required.
 - I see this as a more pedagogical mode, designed to teach binary concepts by breaking down each time unit into its decimal place values.
 - Each unit is split into tens and units columns.
 - Tens and units both show weighted help contributions in help mode.
-- Help values for hours tens now use weighted values (1, 2, 4, 8), matching units.
+- Hours tens place only uses 2 bits (0, 10) since the max is 23.
 
 ### Digital Panel
 - Rolling two-slot H/M/S values with per-slot animation.
@@ -58,7 +68,7 @@ Current built-in themes:
 11. Sunny Pop
 12. Christmas Glow
 
-All themes include custom `bit.on` motion tuned to a subtle profile.
+I ran out of silly names! Most themes include custom `bit.on` motion tuned to a subtle profile.
 
 ## Responsive Behavior
 - Desktop: settings are shown as a bottom control bar.
