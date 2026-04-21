@@ -113,7 +113,7 @@ function setRollingText(node, nextValue) {
 		return;
 	}
 
-	const next = String(nextValue).padStart(2, "0").slice(-2);
+	const next = String(nextValue).slice(-2).padStart(2, " ");
 	const current = node.dataset.rollValue;
 	const slots = ensureRollingSlots(node, current || next);
 
@@ -136,7 +136,10 @@ function setRollingText(node, nextValue) {
 }
 
 function setHelpTotals(values) {
-	setRollingText(totalsNodes.sixBit.hours, String(values.hours).padStart(2, "0"));
+	const hoursText = state.show24HourFormat
+		? String(values.hours).padStart(2, "0")
+		: String(values.hours).padStart(2, " ");
+	setRollingText(totalsNodes.sixBit.hours, hoursText);
 	setRollingText(totalsNodes.sixBit.minutes, String(values.minutes).padStart(2, "0"));
 	setRollingText(totalsNodes.sixBit.seconds, String(values.seconds).padStart(2, "0"));
 }
@@ -162,9 +165,9 @@ function updateInlineBitHelp(values, mode) {
 		FOUR_BIT_WEIGHTS.forEach((weight) => {
 			const tensNode = document.getElementById(`${unit}Tens${weight}`);
 			const unitsNode = document.getElementById(`${unit}${weight}`);
-			const tensContribution = (tens & weight) !== 0 ? 1 : 0;
+			const tensContribution = (tens & weight) !== 0 ? weight : 0;
 			const unitsContribution = (units & weight) !== 0 ? weight : 0;
-			setBitHelpData(tensNode, tensContribution, "bin");
+			setBitHelpData(tensNode, tensContribution, weight);
 			setBitHelpData(unitsNode, unitsContribution, weight);
 		});
 	});
