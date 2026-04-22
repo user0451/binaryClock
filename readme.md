@@ -132,13 +132,13 @@ Saved keys in localStorage:
 - [scripts/config.js](scripts/config.js): constants, timing windows, storage keys, easing pool, shuffleable theme list.
 
 ## Future
+Some things I could do in the future if bored enough, but probably won't:
 - expose the shuffle time interval in the UI for user control.
 - Add an optional seconds progress ring around the clock face.
 - Add a mode with only hours and minutes for a more minimalist look.
 - Add a mode with a binary progress bar for each time unit instead of discrete bits.
 - Add a "learn" mode with interactive quizzes to test binary understanding.
 - Reverse bit order mode (LSB at top).
-- My responsive breakpoint game is weak — add intermediate breakpoints for tablets and landscape phones. The entire current responsive implementation is quite poor; I went down the wrong avenue.
 - Add a "colorblind mode" with high-contrast patterns instead of colors for better accessibility.
 - Add a "darken inactive bits" toggle for better focus on the active bits.
 - Add some fun easter egg themes unlocked by clicking the title a certain number of times, for nobody to ever discover.
@@ -149,10 +149,15 @@ Saved keys in localStorage:
 - Add particle effects during mode switches or time changes — little bursts of binary digits or colorful sparks from the clock face.
 - Add a celebration mode for special occasions like New Year's Eve, where midnight triggers confetti and general chaos.
 - Countdown timers or alarm functionality with a binary countdown and a fun completion animation.
+- I'm no expert, but optimising the animation performance or providing an option to skip it could improve the experience for some users.
 
 ## Known Issues
-- The mobile responsive behaviour is pretty basic. The settings panel is clunky and the clock face could be better optimised for small screens. The entire layout needs a rethink for mobile.
+- The mobile responsive behaviour is pretty basic: I went down the wrong avenue... The settings panel is clunky and the clock face could be better optimised for small screens.  The entire current responsive implementation is quite poor; the entire layout needs a rethink for mobile.
 - The transition animations could always use another pass. There's more randomisation now, but the timing windows still feel a bit uniform under certain conditions.
+-The bits (bubbles) are not as bouncey as I would like; the custom `bit.on` animations in some themes add a bit of extra life, but I think the core motion profiles could be more dynamic and less uniform across themes.
+- The digital panel's rolling animation is a bit clunky and could be smoother, especially when transitioning between certain numbers (e.g. 09 to 10).
+- The help annotations are a bit basic and could be more visually integrated with the clock face, perhaps with better typography or a more intuitive layout.
+- The theme shuffle mode is fun but could use a smoother transition between themes, rather than an abrupt change every 10 minutes. Maybe a crossfade or a more elaborate animation could make the shuffle feel more polished.
 
 ## License
 Steal whatever you like, but don't blame me if it explodes. If you make something cool with this code, let me know!

@@ -4,6 +4,12 @@ body.mode-transitioning .helpRows6 {
 	transform: scale(0.72);
 }
 
+body.orientation-transitioning .helpRows4,
+body.orientation-transitioning .helpRows6 {
+	opacity: 0 !important;
+	transform: scale(0.72);
+}
+
 body.mode-transitioning.to-6bit [data-not6Bit] {
 	opacity: 0 !important;
 	visibility: hidden !important;
@@ -31,6 +37,11 @@ body.mode-transitioning .bit {
 }
 
 body.help-visible.mode-transitioning .bit::after {
+	animation: helpValueFade 980ms var(--ease-soft) both;
+	animation-delay: calc((var(--column-offset) * 0.35) + (var(--rand-delay-in) * 0.4));
+}
+
+body.help-visible.orientation-transitioning .bit::after {
 	animation: helpValueFade 980ms var(--ease-soft) both;
 	animation-delay: calc((var(--column-offset) * 0.35) + (var(--rand-delay-in) * 0.4));
 }
