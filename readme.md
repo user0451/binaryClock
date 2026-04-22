@@ -6,9 +6,9 @@ https://spinningrock.net/binary/
 
 
 ## Current State
-- Two display modes: 6-bit and 4-bit.
+- Two display modes: 6-bit (default) and 4-bit.
 - Two bit orientations: vertical (default) and horizontal.
-- Two time formats: 24-hour and 12-hour.
+- Two time formats: 24-hour (default) and 12-hour.
 - Optional learning overlays and optional digital panel.
 - Theme picker with 16 built-in themes, plus a shuffle mode that rotates automatically every 10 minutes.
 - Page-load assembly animation and per-bit randomised easing on mode/theme transitions.

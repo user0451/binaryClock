@@ -1,4 +1,7 @@
 /minified/
+/node_modules/
 
 /.vscode/
-/add-min-*
+/tools/
+/node_modules/
+package*
