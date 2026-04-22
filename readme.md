@@ -154,7 +154,7 @@ Some things I could do in the future if bored enough, but probably won't:
 ## Known Issues
 - The mobile responsive behaviour is pretty basic: I went down the wrong avenue... The settings panel is clunky and the clock face could be better optimised for small screens.  The entire current responsive implementation is quite poor; the entire layout needs a rethink for mobile.
 - The transition animations could always use another pass. There's more randomisation now, but the timing windows still feel a bit uniform under certain conditions.
--The bits (bubbles) are not as bouncey as I would like; the custom `bit.on` animations in some themes add a bit of extra life, but I think the core motion profiles could be more dynamic and less uniform across themes.
+- The bits (bubbles) are not as bouncey as I would like; the custom `bit.on` animations in some themes add a bit of extra life, but I think the core motion profiles could be more dynamic and less uniform across themes.
 - The digital panel's rolling animation is a bit clunky and could be smoother, especially when transitioning between certain numbers (e.g. 09 to 10).
 - The help annotations are a bit basic and could be more visually integrated with the clock face, perhaps with better typography or a more intuitive layout.
 - The theme shuffle mode is fun but could use a smoother transition between themes, rather than an abrupt change every 10 minutes. Maybe a crossfade or a more elaborate animation could make the shuffle feel more polished.
