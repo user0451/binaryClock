@@ -21,8 +21,8 @@ https://spinningrock.net/binary/
 
 ### Where to Start
 - Hardcore: 6-bit mode only.
-- Average: 6-bit mode with the digital panel on.
-- Beginner: 4-bit mode with digital and help values on.
+- Average: 6-bit mode, Horizontal orientation with the digital panel on.
+- Beginner: 4-bit mode, Vertical orientation with digital and help values on.
 - 12/24-hour format is a personal preference.
 
 ## Run
@@ -64,7 +64,7 @@ No build step is required.
 - AM/PM badge is visible only in 12-hour mode.
 
 ### Page Load
-- On first render, all clock bits play a staggered assembly animation (`bitAssemble`) before the clock starts ticking, giving the initial experience a satisfying "power on" feel.
+- On first render, all clock bits play a staggered assembly animation (`bitAssemble`) before the clock starts ticking, giving the initial experience a satisfying "power on" feel. Actually, it's not that great - nowhere near!
 
 ## Themes
 16 built-in themes, plus shuffle mode:
@@ -152,12 +152,12 @@ Some things I could do in the future if bored enough, but probably won't:
 - I'm no expert, but optimising the animation performance or providing an option to skip it could improve the experience for some users.
 
 ## Known Issues
-- The mobile responsive behaviour is pretty basic: I went down the wrong avenue... The settings panel is clunky and the clock face could be better optimised for small screens.  The entire current responsive implementation is quite poor; the entire layout needs a rethink for mobile.
+- Help features do not animate in sync with mode changes; they just pop in and out at the end of the bit transition window. It would be nice if they could fade or animate in a more integrated way during the mode switch, as we have already implemented the animations during direction/bit switches... 
+- The theme shuffle mode is fun but could use a smoother transition between themes, rather than an abrupt change every 10 minutes. Maybe a crossfade or a more elaborate animation could make the shuffle feel more polished.
+- The help annotations are a bit basic and could be more visually integrated with the clock face, perhaps with better typography or a more intuitive layout.
+- The mobile responsive behaviour is pretty basic: I went down the wrong avenue... The settings panel is clunky and the clock face could be better optimised for small screens.  The entire current responsive implementation is quite poor; the layout needs a rethink for mobile.
 - The transition animations could always use another pass. There's more randomisation now, but the timing windows still feel a bit uniform under certain conditions.
 - The bits (bubbles) are not as bouncey as I would like; the custom `bit.on` animations in some themes add a bit of extra life, but I think the core motion profiles could be more dynamic and less uniform across themes.
-- The digital panel's rolling animation is a bit clunky and could be smoother, especially when transitioning between certain numbers (e.g. 09 to 10).
-- The help annotations are a bit basic and could be more visually integrated with the clock face, perhaps with better typography or a more intuitive layout.
-- The theme shuffle mode is fun but could use a smoother transition between themes, rather than an abrupt change every 10 minutes. Maybe a crossfade or a more elaborate animation could make the shuffle feel more polished.
 
 ## License
 Steal whatever you like, but don't blame me if it explodes. If you make something cool with this code, let me know!
