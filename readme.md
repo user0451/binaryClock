@@ -133,6 +133,7 @@ Saved keys in localStorage:
 
 ## Future
 Some things I could do in the future if bored enough, but probably won't:
+- The help annotations are a bit basic and could be more visually integrated with the clock face, perhaps with better typography or a more intuitive layout.
 - expose the shuffle time interval in the UI for user control.
 - Add an optional seconds progress ring around the clock face.
 - Add a mode with only hours and minutes for a more minimalist look.
@@ -149,12 +150,9 @@ Some things I could do in the future if bored enough, but probably won't:
 - Add particle effects during mode switches or time changes — little bursts of binary digits or colorful sparks from the clock face.
 - Add a celebration mode for special occasions like New Year's Eve, where midnight triggers confetti and general chaos.
 - Countdown timers or alarm functionality with a binary countdown and a fun completion animation.
-- I'm no expert, but optimising the animation performance or providing an option to skip it could improve the experience for some users.
+- Hide unused tens-hour bits in 4-bit mode, with an option to toggle them for symmetry.
 
 ## Known Issues
-- Help features do not animate in sync with mode changes; they just pop in and out at the end of the bit transition window. It would be nice if they could fade or animate in a more integrated way during the mode switch, as we have already implemented the animations during direction/bit switches... 
-- The theme shuffle mode is fun but could use a smoother transition between themes, rather than an abrupt change every 10 minutes. Maybe a crossfade or a more elaborate animation could make the shuffle feel more polished.
-- The help annotations are a bit basic and could be more visually integrated with the clock face, perhaps with better typography or a more intuitive layout.
 - The mobile responsive behaviour is pretty basic: I went down the wrong avenue... The settings panel is clunky and the clock face could be better optimised for small screens.  The entire current responsive implementation is quite poor; the layout needs a rethink for mobile.
 - The transition animations could always use another pass. There's more randomisation now, but the timing windows still feel a bit uniform under certain conditions.
 - The bits (bubbles) are not as bouncey as I would like; the custom `bit.on` animations in some themes add a bit of extra life, but I think the core motion profiles could be more dynamic and less uniform across themes.

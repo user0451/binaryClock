@@ -17,6 +17,7 @@ export const controls = {
 
 export const clockElement = document.querySelector(".clock");
 export const allBitNodes = Array.from(document.querySelectorAll(".clock .bit"));
+export const helpRowNodes = Array.from(document.querySelectorAll(".clock .helpRows4, .clock .helpRows6"));
 export const totalsPanel = document.querySelector(".totalsPanel");
 export const meridiemBadge = document.getElementById("meridiemBadge");
 

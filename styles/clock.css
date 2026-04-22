@@ -19,6 +19,7 @@
 	justify-content: center;
 	gap: var(--group-gap);
 	position: relative;
+	overflow: visible;
 	transition: transform var(--motion-slow) var(--ease-primary), opacity var(--motion-base) var(--ease-soft);
 }
 
@@ -44,6 +45,7 @@
 	--effective-bit-gap: var(--bit-gap);
 	gap: var(--effective-bit-gap);
 	position: relative;
+	overflow: visible;
 	transition: transform var(--motion-slow) var(--ease-primary), opacity var(--motion-base) var(--ease-soft);
 }
 
@@ -71,6 +73,7 @@ body.help-visible .clock[data-mode="4bit"] .digit {
 	transform-origin: center;
 	transition: transform var(--motion-base) var(--ease-primary), opacity var(--motion-base) var(--ease-soft), background-color var(--motion-base) var(--ease-soft), box-shadow var(--motion-base) var(--ease-soft), border-color var(--motion-base) var(--ease-soft), filter var(--motion-base) var(--ease-soft);
 	position: relative;
+	overflow: visible;
 }
 
 .helpRows4,
@@ -79,9 +82,14 @@ body.help-visible .clock[data-mode="4bit"] .digit {
 	inset: 0;
 	pointer-events: none;
 	opacity: 0;
-	transition: opacity 300ms var(--ease-soft), transform 320ms var(--ease-primary);
 	transform: scale(0.98);
 	z-index: 3;
+	transition: opacity 320ms var(--ease-soft), transform 360ms var(--ease-primary), filter 260ms var(--ease-soft);
+	--column-offset: 0ms;
+	--rand-delay-in: 0ms;
+	--rand-delay-out: 0ms;
+	--rand-ease-in: var(--ease-bubble-in);
+	--rand-ease-out: var(--ease-bubble-out);
 }
 
 .helpPlusRow {
@@ -93,6 +101,7 @@ body.help-visible .clock[data-mode="4bit"] .digit {
 	line-height: 1;
 	color: var(--help-plus-color);
 	text-shadow: 0 0 8px var(--help-plus-glow);
+	transition: color var(--motion-base) var(--ease-soft), text-shadow var(--motion-base) var(--ease-soft);
 }
 
 .helpRows4 .helpPlusRow[data-pos="1"] {

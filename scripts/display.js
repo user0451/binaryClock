@@ -1,24 +1,39 @@
 import { FOUR_BIT_WEIGHTS, HELP_WEIGHTS, TRANSITION_EASINGS } from "./config.js";
-import { allBitNodes, meridiemBadge, sixBitNodes, totalsNodes } from "./dom.js";
+import { allBitNodes, helpRowNodes, meridiemBadge, sixBitNodes, totalsNodes } from "./dom.js";
 import { state } from "./state.js";
 
 const rollingTimers = new WeakMap();
+const UNIT_COLUMN_OFFSETS = {
+	hours: "0ms",
+	seconds: "45ms",
+	minutes: "90ms"
+};
 
 function randomDelayMs(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function applyRandomTransitionVars(node, index) {
+	const wave = (index % 3) * 18;
+	const inDelay = randomDelayMs(0, 170) + wave;
+	const outDelay = randomDelayMs(0, 180) + ((2 - (index % 3)) * 14);
+	const easeIn = TRANSITION_EASINGS[Math.floor(Math.random() * TRANSITION_EASINGS.length)];
+	const easeOut = TRANSITION_EASINGS[Math.floor(Math.random() * TRANSITION_EASINGS.length)];
+	node.style.setProperty("--rand-delay-in", `${inDelay}ms`);
+	node.style.setProperty("--rand-delay-out", `${outDelay}ms`);
+	node.style.setProperty("--rand-ease-in", easeIn);
+	node.style.setProperty("--rand-ease-out", easeOut);
+}
+
 export function applyModeJitterDelays() {
 	allBitNodes.forEach((node, index) => {
-		const wave = (index % 3) * 18;
-		const inDelay = randomDelayMs(0, 170) + wave;
-		const outDelay = randomDelayMs(0, 180) + ((2 - (index % 3)) * 14);
-		const easeIn = TRANSITION_EASINGS[Math.floor(Math.random() * TRANSITION_EASINGS.length)];
-		const easeOut = TRANSITION_EASINGS[Math.floor(Math.random() * TRANSITION_EASINGS.length)];
-		node.style.setProperty("--rand-delay-in", `${inDelay}ms`);
-		node.style.setProperty("--rand-delay-out", `${outDelay}ms`);
-		node.style.setProperty("--rand-ease-in", easeIn);
-		node.style.setProperty("--rand-ease-out", easeOut);
+		applyRandomTransitionVars(node, index);
+	});
+
+	helpRowNodes.forEach((node, index) => {
+		applyRandomTransitionVars(node, index);
+		const unit = node.closest(".timeGroup")?.dataset.unit;
+		node.style.setProperty("--column-offset", UNIT_COLUMN_OFFSETS[unit] || "0ms");
 	});
 }
 

@@ -1,13 +1,30 @@
-body.mode-transitioning .helpRows4,
-body.mode-transitioning .helpRows6 {
-	opacity: 0 !important;
-	transform: scale(0.72);
+body.help-visible .help-rows-transitioning .helpRows4,
+body.help-visible .help-rows-transitioning .helpRows6 {
+	will-change: transform, opacity, filter;
 }
 
-body.orientation-transitioning .helpRows4,
-body.orientation-transitioning .helpRows6 {
-	opacity: 0 !important;
-	transform: scale(0.72);
+body.theme-transitioning::before {
+	content: "";
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	z-index: 0;
+	background:
+		radial-gradient(circle at 18% 14%, var(--theme-fade-hours-glow) 0%, transparent 34%),
+		radial-gradient(circle at 78% 18%, var(--theme-fade-minutes-glow) 0%, transparent 36%),
+		radial-gradient(circle at 52% 84%, var(--theme-fade-seconds-glow) 0%, transparent 34%),
+		var(--theme-fade-surface-bg);
+	box-shadow:
+		inset 0 0 0 1px color-mix(in srgb, var(--theme-fade-surface-card) 86%, transparent),
+		0 0 12rem color-mix(in srgb, var(--theme-fade-theme-bg-glow) 70%, transparent);
+	opacity: 1;
+	animation: themeColorFade var(--theme-fade-duration) var(--ease-soft) var(--theme-fade-start) both;
+}
+
+body.theme-transitioning .clock,
+body.theme-transitioning .totalsPanel,
+body.theme-transitioning .helpPlusRow {
+	transition: color var(--theme-fade-duration) var(--ease-soft), border-color var(--theme-fade-duration) var(--ease-soft), box-shadow var(--theme-fade-duration) var(--ease-soft), text-shadow var(--theme-fade-duration) var(--ease-soft), background-color var(--theme-fade-duration) var(--ease-soft);
 }
 
 body.mode-transitioning.to-6bit [data-not6Bit] {
@@ -44,6 +61,38 @@ body.help-visible.mode-transitioning .bit::after {
 body.help-visible.orientation-transitioning .bit::after {
 	animation: helpValueFade 980ms var(--ease-soft) both;
 	animation-delay: calc((var(--column-offset) * 0.35) + (var(--rand-delay-in) * 0.4));
+}
+
+body.help-visible.mode-transitioning.to-6bit .clock[data-mode="6bit"] .helpRows6 {
+	animation: helpRowsFadeIn 1480ms var(--rand-ease-in) both;
+	animation-delay: calc(var(--column-offset) + var(--mode-delay-in, 0ms) + var(--rand-delay-in));
+}
+
+body.help-visible.mode-transitioning.to-4bit .clock[data-mode="4bit"] .helpRows4 {
+	animation: helpRowsFadeIn 1360ms var(--rand-ease-out) both;
+	animation-delay: calc(var(--column-offset) + var(--mode-delay-out, 0ms) + var(--rand-delay-out));
+}
+
+body.help-visible.mode-transitioning.to-6bit .clock[data-mode="6bit"] .helpRows4 {
+	animation: helpRowsFadeOut 920ms var(--rand-ease-out) both;
+	animation-delay: calc(var(--column-offset) + var(--rand-delay-out));
+}
+
+body.help-visible.mode-transitioning.to-4bit .clock[data-mode="4bit"] .helpRows6 {
+	animation: helpRowsFadeOut 920ms var(--rand-ease-in) both;
+	animation-delay: calc(var(--column-offset) + var(--rand-delay-in));
+}
+
+body.help-visible.orientation-transitioning.to-horizontal .clock[data-mode="4bit"] .helpRows4,
+body.help-visible.orientation-transitioning.to-horizontal .clock[data-mode="6bit"] .helpRows6 {
+	animation: helpRowsFadeIn 1180ms var(--rand-ease-in) both;
+	animation-delay: calc(var(--column-offset) + var(--rand-delay-in));
+}
+
+body.help-visible.orientation-transitioning.to-vertical .clock[data-mode="4bit"] .helpRows4,
+body.help-visible.orientation-transitioning.to-vertical .clock[data-mode="6bit"] .helpRows6 {
+	animation: helpRowsFadeIn 1180ms var(--rand-ease-out) both;
+	animation-delay: calc(var(--column-offset) + var(--rand-delay-out));
 }
 
 body.mode-transitioning.to-6bit .clock[data-mode="6bit"] .bit {
@@ -539,5 +588,59 @@ body.orientation-transitioning.to-vertical .clock .bit {
 
 	75% {
 		filter: contrast(1.08) saturate(1.12);
+	}
+}
+
+@keyframes helpRowsFadeIn {
+	0% {
+		opacity: 0;
+		transform: scale(0.72) translate3d(0, 0.18rem, 0);
+		filter: blur(0.08rem);
+	}
+
+	38% {
+		opacity: 0.72;
+		transform: scale(1.08) translate3d(0, -0.06rem, 0);
+	}
+
+	68% {
+		opacity: 0.48;
+		transform: scale(0.94) translate3d(0, 0.03rem, 0);
+		filter: blur(0.02rem);
+	}
+
+	100% {
+		opacity: 0.58;
+		transform: scale(1) translate3d(0, 0, 0);
+		filter: blur(0);
+	}
+}
+
+@keyframes helpRowsFadeOut {
+	0% {
+		opacity: 0.58;
+		transform: scale(1) translate3d(0, 0, 0);
+		filter: blur(0);
+	}
+
+	45% {
+		opacity: 0.28;
+		transform: scale(0.9) translate3d(0, 0.05rem, 0);
+	}
+
+	100% {
+		opacity: 0;
+		transform: scale(0.72) translate3d(0, 0.18rem, 0);
+		filter: blur(0.08rem);
+	}
+}
+
+@keyframes themeColorFade {
+	from {
+		opacity: 1;
+	}
+
+	to {
+		opacity: 0;
 	}
 }

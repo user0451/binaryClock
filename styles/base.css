@@ -70,6 +70,9 @@ body {
 	display: grid;
 	place-items: center;
 	padding: clamp(0.45rem, 1.3vw, 1.4rem);
+	position: relative;
+	isolation: isolate;
+	overflow-x: hidden;
 }
 
 .appShell {
@@ -78,4 +81,6 @@ body {
 	grid-template-columns: 1fr;
 	gap: clamp(0.8rem, 1.8vw, 1.4rem);
 	justify-items: center;
+	position: relative;
+	z-index: 1;
 }

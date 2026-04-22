@@ -484,3 +484,12 @@ html[data-theme="retro-pixel-crunch"] {
 html[data-theme="retro-pixel-crunch"] .bit.on {
 	animation: retroStep 2.8s steps(12, end) infinite;
 }
+
+html[data-theme] {
+	--bit-on-color: var(--hours-on);
+	--theme-accent-color: var(--minutes-on);
+	--theme-bg-glow: var(--hours-glow);
+	--help-annotation-bg: var(--digital-pill-bg);
+	--help-annotation-shadow: 0 10px 24px var(--help-plus-glow);
+	--help-anchor-color: var(--help-plus-color);
+}

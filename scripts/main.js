@@ -40,8 +40,7 @@ function toggleDigital() {
 function pickRandomTheme() {
 	const available = SHUFFLEABLE_THEMES.filter(t => t !== state.theme);
 	state.theme = available[Math.floor(Math.random() * available.length)];
-	applyTheme();
-	runThemeMotionBurst();
+	runThemeMotionBurst(() => applyTheme());
 }
 
 export function startRandomMode() {
@@ -64,8 +63,7 @@ function stopRandomMode() {
 function onThemeChange() {
 	stopRandomMode();
 	state.theme = controls.themeSelect.value;
-	applyTheme();
-	runThemeMotionBurst();
+	runThemeMotionBurst(() => applyTheme());
 	persistState();
 }
 
