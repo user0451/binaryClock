@@ -21,7 +21,7 @@ export const SHUFFLEABLE_THEMES = [
 	"sunset-bloom", "cyberpunk-grid", "metallic-core", "monochrome-noir",
 	"electric-storm", "gloomy-mist", "sunny-pop", "christmas-glow",
 	"galactic-disco-inferno", "enchanted-forest-glow", "midnight-mirage",
-	"retro-pixel-crunch"
+	"retro-pixel-crunch", "bit-boring", "boring-bit"
 ];
 
 export const TRANSITION_EASINGS = [

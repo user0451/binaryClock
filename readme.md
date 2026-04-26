@@ -10,7 +10,7 @@ https://spinningrock.net/binary/
 - Two bit orientations: vertical (default) and horizontal.
 - Two time formats: 24-hour (default) and 12-hour.
 - Optional learning overlays and optional digital panel.
-- Theme picker with 16 built-in themes, plus a shuffle mode that rotates automatically every 10 minutes.
+- Theme picker with 18 built-in themes, plus a shuffle mode that rotates automatically every 10 minutes.
 - Page-load assembly animation and per-bit randomised easing on mode/theme transitions.
 - Responsive behaviour for desktop and mobile.
 - State persistence in localStorage.
@@ -36,7 +36,7 @@ No build step is required.
 - **24 / 12**: switches time format.
 - **Digital**: toggles the rolling digital companion panel.
 - **Vertical / Horizontal**: switches bit orientation. Bits animate between layouts using the same jitter-delay infrastructure as mode transitions.
-- **Help**: toggles inline binary weight annotations and the totals panel.
+- **Help**: toggles inline binary weight annotations and the digital panel.
 - **Theme (button)**: click to toggle automatic shuffle mode — the container sways gently while shuffle is active. Tooltip and `aria-pressed` state reflect the current mode.
 - **Theme (dropdown)**: selects a specific theme. Picking any theme manually stops the shuffle.
 
@@ -67,7 +67,7 @@ No build step is required.
 - On first render, all clock bits play a staggered assembly animation (`bitAssemble`) before the clock starts ticking, giving the initial experience a satisfying "power on" feel. Actually, it's not that great - nowhere near!
 
 ## Themes
-16 built-in themes, plus shuffle mode:
+18 built-in themes, plus shuffle mode:
 
 1. Classic RGB Neon
 2. Amber Terminal
@@ -85,8 +85,10 @@ No build step is required.
 14. Enchanted Forest Glow
 15. Midnight Mirage
 16. Retro Pixel Crunch
+17. Bit Boring
+18. Boring Bit
 
-Most themes include a custom `bit.on` animation tuned to a subtle theme-appropriate motion profile. **Shuffle mode** rotates through all 16 themes every 10 minutes; the theme selector container gently sways while active. Picking any theme manually disables shuffle.
+Most themes include a custom `bit.on` animation tuned to a subtle theme-appropriate motion profile. **Shuffle mode** rotates through all 18 themes every 10 minutes; the theme selector container gently sways while active. Picking any theme manually disables shuffle.
 
 ## Animations
 - **Mode transitions**: bits fly out and back in with per-bit randomised `--rand-delay-in/out` and `--rand-ease-in/out` CSS custom properties, drawn from a pool of easing curves. The direction of animation adapts to whether the target mode is 6-bit or 4-bit, and to the current bit orientation.

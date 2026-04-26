@@ -485,6 +485,167 @@ html[data-theme="retro-pixel-crunch"] .bit.on {
 	animation: retroStep 2.8s steps(12, end) infinite;
 }
 
+
+html[data-theme="bit-boring"] {
+	--surface-bg: radial-gradient(circle at 20% 10%, #1a1a1a 0%, #121212 56%, #0b0b0b 100%);
+	--surface-card: rgba(26, 26, 26, 0.58);
+	--surface-edge: rgba(116, 116, 116, 0.2);
+	--text-main: #c4c4c4;
+	--text-muted: #8f8f8f;
+	--control-bg: rgba(255, 255, 255, 0.08);
+	--control-active: #7f7f7f;
+	--focus-ring: #c2c2c2;
+	--hours-on: #9f9f9f;
+	--minutes-on: #acacac;
+	--seconds-on: #b7b7b7;
+	--hours-glow: rgba(181, 181, 181, 0.16);
+	--minutes-glow: rgba(188, 188, 188, 0.16);
+	--seconds-glow: rgba(197, 197, 197, 0.16);
+	--bit-off: linear-gradient(160deg, #212121, #171717);
+	--bit-off-border: rgba(116, 116, 116, 0.34);
+	--digital-panel-bg: linear-gradient(160deg, rgba(54, 54, 54, 0.42), rgba(18, 18, 18, 0.58));
+	--digital-panel-border: rgba(130, 130, 130, 0.24);
+	--digital-pill-bg: rgba(24, 24, 24, 0.84);
+	--digital-pill-border: rgba(137, 137, 137, 0.24);
+	--digital-label: rgba(171, 171, 171, 0.9);
+	--digital-value: rgba(210, 210, 210, 1);
+	--digital-meridiem-bg: linear-gradient(160deg, rgba(56, 56, 56, 0.52), rgba(19, 19, 19, 0.66));
+	--digital-meridiem-border: rgba(132, 132, 132, 0.24);
+	--digital-meridiem-text: rgba(208, 208, 208, 1);
+	--help-plus-color: rgba(160, 160, 160, 0.58);
+	--help-plus-glow: rgba(102, 102, 102, 0.16);
+	--font-main: "Courier New", "Consolas", monospace;
+	--font-mono: "Courier New", "Consolas", monospace;
+	--boring-digit-on: rgba(218, 218, 218, 0.92);
+	--boring-digit-off: var(--boring-digit-on);
+}
+
+html[data-theme="bit-boring"] .bit {
+	background: transparent !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+}
+
+html[data-theme="bit-boring"] .bit::before {
+	content: "0";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	font-family: var(--font-mono);
+	font-size: clamp(1.4rem, calc(var(--bit-size) * 1), 6rem);
+	font-weight: 700;
+	line-height: 1;
+	color: var(--boring-digit-off);
+	text-shadow: none;
+	pointer-events: none;
+	transition: color 200ms ease, opacity 200ms ease, transform 260ms ease;
+}
+
+html[data-theme="bit-boring"] .bit.on::before {
+	content: "1";
+	color: var(--boring-digit-on);
+}
+
+html[data-theme="bit-boring"] .hours .bit.on,
+html[data-theme="bit-boring"] .minutes .bit.on,
+html[data-theme="bit-boring"] .seconds .bit.on {
+	background: transparent !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+}
+
+html[data-theme="boring-bit"] {
+	--surface-bg: radial-gradient(circle at 22% 10%, #f6f6f6 0%, #ededed 58%, #dfdfdf 100%);
+	--surface-card: rgba(255, 255, 255, 0.62);
+	--surface-edge: rgba(45, 45, 45, 0.2);
+	--text-main: #202020;
+	--text-muted: #4d4d4d;
+	--control-bg: rgba(0, 0, 0, 0.08);
+	--control-active: #111111;
+	--focus-ring: #111111;
+	--hours-on: #121212;
+	--minutes-on: #0f0f0f;
+	--seconds-on: #1a1a1a;
+	--hours-glow: rgba(22, 22, 22, 0.16);
+	--minutes-glow: rgba(17, 17, 17, 0.16);
+	--seconds-glow: rgba(26, 26, 26, 0.16);
+	--bit-off: linear-gradient(160deg, #f2f2f2, #e7e7e7);
+	--bit-off-border: rgba(56, 56, 56, 0.34);
+	--digital-panel-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.74), rgba(226, 226, 226, 0.68));
+	--digital-panel-border: rgba(40, 40, 40, 0.22);
+	--digital-pill-bg: rgba(246, 246, 246, 0.92);
+	--digital-pill-border: rgba(38, 38, 38, 0.22);
+	--digital-label: rgba(62, 62, 62, 0.9);
+	--digital-value: rgba(12, 12, 12, 1);
+	--digital-meridiem-bg: linear-gradient(160deg, rgba(252, 252, 252, 0.92), rgba(229, 229, 229, 0.78));
+	--digital-meridiem-border: rgba(38, 38, 38, 0.2);
+	--digital-meridiem-text: rgba(8, 8, 8, 1);
+	--help-plus-color: rgba(56, 56, 56, 0.55);
+	--help-plus-glow: rgba(112, 112, 112, 0.12);
+	--font-main: "Courier New", "Consolas", monospace;
+	--font-mono: "Courier New", "Consolas", monospace;
+	--boring-digit-on: rgba(12, 12, 12, 0.94);
+	--boring-digit-off: var(--boring-digit-on);
+}
+
+html[data-theme="boring-bit"] .bit {
+	background: transparent !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+}
+
+html[data-theme="boring-bit"] .bit::before {
+	content: "0";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	font-family: var(--font-mono);
+	font-size: clamp(2rem, calc(var(--bit-size) * 1), 6rem);
+	font-weight: 700;
+	line-height: 1;
+	color: var(--boring-digit-off);
+	text-shadow: none;
+	pointer-events: none;
+	transition: color 200ms ease, opacity 200ms ease, transform 260ms ease;
+}
+
+html[data-theme="boring-bit"] .bit.on::before {
+	content: "1";
+	color: var(--boring-digit-on);
+}
+
+html[data-theme="bit-boring"] .bit,
+html[data-theme="boring-bit"] .bit {
+	perspective: 700px;
+	transform-style: preserve-3d;
+}
+
+html[data-theme="bit-boring"] .bit::before,
+html[data-theme="boring-bit"] .bit::before {
+	display: inline-block;
+	transform-origin: 50% 50%;
+	backface-visibility: hidden;
+	will-change: transform, filter;
+}
+
+html[data-theme="bit-boring"] .bit.slinky-spin::before,
+html[data-theme="boring-bit"] .bit.slinky-spin::before {
+	animation: boringDigitSlinkySpin 520ms cubic-bezier(0.24, 0.74, 0.2, 1);
+}
+
+html[data-theme="boring-bit"] .hours .bit.on,
+html[data-theme="boring-bit"] .minutes .bit.on,
+html[data-theme="boring-bit"] .seconds .bit.on {
+	background: transparent !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+}
+
+
+
+
 html[data-theme] {
 	--bit-on-color: var(--hours-on);
 	--theme-accent-color: var(--minutes-on);

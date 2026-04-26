@@ -184,7 +184,7 @@ body.help-visible .clock[data-mode="6bit"] .helpRows6 {
 	transform: scale(1);
 }
 
-.totalsPanel {
+.digitalPanel {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -203,13 +203,13 @@ body.help-visible .clock[data-mode="6bit"] .helpRows6 {
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 26px rgba(0, 0, 0, 0.28);
 }
 
-body.digital-visible .totalsPanel {
+body.digital-visible .digitalPanel {
 	opacity: 1;
 	pointer-events: auto;
 	transform: translateY(0) scale(1);
 }
 
-.totalsRow {
+.digitalRow {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -217,7 +217,7 @@ body.digital-visible .totalsPanel {
 	flex-wrap: wrap;
 }
 
-.totalCell {
+.digitalCell {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.3rem;
@@ -229,13 +229,13 @@ body.digital-visible .totalsPanel {
 	line-height: 1;
 }
 
-.totalLabel {
+.digitalLabel {
 	font-size: clamp(0.58rem, 1vw, 0.88rem);
 	letter-spacing: 0.08em;
 	color: var(--digital-label);
 }
 
-.totalValue {
+.digitalValue {
 	position: relative;
 	display: inline-flex;
 	align-items: center;
@@ -252,7 +252,7 @@ body.digital-visible .totalsPanel {
 	text-align: center;
 }
 
-.totalValue .digitSlot {
+.digitalValue .digitSlot {
 	position: relative;
 	display: inline-flex;
 	align-items: center;
@@ -262,7 +262,7 @@ body.digital-visible .totalsPanel {
 	overflow: hidden;
 }
 
-.totalValue .digitLayer {
+.digitalValue .digitLayer {
 	position: absolute;
 	left: 0;
 	right: 0;
@@ -275,11 +275,12 @@ body.digital-visible .totalsPanel {
 	pointer-events: none;
 }
 
-.totalValue .digitLayer.out {
+
+.digitalValue .digitLayer.out {
 	animation: digitalRollOutUp 360ms var(--ease-primary) both;
 }
 
-.totalValue .digitLayer.in {
+.digitalValue .digitLayer.in {
 	animation: digitalRollInUp 360ms var(--ease-primary) both;
 }
 

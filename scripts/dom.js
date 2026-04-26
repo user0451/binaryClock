@@ -9,6 +9,8 @@ export const controls = {
 	digitalToggle: document.getElementById("digitalToggle"),
 	digitalLabel: document.getElementById("digitalLabel"),
 	shuffleButton: document.getElementById("shuffleButton"),
+	themeSelectDisplay: document.getElementById("themeSelectDisplay"),
+	themeSelectList: document.getElementById("themeSelectList"),
 	themeSelect: document.getElementById("themeSelect"),
 	settingsButton: document.getElementById("settingsButton"),
 	settingsOverlay: document.getElementById("settingsOverlay"),
@@ -18,14 +20,14 @@ export const controls = {
 export const clockElement = document.querySelector(".clock");
 export const allBitNodes = Array.from(document.querySelectorAll(".clock .bit"));
 export const helpRowNodes = Array.from(document.querySelectorAll(".clock .helpRows4, .clock .helpRows6"));
-export const totalsPanel = document.querySelector(".totalsPanel");
+export const digitalPanel = document.querySelector(".digitalPanel");
 export const meridiemBadge = document.getElementById("meridiemBadge");
 
-export const totalsNodes = {
+export const digitalNodes = {
 	sixBit: {
-		hours: document.getElementById("total6-hours"),
-		minutes: document.getElementById("total6-minutes"),
-		seconds: document.getElementById("total6-seconds")
+		hours: document.getElementById("digital-hours"),
+		minutes: document.getElementById("digital-minutes"),
+		seconds: document.getElementById("digital-seconds")
 	}
 };
 

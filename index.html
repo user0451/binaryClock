@@ -124,19 +124,19 @@
 
 		</div>
 
-		<section class="totalsPanel" aria-live="polite" aria-label="Help totals" aria-hidden="true">
-			<div class="totalsRow" data-mode="all">
-				<div class="totalCell">
-					<span class="totalLabel">H</span>
-					<span class="totalValue" id="total6-hours">00</span>
+		<section class="digitalPanel" aria-live="polite" aria-label="Help digital" aria-hidden="true">
+			<div class="digitalRow" data-mode="all">
+				<div class="digitalCell">
+					<span class="digitalLabel">H</span>
+					<span class="digitalValue" id="digital-hours">00</span>
 				</div>
-				<div class="totalCell">
-					<span class="totalLabel">M</span>
-					<span class="totalValue" id="total6-minutes">00</span>
+				<div class="digitalCell">
+					<span class="digitalLabel">M</span>
+					<span class="digitalValue" id="digital-minutes">00</span>
 				</div>
-				<div class="totalCell">
-					<span class="totalLabel">S</span>
-					<span class="totalValue" id="total6-seconds">00</span>
+				<div class="digitalCell">
+					<span class="digitalLabel">S</span>
+					<span class="digitalValue" id="digital-seconds">00</span>
 				</div>
 			</div>
 			<div id="meridiemBadge" class="meridiemBadge" aria-live="polite" aria-hidden="true">AM</div>
@@ -182,10 +182,16 @@
 					<button type="button" id="shuffleButton" class="shuffle-btn label-text"
 						title="Shuffle off. Click to rotate themes automatically every 10 minutes."
 						aria-pressed="false">Theme</button>
-					<select id="themeSelect" aria-label="Clock visual theme">
+					<button type="button" id="themeSelectDisplay" class="theme-select-display" aria-haspopup="listbox"
+						aria-expanded="false" aria-controls="themeSelectList" aria-label="Clock visual theme"></button>
+					<div id="themeSelectList" class="theme-select-list" role="listbox"
+						aria-label="Clock visual theme options"></div>
+					<select id="themeSelect" aria-label="Clock visual theme" tabindex="-1" aria-hidden="true">
 						<option value="classic-rgb-neon">Classic RGB Neon</option>
 						<option value="amber-terminal">Amber Terminal</option>
 						<option value="ice-glass">Ice Glass</option>
+						<option value="bit-boring">Bit Boring</option>
+						<option value="boring-bit">Boring Bits</option>
 						<option value="matrix-pulse">Matrix Pulse</option>
 						<option value="sunset-bloom">Sunset Bloom</option>
 						<option value="cyberpunk-grid">Cyberpunk Grid</option>

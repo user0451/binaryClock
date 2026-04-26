@@ -22,7 +22,7 @@ body.theme-transitioning::before {
 }
 
 body.theme-transitioning .clock,
-body.theme-transitioning .totalsPanel,
+body.theme-transitioning .digitalPanel,
 body.theme-transitioning .helpPlusRow {
 	transition: color var(--theme-fade-duration) var(--ease-soft), border-color var(--theme-fade-duration) var(--ease-soft), box-shadow var(--theme-fade-duration) var(--ease-soft), text-shadow var(--theme-fade-duration) var(--ease-soft), background-color var(--theme-fade-duration) var(--ease-soft);
 }
@@ -588,6 +588,61 @@ body.orientation-transitioning.to-vertical .clock .bit {
 
 	75% {
 		filter: contrast(1.08) saturate(1.12);
+	}
+}
+
+@keyframes bitBoringFade {
+
+	0%,
+	100% {
+		opacity: 0.92;
+		transform: scale(1);
+	}
+
+	50% {
+		opacity: 1;
+		transform: scale(1.02);
+	}
+}
+
+@keyframes boringBitFade {
+
+	0%,
+	100% {
+		opacity: 0.9;
+		transform: scale(1);
+	}
+
+	50% {
+		opacity: 1;
+		transform: scale(1.015);
+	}
+}
+
+@keyframes boringDigitSlinkySpin {
+	0% {
+		transform: translate(-50%, -50%) rotateY(0deg) scale(1);
+		filter: blur(0);
+	}
+
+	/* 34% {
+		transform: translate(-50%, -50%) rotateY(88deg) scale(0.975);
+		filter: blur(0.012rem);
+	} */
+
+	50% {
+		transform: translate(-50%, -50%) rotateY(224deg) scale(0.985);
+		filter: blur(0.008rem);
+	}
+
+	86% {
+		transform: translate(-50%, -50%) rotateY(320deg) scale(0.995);
+		filter: blur(0.003rem);
+	}
+
+	100% {
+		transform: translate(-50%, -50%) rotateY(360deg) scale(1);
+		filter: blur(0);
 	}
 }
 

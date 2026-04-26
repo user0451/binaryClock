@@ -164,7 +164,7 @@ body.bits-horizontal .clock[data-mode="4bit"] .timeGroup {
 @media (min-width: 1100px) {
 	body.bits-horizontal .clock[data-mode="4bit"] {
 		--bit-size: clamp(2.1rem, 4.4vw, 4.3rem);
-		--bit-gap: clamp(0.31rem, 1vw, 0.62rem);
+		--bit-gap: clamp(0.31rem, 1vw, 1rem);
 		--group-gap: clamp(0.72rem, 1.55vw, 1.4rem);
 		--clock-gap: clamp(0.75rem, 1.9vw, 2.2rem);
 		padding: clamp(1.1rem, 2.5vw, 2.3rem) clamp(0.9rem, 2.2vw, 1.9rem);

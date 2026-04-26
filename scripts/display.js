@@ -1,13 +1,15 @@
 import { FOUR_BIT_WEIGHTS, HELP_WEIGHTS, TRANSITION_EASINGS } from "./config.js";
-import { allBitNodes, helpRowNodes, meridiemBadge, sixBitNodes, totalsNodes } from "./dom.js";
+import { allBitNodes, helpRowNodes, meridiemBadge, sixBitNodes, digitalNodes } from "./dom.js";
 import { state } from "./state.js";
 
 const rollingTimers = new WeakMap();
+const bitSpinTimers = new WeakMap();
 const UNIT_COLUMN_OFFSETS = {
 	hours: "0ms",
 	seconds: "45ms",
 	minutes: "90ms"
 };
+const SLINKY_SPIN_THEMES = new Set(["bit-boring", "boring-bit"]);
 
 function randomDelayMs(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -60,11 +62,49 @@ function updateMeridiemBadge(values) {
 	meridiemBadge.setAttribute("aria-hidden", showMeridiem ? "false" : "true");
 }
 
+function shouldRunSlinkySpin() {
+	if (state.modeTransitioning) {
+		return false;
+	}
+	return SLINKY_SPIN_THEMES.has(document.documentElement.dataset.theme || "");
+}
+
+function triggerBitSlinkySpin(node) {
+	const pendingTimer = bitSpinTimers.get(node);
+	if (pendingTimer) {
+		window.clearTimeout(pendingTimer);
+		bitSpinTimers.delete(node);
+	}
+
+	node.classList.remove("slinky-spin");
+	void node.offsetWidth;
+	node.classList.add("slinky-spin");
+
+	const timerId = window.setTimeout(() => {
+		node.classList.remove("slinky-spin");
+		bitSpinTimers.delete(node);
+	}, 520);
+
+	bitSpinTimers.set(node, timerId);
+}
+
+function setBitState(node, isOn) {
+	const wasOn = node.classList.contains("on");
+	if (wasOn === isOn) {
+		return;
+	}
+
+	node.classList.toggle("on", isOn);
+	if (shouldRunSlinkySpin()) {
+		triggerBitSlinkySpin(node);
+	}
+}
+
 function applySixBit(unit, value) {
 	const list = sixBitNodes[unit];
 	for (let i = 0; i < 6; i++) {
 		const bitValue = 1 << (5 - i);
-		list[i].classList.toggle("on", (value & bitValue) !== 0);
+		setBitState(list[i], (value & bitValue) !== 0);
 	}
 }
 
@@ -73,8 +113,8 @@ function applyFourBit(prefix, value) {
 	const units = value % 10;
 	for (let i = 0; i < 4; i++) {
 		const bitValue = 1 << (3 - i);
-		document.getElementById(prefix + "Tens" + bitValue).classList.toggle("on", (tens & bitValue) !== 0);
-		document.getElementById(prefix + bitValue).classList.toggle("on", (units & bitValue) !== 0);
+		setBitState(document.getElementById(prefix + "Tens" + bitValue), (tens & bitValue) !== 0);
+		setBitState(document.getElementById(prefix + bitValue), (units & bitValue) !== 0);
 	}
 }
 
@@ -160,13 +200,13 @@ function setRollingText(node, nextValue) {
 	setRollingDigit(slots[1], next[1]);
 }
 
-function setHelpTotals(values) {
+function setHelpdigital(values) {
 	const hoursText = state.show24HourFormat
 		? String(values.hours).padStart(2, "0")
 		: String(values.hours).padStart(2, " ");
-	setRollingText(totalsNodes.sixBit.hours, hoursText);
-	setRollingText(totalsNodes.sixBit.minutes, String(values.minutes).padStart(2, "0"));
-	setRollingText(totalsNodes.sixBit.seconds, String(values.seconds).padStart(2, "0"));
+	setRollingText(digitalNodes.sixBit.hours, hoursText);
+	setRollingText(digitalNodes.sixBit.minutes, String(values.minutes).padStart(2, "0"));
+	setRollingText(digitalNodes.sixBit.seconds, String(values.seconds).padStart(2, "0"));
 }
 
 function updateInlineBitHelp(values, mode) {
@@ -178,7 +218,7 @@ function updateInlineBitHelp(values, mode) {
 				setBitHelpData(node, contribution, weight);
 			});
 		});
-		setHelpTotals(values);
+		setHelpdigital(values);
 		return;
 	}
 
@@ -197,7 +237,7 @@ function updateInlineBitHelp(values, mode) {
 		});
 	});
 
-	setHelpTotals(values);
+	setHelpdigital(values);
 }
 
 export function updateTimeDisplayForMode(values, mode) {

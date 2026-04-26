@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from "./config.js";
-import { clockElement, controls, totalsPanel } from "./dom.js";
+import { clockElement, controls, digitalPanel } from "./dom.js";
 import { state } from "./state.js";
 
 export function setModeLabel() {
@@ -37,8 +37,8 @@ export function applyHelpState() {
 
 export function applyDigitalState() {
 	document.body.classList.toggle("digital-visible", state.digitalVisible);
-	if (totalsPanel) {
-		totalsPanel.setAttribute("aria-hidden", state.digitalVisible ? "false" : "true");
+	if (digitalPanel) {
+		digitalPanel.setAttribute("aria-hidden", state.digitalVisible ? "false" : "true");
 	}
 }
 
@@ -62,6 +62,15 @@ export function applyTheme() {
 	}
 	if (controls.themeSelect.value !== state.theme) {
 		controls.themeSelect.value = state.theme;
+	}
+	if (controls.themeSelectDisplay) {
+		const selectedOption = controls.themeSelect.options[controls.themeSelect.selectedIndex];
+		controls.themeSelectDisplay.textContent = selectedOption ? selectedOption.text : "Theme";
+	}
+	if (controls.themeSelectList) {
+		controls.themeSelectList.querySelectorAll(".theme-select-option").forEach((optionNode) => {
+			optionNode.setAttribute("aria-selected", optionNode.dataset.themeValue === state.theme ? "true" : "false");
+		});
 	}
 }
 
