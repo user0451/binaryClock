@@ -76,7 +76,7 @@ body.help-visible .clock[data-mode="4bit"] .digit {
 	background: var(--bit-off);
 	box-shadow: inset 0 -0.35rem 0.6rem rgba(0, 0, 0, 0.25);
 	transform-origin: center;
-	transition: transform var(--motion-base) var(--ease-primary), opacity var(--motion-base) var(--ease-soft), background-color var(--motion-base) var(--ease-soft), box-shadow var(--motion-base) var(--ease-soft), border-color var(--motion-base) var(--ease-soft), filter var(--motion-base) var(--ease-soft);
+	transition: transform var(--motion-base) var(--ease-primary), border-radius var(--motion-base) var(--ease-primary), opacity var(--motion-base) var(--ease-soft), background-color var(--motion-base) var(--ease-soft), box-shadow var(--motion-base) var(--ease-soft), border-color var(--motion-base) var(--ease-soft), filter var(--motion-base) var(--ease-soft);
 	position: relative;
 	overflow: visible;
 }

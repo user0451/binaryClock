@@ -1,4 +1,4 @@
-import { controls } from "./dom.js";
+import { allBitNodes, controls } from "./dom.js";
 import { applyModeJitterDelays, runTick } from "./display.js";
 import { PAGE_ASSEMBLY_WINDOW_MS, RANDOM_THEME_INTERVAL_MS, SHUFFLEABLE_THEMES } from "./config.js";
 import { state } from "./state.js";
@@ -99,7 +99,7 @@ function toggleMode() {
 }
 
 function toggleTimeFormat() {
-	state.show24HourFormat = !controls.timeFormatToggle.checked;
+	state.show24HourFormat = controls.timeFormatToggle.checked;
 	setTimeFormatLabel();
 	persistState();
 	runTick();
@@ -181,8 +181,191 @@ function startClock() {
 	runTick();
 }
 
+function wireBitLiquidInteractions() {
+	const releaseTimers = new WeakMap();
+	const liquidProfiles = new WeakMap();
+	const settleAnimations = new WeakMap();
+	const liquidShapeCount = 6;
+
+	function randomInt(min, max) {
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+
+	function createLiquidShape() {
+		const topLeftX = randomInt(30, 70);
+		const topRightX = 100 - topLeftX;
+		const bottomLeftX = randomInt(30, 70);
+		const bottomRightX = 100 - bottomLeftX;
+		const topLeftY = randomInt(30, 70);
+		const topRightY = 100 - topLeftY;
+		const bottomLeftY = randomInt(30, 70);
+		const bottomRightY = 100 - bottomLeftY;
+
+		return `${topLeftX}% ${topRightX}% ${bottomLeftX}% ${bottomRightX}% / ${topLeftY}% ${topRightY}% ${bottomLeftY}% ${bottomRightY}%`;
+	}
+
+	function applyRandomLiquidProfile(bitNode, pointerType) {
+		for (let index = 0; index < liquidShapeCount; index += 1) {
+			bitNode.style.setProperty(`--liquid-shape-${index}`, createLiquidShape());
+		}
+
+		const durationSeconds = pointerType === "touch"
+			? (randomInt(95, 150) / 100).toFixed(2)
+			: (randomInt(180, 520) / 100).toFixed(2);
+		const negativeOffsetSeconds = (Math.random() * Number(durationSeconds)).toFixed(2);
+
+		bitNode.style.setProperty("--liquid-duration", `${durationSeconds}s`);
+		bitNode.style.setProperty("--liquid-delay", `-${negativeOffsetSeconds}s`);
+		liquidProfiles.set(bitNode, {
+			startedAt: performance.now(),
+			durationMs: Number(durationSeconds) * 1000,
+			offsetMs: Number(negativeOffsetSeconds) * 1000
+		});
+	}
+
+	function cancelSettleAnimation(bitNode) {
+		const animation = settleAnimations.get(bitNode);
+		if (animation) {
+			animation.cancel();
+			settleAnimations.delete(bitNode);
+		}
+		bitNode.style.removeProperty("border-radius");
+	}
+
+	function createSettlingShape() {
+		const topLeftX = randomInt(44, 56);
+		const topRightX = 100 - topLeftX;
+		const bottomLeftX = randomInt(44, 56);
+		const bottomRightX = 100 - bottomLeftX;
+		const topLeftY = randomInt(44, 56);
+		const topRightY = 100 - topLeftY;
+		const bottomLeftY = randomInt(44, 56);
+		const bottomRightY = 100 - bottomLeftY;
+
+		return `${topLeftX}% ${topRightX}% ${bottomLeftX}% ${bottomRightX}% / ${topLeftY}% ${topRightY}% ${bottomLeftY}% ${bottomRightY}%`;
+	}
+
+	function createCircleShape() {
+		return "50% 50% 50% 50% / 50% 50% 50% 50%";
+	}
+
+	function finishLiquid(bitNode) {
+		const currentRadius = window.getComputedStyle(bitNode).borderRadius;
+		bitNode.classList.remove("liquid-live", "liquid-touch");
+
+		if (typeof bitNode.animate !== "function") {
+			bitNode.style.borderRadius = currentRadius;
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					bitNode.style.removeProperty("border-radius");
+				});
+			});
+			return;
+		}
+
+		const settleAnimation = bitNode.animate([
+			{ borderRadius: currentRadius, offset: 0 },
+			{ borderRadius: createSettlingShape(), offset: 0.42 },
+			{ borderRadius: createSettlingShape(), offset: 0.78 },
+			{ borderRadius: createCircleShape(), offset: 1 }
+		], {
+			duration: bitNode.classList.contains("liquid-touch") ? 420 : 520,
+			easing: "cubic-bezier(0.2, 0.78, 0.18, 1)",
+			fill: "forwards"
+		});
+
+		settleAnimations.set(bitNode, settleAnimation);
+		settleAnimation.addEventListener("finish", () => {
+			if (settleAnimations.get(bitNode) !== settleAnimation) {
+				return;
+			}
+			settleAnimations.delete(bitNode);
+			bitNode.style.borderRadius = createCircleShape();
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+			bitNode.style.removeProperty("border-radius");
+				});
+			});
+		});
+		settleAnimation.addEventListener("cancel", () => {
+			if (settleAnimations.get(bitNode) === settleAnimation) {
+				settleAnimations.delete(bitNode);
+			}
+		});
+	}
+
+	function getLiquidReleaseDelay(bitNode) {
+		const profile = liquidProfiles.get(bitNode);
+		if (!profile) {
+			return bitNode.classList.contains("liquid-touch") ? 220 : 180;
+		}
+
+		const elapsedMs = performance.now() - profile.startedAt;
+		const progressMs = (profile.offsetMs + elapsedMs) % profile.durationMs;
+		const remainingMs = profile.durationMs - progressMs;
+
+		return Math.max(remainingMs, 80);
+	}
+
+	function clearReleaseTimer(bitNode) {
+		const timerId = releaseTimers.get(bitNode);
+		if (timerId) {
+			window.clearTimeout(timerId);
+			releaseTimers.delete(bitNode);
+		}
+	}
+
+	function startLiquid(bitNode, pointerType) {
+		clearReleaseTimer(bitNode);
+		cancelSettleAnimation(bitNode);
+		applyRandomLiquidProfile(bitNode, pointerType);
+		bitNode.classList.add("liquid-live");
+		bitNode.classList.toggle("liquid-touch", pointerType === "touch");
+	}
+
+	function releaseLiquid(bitNode) {
+		clearReleaseTimer(bitNode);
+		const delayMs = getLiquidReleaseDelay(bitNode);
+		const timerId = window.setTimeout(() => {
+			finishLiquid(bitNode);
+			liquidProfiles.delete(bitNode);
+			releaseTimers.delete(bitNode);
+		}, delayMs);
+		releaseTimers.set(bitNode, timerId);
+	}
+
+	allBitNodes.forEach((bitNode) => {
+		bitNode.addEventListener("pointerenter", (event) => {
+			if (event.pointerType === "mouse" || event.pointerType === "pen") {
+				startLiquid(bitNode, event.pointerType);
+			}
+		});
+
+		bitNode.addEventListener("pointerleave", () => {
+			releaseLiquid(bitNode);
+		});
+
+		bitNode.addEventListener("pointerdown", (event) => {
+			startLiquid(bitNode, event.pointerType);
+		});
+
+		bitNode.addEventListener("pointerup", () => {
+			releaseLiquid(bitNode);
+		});
+
+		bitNode.addEventListener("pointercancel", () => {
+			releaseLiquid(bitNode);
+		});
+
+		bitNode.addEventListener("lostpointercapture", () => {
+			releaseLiquid(bitNode);
+		});
+	});
+}
+
 function wireEvents() {
 	buildThemeDropdownOptions();
+	wireBitLiquidInteractions();
 	controls.modeToggle.addEventListener("change", toggleMode);
 	controls.timeFormatToggle.addEventListener("change", toggleTimeFormat);
 	controls.helpToggle.addEventListener("change", toggleHelp);

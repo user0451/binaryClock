@@ -113,13 +113,13 @@ export function restoreState() {
 	}
 
 	const format = localStorage.getItem(STORAGE_KEYS.format);
-	state.show24HourFormat = format !== "12";
+	state.show24HourFormat = format === "24";
 
 	const help = localStorage.getItem(STORAGE_KEYS.help);
 	state.helpVisible = help === "on";
 
 	const digital = localStorage.getItem(STORAGE_KEYS.digital);
-	state.digitalVisible = digital === "on";
+	state.digitalVisible = digital !== "off";
 
 	const scanlines = localStorage.getItem(STORAGE_KEYS.scanlines);
 	state.scanlinesVisible = scanlines !== "off";
@@ -137,7 +137,7 @@ export function restoreState() {
 	}
 
 	controls.modeToggle.checked = state.mode === "4-bit";
-	controls.timeFormatToggle.checked = !state.show24HourFormat;
+	controls.timeFormatToggle.checked = state.show24HourFormat;
 	controls.helpToggle.checked = state.helpVisible;
 	controls.digitalToggle.checked = state.digitalVisible;
 	controls.scanlinesToggle.checked = state.scanlinesVisible;

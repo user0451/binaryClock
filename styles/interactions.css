@@ -1,0 +1,114 @@
+/* ── Liquid hover / touch effect for clock bits ──────────────────────── */
+
+/*
+ * Selector: html[data-theme] .bit
+ * Specificity: 0,1,2,1 — matches & beats html[data-theme="…"] .bit.on (0,1,2,1)
+ * by cascade order since this file is imported last in style.css.
+ */
+
+@keyframes bitLiquid {
+	0% {
+		border-radius: var(--liquid-shape-0, 42% 58% 64% 36% / 54% 46% 60% 40%);
+	}
+
+	20% {
+		border-radius: var(--liquid-shape-1, 64% 36% 40% 60% / 40% 60% 46% 54%);
+	}
+
+	40% {
+		border-radius: var(--liquid-shape-2, 36% 64% 60% 40% / 62% 38% 42% 58%);
+	}
+
+	60% {
+		border-radius: var(--liquid-shape-3, 60% 40% 36% 64% / 44% 56% 64% 36%);
+	}
+
+	80% {
+		border-radius: var(--liquid-shape-4, 44% 56% 62% 38% / 64% 36% 40% 60%);
+	}
+
+	100% {
+		border-radius: var(--liquid-shape-5, 66% 34% 44% 56% / 46% 54% 60% 40%);
+	}
+}
+
+html[data-theme] .bit.liquid-live {
+	z-index: 2;
+	will-change: border-radius;
+}
+
+/*
+ * Hover: continuous blob morph — mouse / trackpad only.
+ * No filter: avoids a new stacking/filter context so the bit's box-shadow
+ * is never clipped. z-index: 2 raises it above all z-index:auto siblings
+ * so the glow composites on top of adjacent bits' backgrounds.
+ */
+@media (hover: hover) and (pointer: fine) {
+
+	html[data-theme] .bit:hover,
+	html[data-theme] .bit.liquid-live:not(.liquid-touch) {
+		animation: bitLiquid var(--liquid-duration, 2.4s) linear infinite alternate;
+		animation-delay: var(--liquid-delay, 0s);
+		z-index: 2;
+		cursor: default;
+		will-change: border-radius;
+	}
+}
+
+/*
+ * Press / tap — default (mouse click):
+ * Fast compress + blob on the way down (80 ms), springs back at
+ * normal 320 ms ease-primary when :active ends.
+ */
+html[data-theme] .bit:active {
+	transform: scale(0.84);
+	border-radius: 48% 52% 62% 38% / 42% 58% 44% 56%;
+	z-index: 2;
+	transition:
+		transform 80ms ease-out,
+		border-radius 80ms ease-out,
+		opacity var(--motion-base) var(--ease-soft),
+		background-color var(--motion-base) var(--ease-soft),
+		box-shadow var(--motion-base) var(--ease-soft),
+		border-color var(--motion-base) var(--ease-soft);
+}
+
+/*
+ * Touch :active override — counteract the press-shrink with scale(1)
+ * and run the liquid morph while the finger is held down.
+ * (:hover never fires on touch, so this is the only liquid effect.)
+ */
+@media (hover: none) {
+
+	html[data-theme] .bit:active,
+	html[data-theme] .bit.liquid-live.liquid-touch {
+		transform: scale(1);
+		animation-name: bitLiquid !important;
+		animation-duration: var(--liquid-duration, 1.4s) !important;
+		animation-delay: var(--liquid-delay, 0s) !important;
+		animation-timing-function: linear !important;
+		animation-iteration-count: infinite !important;
+		animation-direction: alternate !important;
+		will-change: border-radius;
+	}
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+	html[data-theme] .bit:hover {
+		animation: none;
+		will-change: auto;
+	}
+
+	html[data-theme] .bit.liquid-live {
+		animation: none !important;
+		will-change: auto;
+	}
+
+	html[data-theme] .bit:active {
+		transform: scale(0.94);
+		border-radius: 999px;
+		animation: none;
+		transition: transform 80ms ease-out;
+	}
+}

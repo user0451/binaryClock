@@ -1,9 +1,9 @@
 export const state = {
 	mode: "6-bit",
 	bitOrientation: "vertical",
-	show24HourFormat: true,
+	show24HourFormat: false,
 	helpVisible: false,
-	digitalVisible: false,
+	digitalVisible: true,
 	scanlinesVisible: true,
 	theme: "classic-rgb-neon",
 	randomMode: false,
