@@ -3,6 +3,7 @@ export const STORAGE_KEYS = {
 	format: "binaryClockFormat",
 	help: "binaryClockHelp",
 	digital: "binaryClockDigital",
+	scanlines: "binaryClockScanlines",
 	theme: "binaryClockTheme",
 	bitOrientation: "binaryClockBitOrientation"
 };

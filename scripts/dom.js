@@ -8,6 +8,8 @@ export const controls = {
 	orientationLabel: document.getElementById("orientationLabel"),
 	digitalToggle: document.getElementById("digitalToggle"),
 	digitalLabel: document.getElementById("digitalLabel"),
+	scanlinesToggle: document.getElementById("scanlinesToggle"),
+	scanlinesLabel: document.getElementById("scanlinesLabel"),
 	shuffleButton: document.getElementById("shuffleButton"),
 	themeSelectDisplay: document.getElementById("themeSelectDisplay"),
 	themeSelectList: document.getElementById("themeSelectList"),

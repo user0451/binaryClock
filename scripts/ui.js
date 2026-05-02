@@ -16,6 +16,12 @@ export function setDigitalLabel() {
 	}
 }
 
+export function setScanlinesLabel() {
+	if (controls.scanlinesLabel) {
+		controls.scanlinesLabel.innerText = "Scanlines";
+	}
+}
+
 export function setOrientationLabel() {
 	if (controls.orientationLabel) {
 		controls.orientationLabel.innerText = state.bitOrientation === "horizontal" ? "Horizontal" : "Vertical";
@@ -27,6 +33,7 @@ export function persistState() {
 	localStorage.setItem(STORAGE_KEYS.format, state.show24HourFormat ? "24" : "12");
 	localStorage.setItem(STORAGE_KEYS.help, state.helpVisible ? "on" : "off");
 	localStorage.setItem(STORAGE_KEYS.digital, state.digitalVisible ? "on" : "off");
+	localStorage.setItem(STORAGE_KEYS.scanlines, state.scanlinesVisible ? "on" : "off");
 	localStorage.setItem(STORAGE_KEYS.theme, state.randomMode ? "random-shuffle" : state.theme);
 	localStorage.setItem(STORAGE_KEYS.bitOrientation, state.bitOrientation);
 }
@@ -40,6 +47,10 @@ export function applyDigitalState() {
 	if (digitalPanel) {
 		digitalPanel.setAttribute("aria-hidden", state.digitalVisible ? "false" : "true");
 	}
+}
+
+export function applyScanlineState() {
+	document.body.classList.toggle("scanlines-off", !state.scanlinesVisible);
 }
 
 export function applyBitOrientationState() {
@@ -78,6 +89,17 @@ export function setSettingsOpen(isOpen) {
 	document.body.classList.toggle("settings-open", isOpen);
 	controls.settingsOverlay.setAttribute("aria-hidden", isOpen ? "false" : "true");
 	controls.settingsButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
+	if (isOpen) {
+		// Move focus to the first interactive control inside the panel
+		const firstFocusable = controls.settingsOverlay.querySelector(
+			'input, button, select, [tabindex]:not([tabindex="-1"])'
+		);
+		if (firstFocusable) {
+			requestAnimationFrame(() => firstFocusable.focus());
+		}
+	} else if (controls.settingsButton) {
+		controls.settingsButton.focus();
+	}
 }
 
 export function toggleSettings() {
@@ -99,6 +121,9 @@ export function restoreState() {
 	const digital = localStorage.getItem(STORAGE_KEYS.digital);
 	state.digitalVisible = digital === "on";
 
+	const scanlines = localStorage.getItem(STORAGE_KEYS.scanlines);
+	state.scanlinesVisible = scanlines !== "off";
+
 	const theme = localStorage.getItem(STORAGE_KEYS.theme);
 	if (theme === "random-shuffle") {
 		state.randomMode = true;
@@ -115,13 +140,16 @@ export function restoreState() {
 	controls.timeFormatToggle.checked = !state.show24HourFormat;
 	controls.helpToggle.checked = state.helpVisible;
 	controls.digitalToggle.checked = state.digitalVisible;
+	controls.scanlinesToggle.checked = state.scanlinesVisible;
 	controls.orientationToggle.checked = state.bitOrientation === "horizontal";
 	setModeLabel();
 	setTimeFormatLabel();
 	setDigitalLabel();
+	setScanlinesLabel();
 	setOrientationLabel();
 	applyHelpState();
 	applyDigitalState();
+	applyScanlineState();
 	applyBitOrientationState();
 	applyTheme();
 	clockElement.setAttribute("data-mode", state.mode === "4-bit" ? "4bit" : "6bit");

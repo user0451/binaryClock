@@ -5,10 +5,11 @@
 }
 
 :root {
-	--bit-size: clamp(2.35rem, 5.1vw, 4.9rem);
-	--bit-gap: clamp(0.36rem, 1.2vw, 0.74rem);
-	--clock-gap: clamp(1rem, 2.8vw, 2.8rem);
-	--group-gap: clamp(0.85rem, 2vw, 1.7rem);
+	/* Mobile-first: vmin scales with the shorter viewport side */
+	--bit-size: clamp(3.6rem, 24vmin, 7rem);
+	--bit-gap: clamp(0.18rem, 0.8vmin, 0.38rem);
+	--clock-gap: clamp(1rem, 3.4vmin, 1.95rem);
+	--group-gap: clamp(0.34rem, 1.8vmin, 0.9rem);
 	--control-height: clamp(2.1rem, 4.4vw, 2.4rem);
 	--control-width: clamp(6rem, 12vw, 7rem);
 	--switch-knob: calc(var(--control-height) - 0.4rem);
@@ -19,6 +20,11 @@
 	--ease-bubble-in: cubic-bezier(0.15, 0.86, 0.24, 1.12);
 	--ease-bubble-out: cubic-bezier(0.22, 0.76, 0.2, 1.06);
 	--bubble-travel: 1;
+
+	/* Arcade radar flair */
+	--scanline-gap: 3px;
+	--scanline-opacity: 0.06;
+	--radar-glow-size: 1;
 
 	--surface-bg: radial-gradient(circle at 18% 15%, #171127 0%, #070709 62%, #000 100%);
 	--surface-card: rgba(15, 14, 24, 0.52);
@@ -61,6 +67,25 @@ body {
 	padding: 0;
 }
 
+/* Arcade CRT scanline overlay */
+body::after {
+	content: "";
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	z-index: 9998;
+	background: repeating-linear-gradient(0deg,
+			transparent 0px,
+			transparent calc(var(--scanline-gap) - 1px),
+			rgba(0, 0, 0, var(--scanline-opacity)) calc(var(--scanline-gap) - 1px),
+			rgba(0, 0, 0, var(--scanline-opacity)) var(--scanline-gap));
+	transition: opacity var(--motion-base) var(--ease-soft);
+}
+
+body.scanlines-off::after {
+	opacity: 0;
+}
+
 body {
 	min-height: 100vh;
 	min-height: 100dvh;
@@ -69,18 +94,22 @@ body {
 	background: var(--surface-bg);
 	display: grid;
 	place-items: center;
-	padding: clamp(0.45rem, 1.3vw, 1.4rem);
+	/* Mobile-first padding */
+	padding: clamp(0.3rem, 2.2vw, 0.7rem);
 	position: relative;
 	isolation: isolate;
 	overflow-x: hidden;
 }
 
 .appShell {
-	width: min(100%, 120rem);
+	/* Mobile-first: fill screen, center content */
+	width: min(100%, 34rem);
+	min-height: 100dvh;
 	display: grid;
 	grid-template-columns: 1fr;
-	gap: clamp(0.8rem, 1.8vw, 1.4rem);
+	gap: clamp(0.32rem, 1.1vh, 0.62rem);
 	justify-items: center;
+	align-content: center;
 	position: relative;
 	z-index: 1;
 }

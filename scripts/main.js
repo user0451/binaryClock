@@ -3,7 +3,7 @@ import { applyModeJitterDelays, runTick } from "./display.js";
 import { PAGE_ASSEMBLY_WINDOW_MS, RANDOM_THEME_INTERVAL_MS, SHUFFLEABLE_THEMES } from "./config.js";
 import { state } from "./state.js";
 import { runThemeMotionBurst, transitionToMode, transitionToOrientation } from "./transitions.js";
-import { applyBitOrientationState, applyDigitalState, applyHelpState, applyTheme, persistState, restoreState, setOrientationLabel, setSettingsOpen, setTimeFormatLabel, toggleSettings } from "./ui.js";
+import { applyBitOrientationState, applyDigitalState, applyHelpState, applyScanlineState, applyTheme, persistState, restoreState, setOrientationLabel, setSettingsOpen, setTimeFormatLabel, toggleSettings } from "./ui.js";
 
 function closeThemeDropdown() {
 	if (!controls.themeSelectList || !controls.themeSelectDisplay) {
@@ -125,6 +125,12 @@ function toggleDigital() {
 	persistState();
 }
 
+function toggleScanlines() {
+	state.scanlinesVisible = controls.scanlinesToggle.checked;
+	applyScanlineState();
+	persistState();
+}
+
 function pickRandomTheme() {
 	const available = SHUFFLEABLE_THEMES.filter(t => t !== state.theme);
 	state.theme = available[Math.floor(Math.random() * available.length)];
@@ -182,6 +188,7 @@ function wireEvents() {
 	controls.helpToggle.addEventListener("change", toggleHelp);
 	controls.orientationToggle.addEventListener("change", toggleOrientation);
 	controls.digitalToggle.addEventListener("change", toggleDigital);
+	controls.scanlinesToggle.addEventListener("change", toggleScanlines);
 	controls.themeSelect.addEventListener("change", onThemeChange);
 	controls.themeSelectDisplay?.addEventListener("click", toggleThemeDropdown);
 	controls.shuffleButton.addEventListener("click", toggleRandomMode);

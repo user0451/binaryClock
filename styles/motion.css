@@ -111,14 +111,48 @@ body.mode-transitioning.to-4bit .clock[data-mode="4bit"] .timeGroup {
 	transform: translateY(0.1rem);
 }
 
-body.mode-transitioning.to-6bit .clock[data-mode="6bit"] .bit {
-	animation: bitFlyIn 1480ms var(--rand-ease-in) both;
-	animation-delay: calc(var(--column-offset) + var(--mode-delay-in) + var(--rand-delay-in));
+/* Mobile: simple fade+scale for mode transitions (low-cost, smooth) */
+body.mode-transitioning.to-6bit .clock[data-mode="6bit"] .bit,
+body.mode-transitioning.to-4bit .clock[data-mode="4bit"] .bit {
+	animation: bitFadeIn 700ms var(--rand-ease-in) both;
+	animation-delay: calc((var(--column-offset) * 0.5) + (var(--rand-delay-in) * 0.55));
 }
 
-body.mode-transitioning.to-4bit .clock[data-mode="4bit"] .bit {
-	animation: bitFoldIn 1360ms var(--rand-ease-out) both;
-	animation-delay: calc(var(--column-offset) + var(--mode-delay-out) + var(--rand-delay-out));
+body.orientation-transitioning.to-horizontal .clock .bit,
+body.orientation-transitioning.to-vertical .clock .bit {
+	animation: bitFadeIn 700ms var(--rand-ease-out) both;
+	animation-delay: calc((var(--column-offset) * 0.5) + (var(--rand-delay-out) * 0.55));
+}
+
+/* Larger screens: full 3D cinematic transitions */
+@media (min-width: 40rem) {
+	body.mode-transitioning.to-6bit .clock[data-mode="6bit"] .bit {
+		animation: bitFlyIn 1480ms var(--rand-ease-in) both;
+		animation-delay: calc(var(--column-offset) + var(--mode-delay-in) + var(--rand-delay-in));
+	}
+
+	body.mode-transitioning.to-4bit .clock[data-mode="4bit"] .bit {
+		animation: bitFoldIn 1360ms var(--rand-ease-out) both;
+		animation-delay: calc(var(--column-offset) + var(--mode-delay-out) + var(--rand-delay-out));
+	}
+
+	body.bits-horizontal.mode-transitioning.to-6bit .clock[data-mode="6bit"] .bit {
+		animation-name: bitFlyInHorizontal;
+	}
+
+	body.bits-horizontal.mode-transitioning.to-4bit .clock[data-mode="4bit"] .bit {
+		animation-name: bitFoldInHorizontal;
+	}
+
+	body.orientation-transitioning.to-horizontal .clock .bit {
+		animation: bitFlyInHorizontal 1480ms var(--rand-ease-in) both;
+		animation-delay: calc(var(--column-offset) + var(--mode-delay-in) + var(--rand-delay-in));
+	}
+
+	body.orientation-transitioning.to-vertical .clock .bit {
+		animation: bitFlyIn 1480ms var(--rand-ease-out) both;
+		animation-delay: calc(var(--column-offset) + var(--mode-delay-out) + var(--rand-delay-out));
+	}
 }
 
 body.page-assembling .clock .bit {
@@ -126,27 +160,50 @@ body.page-assembling .clock .bit {
 	animation-delay: calc((var(--column-offset) * 0.55) + (var(--rand-delay-in) * 0.72));
 }
 
-body.bits-horizontal.mode-transitioning.to-6bit .clock[data-mode="6bit"] .bit {
-	animation-name: bitFlyInHorizontal;
-}
-
-body.bits-horizontal.mode-transitioning.to-4bit .clock[data-mode="4bit"] .bit {
-	animation-name: bitFoldInHorizontal;
-}
-
-/* ── orientation switch animation ───────────────────────────────────── */
+/* ── orientation switch will-change ─────────────────────────────────── */
 body.orientation-transitioning .bit {
 	will-change: transform, opacity, filter;
 }
 
-body.orientation-transitioning.to-horizontal .clock .bit {
-	animation: bitFlyInHorizontal 1480ms var(--rand-ease-in) both;
-	animation-delay: calc(var(--column-offset) + var(--mode-delay-in) + var(--rand-delay-in));
+/* Mobile theme animations: one lightweight pulse per theme (battery-friendly) */
+@media (max-width: calc(40rem - 1px)) {
+	html[data-theme] .bit.on {
+		animation-name: mobileBitPulse !important;
+		animation-duration: 4.5s !important;
+		animation-timing-function: ease-in-out !important;
+		animation-iteration-count: infinite !important;
+	}
 }
 
-body.orientation-transitioning.to-vertical .clock .bit {
-	animation: bitFlyIn 1480ms var(--rand-ease-out) both;
-	animation-delay: calc(var(--column-offset) + var(--mode-delay-out) + var(--rand-delay-out));
+@keyframes mobileBitPulse {
+
+	0%,
+	100% {
+		filter: brightness(1);
+	}
+
+	50% {
+		filter: brightness(1.12);
+	}
+}
+
+@keyframes bitFadeIn {
+	0% {
+		opacity: 0;
+		transform: scale(0.74);
+		filter: blur(0.08rem);
+	}
+
+	65% {
+		opacity: 1;
+		transform: scale(1.05);
+	}
+
+	100% {
+		opacity: 1;
+		transform: scale(1);
+		filter: blur(0);
+	}
 }
 
 @keyframes digitalRollOutUp {

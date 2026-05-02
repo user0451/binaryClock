@@ -13,6 +13,7 @@
 	display: grid;
 	grid-template-columns: 1fr;
 	grid-template-rows: repeat(6, var(--bit-size));
+	width: var(--bit-size);
 	--effective-row-gap: var(--bit-gap);
 	row-gap: var(--effective-row-gap);
 	justify-items: center;
@@ -154,23 +155,4 @@ body.bits-horizontal .clock[data-mode="4bit"] .timeGroup {
 	flex-direction: column;
 	align-items: center;
 	gap: calc(var(--group-gap) * 1.18);
-}
-
-/*
-	Desktop fit pass for horizontal 4-bit mode:
-	Shrink bit geometry and internal spacing so the clock leaves room
-	for the digital panel/settings without affecting other modes.
-*/
-@media (min-width: 1100px) {
-	body.bits-horizontal .clock[data-mode="4bit"] {
-		--bit-size: clamp(2.1rem, 4.4vw, 4.3rem);
-		--bit-gap: clamp(0.31rem, 1vw, 1rem);
-		--group-gap: clamp(0.72rem, 1.55vw, 1.4rem);
-		--clock-gap: clamp(0.75rem, 1.9vw, 2.2rem);
-		padding: clamp(1.1rem, 2.5vw, 2.3rem) clamp(0.9rem, 2.2vw, 1.9rem);
-	}
-
-	body.bits-horizontal .clock[data-mode="4bit"] .timeGroup {
-		gap: calc(var(--group-gap) * 1.14);
-	}
 }

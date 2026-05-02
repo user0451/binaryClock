@@ -4,13 +4,18 @@
 	justify-content: center;
 	gap: var(--clock-gap);
 	position: relative;
+	/* Mobile-first: transparent, fills viewport, no card chrome */
 	width: max-content;
-	max-width: 100%;
-	padding: clamp(1.45rem, 3.2vw, 3rem) clamp(1rem, 2.6vw, 2.3rem);
-	border-radius: 1.2rem;
-	background: var(--surface-card);
-	border: 1px solid var(--surface-edge);
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 14px 40px rgba(0, 0, 0, 0.35);
+	max-width: calc(100vw - 1.2rem);
+	min-height: clamp(22rem, 76dvh, 44rem);
+	padding: clamp(0.24rem, 1.7vmin, 0.75rem);
+	border-radius: 0;
+	background: none;
+	border: none;
+	box-shadow: none;
+	flex-wrap: nowrap;
+	margin-inline: auto;
+	overflow: visible;
 }
 
 .timeGroup {
@@ -97,10 +102,12 @@ body.help-visible .clock[data-mode="4bit"] .digit {
 	left: 50%;
 	transform: translate(-50%, -50%);
 	font-family: var(--font-mono);
-	font-size: clamp(0.6rem, calc(var(--bit-size) * 0.3), 1.5rem);
+	/* Arcade-sized: larger, bolder, integrated with clock face */
+	font-size: clamp(0.72rem, calc(var(--bit-size) * 0.35), 1.6rem);
+	font-weight: 700;
 	line-height: 1;
 	color: var(--help-plus-color);
-	text-shadow: 0 0 8px var(--help-plus-glow);
+	text-shadow: 0 0 10px var(--help-plus-glow), 0 0 3px var(--help-plus-color);
 	transition: color var(--motion-base) var(--ease-soft), text-shadow var(--motion-base) var(--ease-soft);
 }
 

@@ -4,6 +4,7 @@ export const state = {
 	show24HourFormat: true,
 	helpVisible: false,
 	digitalVisible: false,
+	scanlinesVisible: true,
 	theme: "classic-rgb-neon",
 	randomMode: false,
 	randomThemeIntervalId: null,

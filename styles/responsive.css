@@ -1,163 +1,121 @@
-@media (max-width: 56.25rem) {
-	.clock {
-		gap: clamp(0.32rem, 0.8vw, 0.6rem);
-	}
+/* ─────────────────────────────────────────────────────────────────────
+   Responsive: single breakpoint at 640px (40rem).
+   Mobile-first defaults live in base.css, clock.css, and controls.css.
+   Everything below adapts for larger screens.
+───────────────────────────────────────────────────────────────────── */
 
-	.clock[data-mode="6bit"] .timeGroup {
-		width: var(--bit-size);
-	}
-
-	.settingsTrigger {
-		top: auto;
-		right: 50%;
-		transform: translateX(50%);
-		bottom: calc(env(safe-area-inset-bottom, 0px) + 0.8rem);
-	}
-
-	.settingsTrigger:hover {
-		transform: translateX(50%);
-	}
-}
-
-@media (max-width: 40rem) {
+@media (min-width: 40rem) {
 	:root {
-		--bit-size: clamp(2.5rem, 14.2vmin, 4.15rem);
-		--bit-gap: clamp(0.18rem, 0.8vmin, 0.38rem);
-		--group-gap: clamp(0.22rem, 1.1vmin, 0.55rem);
-		--clock-gap: clamp(0.65rem, 2.2vmin, 1.2rem);
+		/* Larger-screen bit geometry: viewport-width based scaling */
+		--bit-size: clamp(2.35rem, 5.1vw, 4.9rem);
+		--bit-gap: clamp(0.36rem, 1.2vw, 0.74rem);
+		--clock-gap: clamp(1rem, 2.8vw, 2.8rem);
+		--group-gap: clamp(0.85rem, 2vw, 1.7rem);
 	}
 
 	body {
-		padding: clamp(0.3rem, 2.2vw, 0.7rem);
+		padding: clamp(0.45rem, 1.3vw, 1.4rem);
+	}
+
+	/* Remove mobile scroll lock on larger screens */
+	body.settings-open {
+		overflow: visible;
 	}
 
 	.appShell {
-		width: min(100%, 34rem);
-		min-height: 100dvh;
-		padding: clamp(0.24rem, 1.4vw, 0.48rem);
-		gap: clamp(0.32rem, 1.1vh, 0.62rem);
+		width: min(100%, 120rem);
+		min-height: unset;
+		gap: clamp(0.8rem, 1.8vw, 1.4rem);
 		align-content: center;
-		justify-items: center;
 	}
 
+	/* Restore card chrome: clock becomes the featured surface */
 	.clock {
-		display: flex;
-		flex-wrap: nowrap;
-		justify-content: center;
-		align-items: center;
-		gap: var(--clock-gap);
-		width: min(100%, 31.5rem);
-		max-width: calc(100vw - clamp(0.8rem, 6vw, 2rem));
-		margin-inline: auto;
-		overflow: hidden;
-		padding: clamp(0.34rem, 1.2vw, 0.62rem);
-		min-height: clamp(17.6rem, 62dvh, 34rem);
-		scroll-snap-type: none;
-		border-radius: clamp(0.6rem, 2.4vw, 0.95rem);
+		padding: clamp(1.45rem, 3.2vw, 3rem) clamp(1rem, 2.6vw, 2.3rem);
+		border-radius: 1.2rem;
+		background: var(--surface-card);
+		border: 1px solid var(--surface-edge);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 14px 40px rgba(0, 0, 0, 0.35);
+		width: max-content;
+		max-width: 100%;
+		min-height: 0;
+		flex-wrap: unset;
+		margin-inline: unset;
+		overflow: visible;
 	}
 
-	.timeGroup {
-		flex: 0 0 auto;
-		scroll-snap-align: none;
-	}
-
-	.timeGroup+.timeGroup {
-		padding-left: 0;
-		margin-left: 0;
-	}
-
-	.timeGroup+.timeGroup::before {
-		left: calc(var(--clock-gap) * -0.5);
-		top: 4%;
-		height: 92%;
-	}
-
-	#settingsOverlay {
-		place-items: end center;
-		padding: clamp(0.45rem, 1.8vw, 0.8rem);
-	}
-
-	#switch-container {
-		width: min(98vw, 30rem);
-		max-height: min(88dvh, 44rem);
-		overflow: auto;
-		padding: clamp(0.7rem, 2.8vw, 1rem);
-		border-radius: clamp(0.75rem, 2.6vw, 1rem);
-	}
-
-	.switch,
-	.themeSelect,
-	#themeSelect {
-		width: min(100%, 16.6rem);
-	}
-
-	.themeSelect {
-		justify-content: space-between;
-	}
-
-	body.settings-open {
-		overflow: hidden;
-	}
-
-	.digitalPanel {
-		justify-self: center;
-		margin-inline: auto;
-	}
-}
-
-@media (min-width: 56.251rem) {
-	body {
-		padding-bottom: clamp(6.2rem, 9vh, 8.4rem);
-	}
-
+	/* ── Settings: hidden top panel, slides down on open ────────────── */
 	.settingsTrigger {
-		display: none;
+		/* Stays top-right on all screen sizes; no bottom repositioning */
+		top: clamp(0.7rem, 2vw, 1.3rem);
+		right: clamp(0.7rem, 2vw, 1.3rem);
 	}
 
 	#settingsOverlay {
-		opacity: 1;
-		pointer-events: auto;
-		background: none;
-		place-items: end center;
+		/* Panel stretches full width, anchored at top */
+		place-items: start stretch;
+		background: transparent;
 		padding: 0;
-		z-index: 22;
+	}
+
+	body.settings-open #settingsOverlay {
+		/* Subtle backdrop on desktop so click-outside works */
+		background: rgba(0, 0, 0, 0.18);
 	}
 
 	#switch-container {
-		position: fixed;
-		left: 50%;
-		bottom: clamp(0.8rem, 2vh, 1.35rem);
-		transform: translateX(-50%);
+		/* Full-width horizontal bar that slides in from top */
+		width: auto;
+		min-width: 100%;
+		max-height: none;
+		overflow: visible;
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
-		flex-wrap: nowrap;
+		flex-wrap: wrap;
 		gap: clamp(0.55rem, 1.2vw, 1rem);
-		width: auto;
-		min-width: min(95vw, 58rem);
 		padding: clamp(0.6rem, 1vw, 0.9rem);
+		border-radius: 0 0 0.95rem 0.95rem;
+		/* Slide in from above viewport */
+		transform: translateY(-110%);
+		transition: transform var(--motion-slow) var(--ease-primary);
 	}
 
+	body.settings-open #switch-container {
+		transform: translateY(0);
+	}
+
+	/* Header/close not needed: click backdrop or trigger to close */
 	.settingsHeader,
 	.settingsClose {
 		display: none;
 	}
 
-	.switch,
-	.themeSelect {
-		width: clamp(7.1rem, 9vw, 9.6rem);
+	/* Control widths for horizontal bar layout */
+	.switch {
+		width: clamp(7.1rem, 8vw, 8.6rem);
 	}
 
 	.themeSelect {
-		width: clamp(10.5rem, 14.5vw, 13.2rem);
+		width: min(100%, clamp(9rem, 14.5vw, 13.2rem));
 	}
 
+	/* Show custom theme listbox; hide native select */
 	#themeSelect {
-		width: 100%;
-		min-width: 0;
+		display: none;
+	}
+
+	.theme-select-display {
+		display: block;
+	}
+
+	/* 6-bit mode: timeGroup must not widen beyond one bit column */
+	.clock[data-mode="6bit"] .timeGroup {
+		width: var(--bit-size);
 	}
 }
 
+/* ── Large desktop: amplify scale and motion ─────────────────────────── */
 @media (min-width: 90rem) {
 	:root {
 		--bit-size: clamp(4rem, 4.7vw, 6.3rem);
@@ -178,6 +136,7 @@
 	}
 }
 
+/* ── Reduced motion: cut all animation and transition ──────────────── */
 @media (prefers-reduced-motion: reduce) {
 
 	*,

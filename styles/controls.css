@@ -2,35 +2,54 @@
 	display: flex;
 	flex-direction: column;
 	flex-wrap: nowrap;
-	gap: 0.75rem;
+	gap: 0.6rem;
 	align-items: center;
 	justify-content: center;
 	padding: clamp(0.8rem, 1.6vw, 1.2rem);
-	min-width: min(92vw, 30rem);
+	width: min(80vw, 22rem);
+	max-height: min(88dvh, 44rem);
+	overflow: auto;
 	background: linear-gradient(165deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
 	border: 1px solid rgba(255, 255, 255, 0.2);
 	border-radius: 0.95rem;
-	-webkit-backdrop-filter: blur(8px);
-	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(12px);
+	backdrop-filter: blur(12px);
 	box-shadow: 0 20px 70px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+	/* Mobile spring-in */
+	transform: translateY(-0.4rem) scale(0.97);
+	transition: transform var(--motion-base) var(--ease-primary);
+}
+
+body.settings-open #switch-container {
+	transform: translateY(0) scale(1);
 }
 
 #settingsOverlay {
 	position: fixed;
 	inset: 0;
 	display: grid;
-	place-items: center;
-	background: radial-gradient(circle at center, rgba(17, 20, 34, 0.42) 0%, rgba(0, 0, 0, 0.7) 100%);
+	/* Mobile: dropdown anchored top-right below the trigger */
+	place-items: start end;
+	background: rgba(0, 0, 0, 0.62);
+	/* Push panel below trigger button (min-height 44px + offset) */
+	padding-top: calc(clamp(0.7rem, 2vw, 1.3rem) + 2.75rem + 0.5rem);
+	padding-right: clamp(0.7rem, 2vw, 1.3rem);
+	padding-bottom: 0;
+	padding-left: 0;
 	opacity: 0;
 	pointer-events: none;
 	transition: opacity var(--motion-base) var(--ease-soft);
 	z-index: 25;
-	padding: clamp(0.9rem, 3vw, 2rem);
 }
 
 body.settings-open #settingsOverlay {
 	opacity: 1;
 	pointer-events: auto;
+}
+
+/* Lock scroll behind mobile backdrop */
+body.settings-open {
+	overflow: hidden;
 }
 
 .settingsHeader {
@@ -72,7 +91,28 @@ body.settings-open #settingsOverlay {
 	right: clamp(0.7rem, 2vw, 1.3rem);
 	z-index: 24;
 	min-height: 44px;
-	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+	/* Keep subtle until user intent (hover/focus) */
+	padding: 0.34rem 0.62rem;
+	font-size: clamp(0.62rem, 0.85vw, 0.76rem);
+	letter-spacing: 0.14em;
+	border-radius: 0.72rem;
+	border-color: rgba(255, 255, 255, 0.18);
+	background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+	opacity: 1;
+	filter: saturate(1);
+	transform: translateY(0) scale(1);
+	transition: transform var(--motion-base) var(--ease-primary), box-shadow var(--motion-base) var(--ease-soft), background var(--motion-base) var(--ease-soft), opacity var(--motion-base) var(--ease-soft), filter var(--motion-base) var(--ease-soft), border-color var(--motion-base) var(--ease-soft);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.settingsTrigger {
+		opacity: 0.62;
+		filter: saturate(0.78);
+		transform: translateY(0) scale(0.94);
+	}
 }
 
 .settingsClose:hover {
@@ -81,8 +121,24 @@ body.settings-open #settingsOverlay {
 }
 
 .settingsTrigger:hover {
-	transform: none;
-	box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+	transform: translateY(-2px) scale(1.03);
+	opacity: 0.96;
+	filter: saturate(1.08);
+	border-color: rgba(255, 255, 255, 0.36);
+	box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34);
+}
+
+.settingsTrigger:focus-visible {
+	opacity: 1;
+	filter: saturate(1.12);
+	transform: translateY(-1px) scale(1.04);
+	border-color: var(--focus-ring);
+	outline: 2px solid var(--focus-ring);
+	outline-offset: 2px;
+}
+
+.settingsTrigger:active {
+	transform: translateY(0) scale(0.98);
 }
 
 body.settings-open .settingsTrigger {
@@ -95,7 +151,8 @@ body.settings-open .settingsTrigger {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: var(--control-width);
+	/* Mobile: fills panel width */
+	width: min(100%, 15.8rem);
 	height: var(--control-height);
 }
 
@@ -152,6 +209,21 @@ body.settings-open .settingsTrigger {
 	text-transform: uppercase;
 }
 
+.switch .label-text {
+	display: block;
+	width: 100%;
+	text-align: right;
+	padding-left: calc(var(--switch-knob) + 0.55rem);
+	padding-right: 1.2rem;
+	transition: padding var(--motion-base) var(--ease-primary), text-shadow var(--motion-base) var(--ease-soft);
+}
+
+.switch input:checked+.slider+.label-text {
+	text-align: left;
+	padding-left: 0.62rem;
+	padding-right: calc(var(--switch-knob) + 0.55rem);
+}
+
 .themeSelect {
 	display: inline-flex;
 	align-items: center;
@@ -163,13 +235,34 @@ body.settings-open .settingsTrigger {
 	border: 1px solid rgba(255, 255, 255, 0.24);
 	background: linear-gradient(160deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.03));
 	transform-origin: center;
+	/* Mobile: fills panel width */
+	width: min(100%, 16.6rem);
+	min-width: 0;
 }
 
 body.random-shuffle-active .themeSelect {
 	animation: shuffleContainerRotate 5.4s ease-in-out infinite;
 }
 
+/* Mobile: show native OS select, hide custom listbox */
 #themeSelect {
+	display: block;
+	flex: 1;
+	min-width: 0;
+	min-height: 44px;
+	padding: 0.45rem 0.6rem;
+	border-radius: 0.45rem;
+	border: 1px solid var(--digital-pill-border);
+	background: var(--digital-pill-bg);
+	color: var(--digital-value);
+	font-family: var(--font-mono);
+	font-size: clamp(0.72rem, 1vw, 0.84rem);
+	cursor: pointer;
+	appearance: auto;
+}
+
+.theme-select-display,
+.theme-select-list {
 	display: none;
 }
 
@@ -184,8 +277,12 @@ body.random-shuffle-active .themeSelect {
 	padding: 0.45rem 1.8rem 0.45rem 0.5rem;
 	line-height: 1.2;
 	min-height: 44px;
-	min-width: 9rem;
+	min-width: 0;
+	width: 100%;
 	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 	cursor: pointer;
 }
 
@@ -209,9 +306,10 @@ body.random-shuffle-active .themeSelect {
 .theme-select-list {
 	position: absolute;
 	top: calc(100% + 0.35rem);
-	right: 0.45rem;
-	left: auto;
-	width: min(18rem, calc(100vw - 2rem));
+	left: 0;
+	right: 0;
+	width: 100%;
+	max-width: 100%;
 	max-height: min(42vh, 14.5rem);
 	overflow-y: auto;
 	padding: 0.3rem;

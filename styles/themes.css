@@ -643,6 +643,26 @@ html[data-theme="boring-bit"] .seconds .bit.on {
 	box-shadow: none !important;
 }
 
+html[data-theme="bit-boring"] .clock .timeGroup+.timeGroup::before {
+	background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.82) 20%, rgba(255, 255, 255, 0.82) 80%, transparent);
+	box-shadow: none;
+}
+
+html[data-theme="bit-boring"] body.bits-horizontal .clock .timeGroup+.timeGroup::before {
+	background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.82) 20%, rgba(255, 255, 255, 0.82) 80%, transparent);
+	box-shadow: none;
+}
+
+html[data-theme="boring-bit"] .clock .timeGroup+.timeGroup::before {
+	background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.86) 20%, rgba(0, 0, 0, 0.86) 80%, transparent);
+	box-shadow: none;
+}
+
+html[data-theme="boring-bit"] body.bits-horizontal .clock .timeGroup+.timeGroup::before {
+	background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.86) 20%, rgba(0, 0, 0, 0.86) 80%, transparent);
+	box-shadow: none;
+}
+
 
 
 
