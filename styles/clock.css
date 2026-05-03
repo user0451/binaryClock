@@ -214,6 +214,17 @@ body.digital-visible .digitalPanel {
 	opacity: 1;
 	pointer-events: auto;
 	transform: translateY(0) scale(1);
+	cursor: pointer;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	body.digital-visible .digitalPanel:hover {
+		opacity: 0.84;
+	}
+}
+
+body.digital-visible .digitalPanel:active {
+	opacity: 0.7;
 }
 
 .digitalRow {

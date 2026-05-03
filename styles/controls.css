@@ -199,6 +199,12 @@ body.settings-open .settingsTrigger {
 	box-shadow: var(--bit-on-shadow-shape) var(--seconds-glow), inset 0 0 0.65rem rgba(255, 255, 255, 0.28);
 }
 
+/* Disabled toggle: visually dimmed when a setting is locked (e.g. digital forced on during help mode) */
+.switch input:disabled+.slider {
+	opacity: 0.35;
+	cursor: not-allowed;
+}
+
 .label-text {
 	position: relative;
 	z-index: 1;

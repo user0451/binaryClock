@@ -5,7 +5,8 @@ export const STORAGE_KEYS = {
 	digital: "binaryClockDigital",
 	scanlines: "binaryClockScanlines",
 	theme: "binaryClockTheme",
-	bitOrientation: "binaryClockBitOrientation"
+	bitOrientation: "binaryClockBitOrientation",
+	lsbFirst: "binaryClockLSBFirst"
 };
 
 export const HELP_WEIGHTS = [32, 16, 8, 4, 2, 1];

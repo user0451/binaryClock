@@ -756,3 +756,25 @@ body.orientation-transitioning .bit {
 		opacity: 0;
 	}
 }
+
+/* ── Scanline animation: slow vertical drift + gentle horizontal wave ── */
+
+@keyframes scanlineDrift {
+	from {
+		background-position-y: 0px;
+	}
+
+	to {
+		background-position-y: var(--scanline-gap, 3px);
+	}
+}
+
+@keyframes scanlineWave {
+	from {
+		transform: skewX(-0.15deg);
+	}
+
+	to {
+		transform: skewX(0.15deg);
+	}
+}

@@ -1,9 +1,9 @@
-import { allBitNodes, controls } from "./dom.js";
+import { allBitNodes, controls, digitalPanel } from "./dom.js";
 import { applyModeJitterDelays, runTick } from "./display.js";
 import { PAGE_ASSEMBLY_WINDOW_MS, RANDOM_THEME_INTERVAL_MS, SHUFFLEABLE_THEMES } from "./config.js";
 import { state } from "./state.js";
 import { runThemeMotionBurst, transitionToMode, transitionToOrientation } from "./transitions.js";
-import { applyBitOrientationState, applyDigitalState, applyHelpState, applyScanlineState, applyTheme, persistState, restoreState, setOrientationLabel, setSettingsOpen, setTimeFormatLabel, toggleSettings } from "./ui.js";
+import { applyBitOrientationState, applyDigitalState, applyHelpState, applyLSBState, applyScanlineState, applyTheme, persistState, restoreState, setLSBLabel, setOrientationLabel, setSettingsOpen, setTimeFormatLabel, toggleSettings } from "./ui.js";
 
 function closeThemeDropdown() {
 	if (!controls.themeSelectList || !controls.themeSelectDisplay) {
@@ -96,10 +96,12 @@ function toggleThemeDropdown() {
 function toggleMode() {
 	const targetMode = controls.modeToggle.checked ? "4-bit" : "6-bit";
 	transitionToMode(targetMode);
+	applyAutoOrientation();
 }
 
 function toggleTimeFormat() {
-	state.show24HourFormat = controls.timeFormatToggle.checked;
+	state.show24HourFormat = !state.show24HourFormat;
+	controls.timeFormatToggle.checked = state.show24HourFormat;
 	setTimeFormatLabel();
 	persistState();
 	runTick();
@@ -109,6 +111,13 @@ function toggleHelp() {
 	state.helpVisible = controls.helpToggle.checked;
 	applyHelpState();
 	persistState();
+}
+
+function toggleLSB() {
+	state.lsbFirst = controls.lsbToggle.checked;
+	applyLSBState();
+	persistState();
+	runTick();
 }
 
 function toggleOrientation() {
@@ -181,10 +190,36 @@ function startClock() {
 	runTick();
 }
 
+const orientationMQL = window.matchMedia("(orientation: portrait)");
+const mobileMQL = window.matchMedia("(max-width: 39.9999rem)");
+
+function getAutoOrientation() {
+	const isPortrait = orientationMQL.matches;
+	if (state.mode === "6-bit") {
+		return isPortrait ? "vertical" : "horizontal";
+	}
+	// 4-bit: opposite — portrait = horizontal, landscape = vertical
+	return isPortrait ? "horizontal" : "vertical";
+}
+
+function applyAutoOrientation() {
+	if (!mobileMQL.matches) {
+		return;
+	}
+	const target = getAutoOrientation();
+	if (target !== state.bitOrientation) {
+		state.bitOrientation = target;
+		setOrientationLabel();
+		transitionToOrientation(target);
+	}
+}
+
 function wireBitLiquidInteractions() {
 	const releaseTimers = new WeakMap();
 	const liquidProfiles = new WeakMap();
 	const settleAnimations = new WeakMap();
+	const pointerPositions = new WeakMap();
+	const moveFramePending = new WeakMap();
 	const liquidShapeCount = 6;
 
 	function randomInt(min, max) {
@@ -202,6 +237,57 @@ function wireBitLiquidInteractions() {
 		const bottomRightY = 100 - bottomLeftY;
 
 		return `${topLeftX}% ${topRightX}% ${bottomLeftX}% ${bottomRightX}% / ${topLeftY}% ${topRightY}% ${bottomLeftY}% ${bottomRightY}%`;
+	}
+
+	function createBiasedLiquidShape(rx, ry) {
+		// rx, ry in -1…+1 relative to bit centre.
+		// Corners TOWARD the pointer compress; corners AWAY bulge.
+		// Base range 30–70, offset by up to ±16pp.
+		const bias = 16;
+		const topLeftX = randomInt(30, 70) + Math.round(-rx * bias);
+		const topRightX = 100 - (randomInt(30, 70) + Math.round(rx * bias));
+		const bottomLeftX = randomInt(30, 70) + Math.round(-rx * bias);
+		const bottomRightX = 100 - (randomInt(30, 70) + Math.round(rx * bias));
+		const topLeftY = randomInt(30, 70) + Math.round(-ry * bias);
+		const topRightY = 100 - (randomInt(30, 70) + Math.round(ry * bias));
+		const bottomLeftY = randomInt(30, 70) + Math.round(-ry * bias);
+		const bottomRightY = 100 - (randomInt(30, 70) + Math.round(ry * bias));
+
+		const clamp = (v) => Math.min(80, Math.max(20, v));
+		return `${clamp(topLeftX)}% ${clamp(topRightX)}% ${clamp(bottomLeftX)}% ${clamp(bottomRightX)}% / ${clamp(topLeftY)}% ${clamp(topRightY)}% ${clamp(bottomLeftY)}% ${clamp(bottomRightY)}%`;
+	}
+
+	function applyBiasedShape(bitNode, rx, ry) {
+		bitNode.style.setProperty("--liquid-shape-0", createBiasedLiquidShape(rx, ry));
+		bitNode.style.setProperty("--liquid-offset-x", `${(rx * 3).toFixed(1)}px`);
+		bitNode.style.setProperty("--liquid-offset-y", `${(ry * 3).toFixed(1)}px`);
+	}
+
+	function onLiquidPointerMove(event, bitNode) {
+		if (!bitNode.classList.contains("liquid-live")) {
+			return;
+		}
+		const rect = bitNode.getBoundingClientRect();
+		const rx = Math.max(-1, Math.min(1, (event.clientX - rect.left - rect.width / 2) / (rect.width / 2)));
+		const ry = Math.max(-1, Math.min(1, (event.clientY - rect.top - rect.height / 2) / (rect.height / 2)));
+		pointerPositions.set(bitNode, { rx, ry });
+		if (!moveFramePending.get(bitNode)) {
+			moveFramePending.set(bitNode, true);
+			requestAnimationFrame(() => {
+				const pos = pointerPositions.get(bitNode);
+				if (pos) {
+					applyBiasedShape(bitNode, pos.rx, pos.ry);
+				}
+				moveFramePending.delete(bitNode);
+			});
+		}
+	}
+
+	function clearPointerBias(bitNode) {
+		pointerPositions.delete(bitNode);
+		moveFramePending.delete(bitNode);
+		bitNode.style.setProperty("--liquid-offset-x", "0px");
+		bitNode.style.setProperty("--liquid-offset-y", "0px");
 	}
 
 	function applyRandomLiquidProfile(bitNode, pointerType) {
@@ -250,6 +336,7 @@ function wireBitLiquidInteractions() {
 	}
 
 	function finishLiquid(bitNode) {
+		clearPointerBias(bitNode);
 		const currentRadius = window.getComputedStyle(bitNode).borderRadius;
 		bitNode.classList.remove("liquid-live", "liquid-touch");
 
@@ -324,6 +411,7 @@ function wireBitLiquidInteractions() {
 	}
 
 	function releaseLiquid(bitNode) {
+		clearPointerBias(bitNode);
 		clearReleaseTimer(bitNode);
 		const delayMs = getLiquidReleaseDelay(bitNode);
 		const timerId = window.setTimeout(() => {
@@ -338,6 +426,7 @@ function wireBitLiquidInteractions() {
 		bitNode.addEventListener("pointerenter", (event) => {
 			if (event.pointerType === "mouse" || event.pointerType === "pen") {
 				startLiquid(bitNode, event.pointerType);
+				onLiquidPointerMove(event, bitNode);
 			}
 		});
 
@@ -347,13 +436,27 @@ function wireBitLiquidInteractions() {
 
 		bitNode.addEventListener("pointerdown", (event) => {
 			startLiquid(bitNode, event.pointerType);
+			onLiquidPointerMove(event, bitNode);
+			if (event.pointerType === "touch") {
+				bitNode.setPointerCapture(event.pointerId);
+			}
 		});
 
-		bitNode.addEventListener("pointerup", () => {
+		bitNode.addEventListener("pointermove", (event) => {
+			onLiquidPointerMove(event, bitNode);
+		});
+
+		bitNode.addEventListener("pointerup", (event) => {
+			if (event.pointerType === "touch") {
+				bitNode.releasePointerCapture(event.pointerId);
+			}
 			releaseLiquid(bitNode);
 		});
 
-		bitNode.addEventListener("pointercancel", () => {
+		bitNode.addEventListener("pointercancel", (event) => {
+			if (event.pointerType === "touch") {
+				bitNode.releasePointerCapture(event.pointerId);
+			}
 			releaseLiquid(bitNode);
 		});
 
@@ -372,6 +475,9 @@ function wireEvents() {
 	controls.orientationToggle.addEventListener("change", toggleOrientation);
 	controls.digitalToggle.addEventListener("change", toggleDigital);
 	controls.scanlinesToggle.addEventListener("change", toggleScanlines);
+	if (controls.lsbToggle) {
+		controls.lsbToggle.addEventListener("change", toggleLSB);
+	}
 	controls.themeSelect.addEventListener("change", onThemeChange);
 	controls.themeSelectDisplay?.addEventListener("click", toggleThemeDropdown);
 	controls.shuffleButton.addEventListener("click", toggleRandomMode);
@@ -383,6 +489,16 @@ function wireEvents() {
 			setSettingsOpen(false);
 		}
 	});
+	if (digitalPanel) {
+		digitalPanel.addEventListener("click", toggleTimeFormat);
+		digitalPanel.addEventListener("keydown", (event) => {
+			if (event.key === "Enter" || event.key === " ") {
+				event.preventDefault();
+				toggleTimeFormat();
+			}
+		});
+	}
+	orientationMQL.addEventListener("change", applyAutoOrientation);
 	document.addEventListener("click", (event) => {
 		if (!controls.themeSelectDisplay || !controls.themeSelectList) {
 			return;
@@ -413,6 +529,7 @@ export function initApp() {
 	if (state.randomMode) {
 		startRandomMode();
 	}
+	applyAutoOrientation();
 	applyModeJitterDelays();
 	document.body.classList.add("page-assembling");
 	window.setTimeout(() => {

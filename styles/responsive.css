@@ -115,6 +115,13 @@
 	}
 }
 
+/* ── Mobile only: hide orientation toggle (auto-orient handles it) ──── */
+@media (max-width: 39.9999rem) {
+	label[for="orientationToggle"] {
+		display: none;
+	}
+}
+
 /* ── Large desktop: amplify scale and motion ─────────────────────────── */
 @media (min-width: 90rem) {
 	:root {

@@ -59,6 +59,98 @@ body.help-visible .clock[data-mode="6bit"] .timeGroup {
 	grid-row: 6;
 }
 
+/* ── LSB-first: reverse bit display order ────────────────────────── */
+
+/* 6-bit vertical: swap grid-row assignments so LSB appears at top */
+body.lsb-first .clock[data-mode="6bit"] .hour1,
+body.lsb-first .clock[data-mode="6bit"] .minute1,
+body.lsb-first .clock[data-mode="6bit"] .second1 {
+	grid-row: 6;
+}
+
+body.lsb-first .clock[data-mode="6bit"] .hour2,
+body.lsb-first .clock[data-mode="6bit"] .minute2,
+body.lsb-first .clock[data-mode="6bit"] .second2 {
+	grid-row: 5;
+}
+
+body.lsb-first .clock[data-mode="6bit"] .hour3,
+body.lsb-first .clock[data-mode="6bit"] .minute3,
+body.lsb-first .clock[data-mode="6bit"] .second3 {
+	grid-row: 4;
+}
+
+body.lsb-first .clock[data-mode="6bit"] .hour4,
+body.lsb-first .clock[data-mode="6bit"] .minute4,
+body.lsb-first .clock[data-mode="6bit"] .second4 {
+	grid-row: 3;
+}
+
+body.lsb-first .clock[data-mode="6bit"] .hour5,
+body.lsb-first .clock[data-mode="6bit"] .minute5,
+body.lsb-first .clock[data-mode="6bit"] .second5 {
+	grid-row: 2;
+}
+
+body.lsb-first .clock[data-mode="6bit"] .hour6,
+body.lsb-first .clock[data-mode="6bit"] .minute6,
+body.lsb-first .clock[data-mode="6bit"] .second6 {
+	grid-row: 1;
+}
+
+/* 6-bit horizontal: swap grid-column assignments so LSB appears at left */
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .hour1,
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .minute1,
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .second1 {
+	grid-column: 6;
+	grid-row: 1;
+}
+
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .hour2,
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .minute2,
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .second2 {
+	grid-column: 5;
+	grid-row: 1;
+}
+
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .hour3,
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .minute3,
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .second3 {
+	grid-column: 4;
+	grid-row: 1;
+}
+
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .hour4,
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .minute4,
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .second4 {
+	grid-column: 3;
+	grid-row: 1;
+}
+
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .hour5,
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .minute5,
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .second5 {
+	grid-column: 2;
+	grid-row: 1;
+}
+
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .hour6,
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .minute6,
+body.lsb-first.bits-horizontal .clock[data-mode="6bit"] .second6 {
+	grid-column: 1;
+	grid-row: 1;
+}
+
+/* 4-bit vertical: column-reverse so LSB(1) is at top */
+body.lsb-first .clock[data-mode="4bit"] .digit {
+	flex-direction: column-reverse;
+}
+
+/* 4-bit horizontal: row-reverse so LSB(1) is at left */
+body.lsb-first.bits-horizontal .clock[data-mode="4bit"] .digit {
+	flex-direction: row-reverse;
+}
+
 .clock[data-mode="6bit"] [data-not6Bit] {
 	position: absolute;
 	opacity: 0;

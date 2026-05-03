@@ -1,6 +1,8 @@
 export const controls = {
 	modeToggle: document.getElementById("modeToggle"),
 	modeLabel: document.getElementById("modeLabel"),
+	lsbToggle: document.getElementById("lsbToggle"),
+	lsbLabel: document.getElementById("lsbLabel"),
 	timeFormatToggle: document.getElementById("timeFormatToggle"),
 	timeFormatLabel: document.getElementById("timeFormatLabel"),
 	helpToggle: document.getElementById("helpToggle"),

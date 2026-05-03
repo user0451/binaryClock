@@ -125,7 +125,8 @@
 
 		</div>
 
-		<section class="digitalPanel" aria-live="polite" aria-label="Help digital" aria-hidden="true">
+		<section class="digitalPanel" aria-live="polite" aria-label="Help digital" aria-hidden="true" role="button"
+			tabindex="0" aria-description="Click to toggle 12/24 hour format">
 			<div class="digitalRow" data-mode="all">
 				<div class="digitalCell">
 					<span class="digitalLabel">H</span>
@@ -183,6 +184,11 @@
 					<input type="checkbox" id="helpToggle">
 					<span class="slider round" aria-hidden="true"></span>
 					<span class="label-text" id="helpLabel">Help</span>
+				</label>
+				<label class="switch" for="lsbToggle">
+					<input type="checkbox" id="lsbToggle">
+					<span class="slider round" aria-hidden="true"></span>
+					<span class="label-text" id="lsbLabel">MSB ↑</span>
 				</label>
 				<div class="themeSelect">
 					<button type="button" id="shuffleButton" class="shuffle-btn label-text"

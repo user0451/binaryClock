@@ -34,7 +34,8 @@
 
 html[data-theme] .bit.liquid-live {
 	z-index: 2;
-	will-change: border-radius;
+	will-change: border-radius, transform;
+	transform: translate(var(--liquid-offset-x, 0px), var(--liquid-offset-y, 0px));
 }
 
 /*
@@ -61,7 +62,7 @@ html[data-theme] .bit.liquid-live {
  * normal 320 ms ease-primary when :active ends.
  */
 html[data-theme] .bit:active {
-	transform: scale(0.84);
+	transform: scale(0.84) translate(var(--liquid-offset-x, 0px), var(--liquid-offset-y, 0px));
 	border-radius: 48% 52% 62% 38% / 42% 58% 44% 56%;
 	z-index: 2;
 	transition:
@@ -103,6 +104,9 @@ html[data-theme] .bit:active {
 	html[data-theme] .bit.liquid-live {
 		animation: none !important;
 		will-change: auto;
+		transform: none !important;
+		--liquid-offset-x: 0px;
+		--liquid-offset-y: 0px;
 	}
 
 	html[data-theme] .bit:active {

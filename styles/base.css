@@ -80,10 +80,22 @@ body::after {
 			rgba(0, 0, 0, var(--scanline-opacity)) calc(var(--scanline-gap) - 1px),
 			rgba(0, 0, 0, var(--scanline-opacity)) var(--scanline-gap));
 	transition: opacity var(--motion-base) var(--ease-soft);
+	animation:
+		scanlineDrift 10s linear infinite,
+		scanlineWave 7s ease-in-out alternate infinite;
+	will-change: background-position, transform;
 }
 
 body.scanlines-off::after {
 	opacity: 0;
+}
+
+/* Remove scanline animation for reduced-motion users (keep scanlines visible, just static) */
+@media (prefers-reduced-motion: reduce) {
+	body::after {
+		animation: none;
+		will-change: auto;
+	}
 }
 
 body {

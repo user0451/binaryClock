@@ -28,18 +28,57 @@ export function setOrientationLabel() {
 	}
 }
 
+export function setLSBLabel() {
+	if (controls.lsbLabel) {
+		controls.lsbLabel.innerText = state.lsbFirst ? "LSB ↑" : "MSB ↑";
+	}
+}
+
+export function applyLSBState() {
+	document.body.classList.toggle("lsb-first", state.lsbFirst);
+	setLSBLabel();
+}
+
 export function persistState() {
 	localStorage.setItem(STORAGE_KEYS.mode, state.mode);
 	localStorage.setItem(STORAGE_KEYS.format, state.show24HourFormat ? "24" : "12");
 	localStorage.setItem(STORAGE_KEYS.help, state.helpVisible ? "on" : "off");
-	localStorage.setItem(STORAGE_KEYS.digital, state.digitalVisible ? "on" : "off");
+	// When help is active, save the real pre-help preference, not the forced value
+	const digitalToSave = state.helpVisible && state.digitalVisibleBeforeHelp !== null
+		? state.digitalVisibleBeforeHelp
+		: state.digitalVisible;
+	localStorage.setItem(STORAGE_KEYS.digital, digitalToSave ? "on" : "off");
 	localStorage.setItem(STORAGE_KEYS.scanlines, state.scanlinesVisible ? "on" : "off");
 	localStorage.setItem(STORAGE_KEYS.theme, state.randomMode ? "random-shuffle" : state.theme);
 	localStorage.setItem(STORAGE_KEYS.bitOrientation, state.bitOrientation);
+	localStorage.setItem(STORAGE_KEYS.lsbFirst, state.lsbFirst ? "on" : "off");
 }
 
 export function applyHelpState() {
-	document.body.classList.toggle("help-visible", state.helpVisible);
+	const enabling = state.helpVisible;
+	document.body.classList.toggle("help-visible", enabling);
+
+	if (enabling) {
+		// Cache the user's real digital preference and force digital visible
+		state.digitalVisibleBeforeHelp = state.digitalVisible;
+		state.digitalVisible = true;
+		if (controls.digitalToggle) {
+			controls.digitalToggle.checked = true;
+			controls.digitalToggle.disabled = true;
+		}
+		applyDigitalState();
+	} else {
+		// Restore prior digital visibility
+		if (state.digitalVisibleBeforeHelp !== null) {
+			state.digitalVisible = state.digitalVisibleBeforeHelp;
+			state.digitalVisibleBeforeHelp = null;
+		}
+		if (controls.digitalToggle) {
+			controls.digitalToggle.checked = state.digitalVisible;
+			controls.digitalToggle.disabled = false;
+		}
+		applyDigitalState();
+	}
 }
 
 export function applyDigitalState() {
@@ -136,21 +175,29 @@ export function restoreState() {
 		state.bitOrientation = bitOrientation;
 	}
 
+	const lsbFirst = localStorage.getItem(STORAGE_KEYS.lsbFirst);
+	state.lsbFirst = lsbFirst === "on";
+
 	controls.modeToggle.checked = state.mode === "4-bit";
 	controls.timeFormatToggle.checked = state.show24HourFormat;
 	controls.helpToggle.checked = state.helpVisible;
 	controls.digitalToggle.checked = state.digitalVisible;
 	controls.scanlinesToggle.checked = state.scanlinesVisible;
 	controls.orientationToggle.checked = state.bitOrientation === "horizontal";
+	if (controls.lsbToggle) {
+		controls.lsbToggle.checked = state.lsbFirst;
+	}
 	setModeLabel();
 	setTimeFormatLabel();
 	setDigitalLabel();
 	setScanlinesLabel();
 	setOrientationLabel();
+	setLSBLabel();
 	applyHelpState();
 	applyDigitalState();
 	applyScanlineState();
 	applyBitOrientationState();
+	applyLSBState();
 	applyTheme();
 	clockElement.setAttribute("data-mode", state.mode === "4-bit" ? "4bit" : "6bit");
 }
