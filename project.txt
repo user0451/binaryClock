@@ -49,3 +49,7 @@ In JS, we need to change the data-attributes based on the current time:
 	let tens = parseInt(currentHour / 10);
 	let units  = currentHour % 10;
 	console.log("FirstDigit =",tens.toString(2),"\nLastDigit =",units.toString(2));
+
+
+themes help (colour companions):
+https://www.figma.com/color-wheel/
