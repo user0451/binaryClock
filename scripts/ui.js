@@ -7,7 +7,7 @@ export function setModeLabel() {
 }
 
 export function setTimeFormatLabel() {
-	controls.timeFormatLabel.innerText = state.show24HourFormat ? "24" : "12";
+	controls.timeFormatLabel.innerText = state.show24HourFormat ? "24h" : "12h";
 }
 
 export function setDigitalLabel() {
@@ -25,12 +25,20 @@ export function setScanlinesLabel() {
 export function setOrientationLabel() {
 	if (controls.orientationLabel) {
 		controls.orientationLabel.innerText = state.bitOrientation === "horizontal" ? "Horizontal" : "Vertical";
+		setLSBTitle();
 	}
+}
+
+ function setLSBTitle() {
+	if (controls.lsbToggle) {
+		controls.lsbLabel.innerText = state.lsbFirst ? (state.bitOrientation === "horizontal" ? "LSB →" : "LSB ↓") : (state.bitOrientation === "horizontal" ? "LSB ←" : "LSB ↑");
+		controls.lsbToggle.parentElement.title = state.lsbFirst ? (state.bitOrientation === "horizontal" ? "Least Significant Bit Left to Right" : "Least Significant Bit Top to Bottom") : (state.bitOrientation === "horizontal" ? "Least Significant Bit Right to Left" : "Least Significant Bit Bottom to Top");
+ 	}
 }
 
 export function setLSBLabel() {
 	if (controls.lsbLabel) {
-		controls.lsbLabel.innerText = state.lsbFirst ? "LSB ↑" : "MSB ↑";
+		setLSBTitle();
 	}
 }
 

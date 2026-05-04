@@ -233,6 +233,7 @@ body.digital-visible .digitalPanel:active {
 	justify-content: center;
 	gap: clamp(0.45rem, 1.3vw, 0.95rem);
 	flex-wrap: wrap;
+	cursor: hand;
 }
 
 .digitalCell {
@@ -245,6 +246,10 @@ body.digital-visible .digitalPanel:active {
 	border: 1px solid var(--digital-pill-border);
 	font-family: var(--font-mono);
 	line-height: 1;
+	pointer-events: none;
+	-webkkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
 }
 
 .digitalLabel {
