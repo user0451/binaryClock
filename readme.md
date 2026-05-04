@@ -4,7 +4,7 @@ Learn binary by reading real time.
 
 An interactive binary clock designed to subtly teach how binary works through visualisation and simple, progressive features.
 
-Live demo: https://spinningrock.net/binary/
+👉 Live demo: https://spinningrock.net/binary/
 
 ![demo](https://github.com/user0451/binaryClock/blob/master/media/binaryclock.gif)
 ---
