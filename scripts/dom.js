@@ -43,6 +43,9 @@ export const quizHUD = {
 	scoreDisplay: document.getElementById("quizHUDScore"),
 	levelDisplay: document.getElementById("quizHUDLevel"),
 	submitButton: document.getElementById("quizHUDSubmit"),
+	actions: document.getElementById("quizHUDActions"),
+	restartButton: document.getElementById("quizHUDRestart"),
+	closeButton: document.getElementById("quizHUDClose"),
 	timerTrack: document.getElementById("quizHUDTimerTrack"),
 	timerFill: document.getElementById("quizHUDTimerFill")
 };
@@ -53,6 +56,8 @@ export const helpRowNodes = Array.from(document.querySelectorAll(".clock .helpRo
 export const digitalPanel = document.querySelector(".digitalPanel");
 export const meridiemBadge = document.getElementById("meridiemBadge");
 export const tipHUD = document.getElementById("tipHUD");
+export const tipHUDText = document.getElementById("tipHUDText");
+export const quizLivesBitNodes = Array.from(document.querySelectorAll(".quizLivesBit"));
 
 export const digitalNodes = {
 	sixBit: {

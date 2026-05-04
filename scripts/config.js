@@ -9,7 +9,9 @@ export const STORAGE_KEYS = {
 	lsbFirst: "binaryClockLSBFirst",
 	gameMode: "binaryClockGameMode",
 	gameScore: "binaryClockGameScore",
-	gameLevel: "binaryClockGameLevel"
+	gameLevel: "binaryClockGameLevel",
+	quizHighScore: "binaryClockQuizHighScore",
+	bitClickingBestTimeMs: "binaryClockBitClickingBestTimeMs"
 };
 
 export const HELP_WEIGHTS = [32, 16, 8, 4, 2, 1];

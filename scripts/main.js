@@ -1,5 +1,5 @@
 import { allBitNodes, clockElement, controls, digitalPanel } from "./dom.js";
-import { applyModeJitterDelays, runTick } from "./display.js";
+import { applyModeJitterDelays, clearClockBitsForGame, runTick } from "./display.js";
 import { PAGE_ASSEMBLY_WINDOW_MS, RANDOM_THEME_INTERVAL_MS, SHUFFLEABLE_THEMES, QUERY_PARAM_KEYS, parseQueryParams } from "./config.js";
 import { state } from "./state.js";
 import { runThemeMotionBurst, transitionToMode, transitionToOrientation } from "./transitions.js";
@@ -193,11 +193,16 @@ function selectGameType(gameType) {
 	}
 	setSettingsOpen(false);
 
+	if (state.mode === "4-bit") {
+		transitionToMode("6-bit");
+		controls.modeToggle.checked = false;
+	}
 	if (gameType === "bit-clicking") {
 		startBitClickingGame();
 	} else if (gameType === "quiz") {
 		startQuizGame();
 	}
+	clearClockBitsForGame();
 }
 
 function exitGameMode() {
@@ -676,16 +681,34 @@ function wireEvents() {
 
 	// Quiz HUD submit button + Enter key on input
 	const quizHUDSubmit = document.getElementById("quizHUDSubmit");
+	const quizHUDRestart = document.getElementById("quizHUDRestart");
+	const quizHUDClose = document.getElementById("quizHUDClose");
 	if (quizHUDSubmit) {
 		quizHUDSubmit.addEventListener("click", submitQuizAnswer);
+	}
+	if (quizHUDRestart) {
+		quizHUDRestart.addEventListener("click", () => {
+			if (!state.gameActive || state.gameMode !== "quiz") return;
+			stopQuizGame();
+			startQuizGame();
+		});
+	}
+	if (quizHUDClose) {
+		quizHUDClose.addEventListener("click", () => {
+			if (!state.gameActive || state.gameMode !== "quiz") return;
+			exitGameMode();
+			controls.gameModeToggle.checked = false;
+		});
 	}
 	const quizHUDInput = document.getElementById("quizHUDInput");
 	const quizHUDPanel = document.getElementById("quizHUD");
 	if (quizHUDPanel && quizHUDSubmit) {
 		quizHUDPanel.addEventListener("click", (event) => {
 			if (!state.gameActive || state.gameMode !== "quiz") return;
+			if (quizHUDPanel.dataset.type === "summary") return;
 			if (quizHUDSubmit.disabled) return;
 			if (event.target.closest("#quizHUDSubmit")) return;
+			if (event.target.closest("#quizHUDRestart") || event.target.closest("#quizHUDClose")) return;
 			if (event.target.closest("#quizHUDInput")) return;
 			animateSubmitPress(quizHUDSubmit);
 			submitQuizAnswer();

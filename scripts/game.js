@@ -1,20 +1,134 @@
 /**
  * Bit-Clicking Game Logic
  *
- * Uses SECONDS, then MINUTES, as the interactive game canvas.
- * Hours/minutes continue showing real time.
- * In 6-bit mode: L1-L3 unlock seconds (4-6 bits), then L4-L9 unlock minutes.
- * In 4-bit mode: progression is capped by available 8 interactive bits.
+ * Uses SECONDS, then MINUTES, then HOURS as the interactive game canvas.
+ * In 6-bit mode: L1-L3 unlock seconds (4-6 bits), L4-L9 unlock minutes, L10-L15 unlock hours.
+ * Hours column bits continue the progressive weighting from 4096 to 131072.
+ * In 4-bit mode: progression is capped by available 8 interactive bits (seconds only).
  */
 
-import { HELP_WEIGHTS } from "./config.js";
-import { gameHUD, quizHUD, sixBitNodes, tipHUD } from "./dom.js";
+import { HELP_WEIGHTS, STORAGE_KEYS } from "./config.js";
+import { gameHUD, quizHUD, quizLivesBitNodes, sixBitNodes, tipHUD, tipHUDText } from "./dom.js";
 import { state } from "./state.js";
 
 let feedbackTimer = null;
 let questionStartedAt = Date.now();
 const TIP_TOTAL_VISIBLE_MS = 10000;
 const TIP_FADE_MS = 400;
+
+function readStoredInt(key) {
+	const rawValue = localStorage.getItem(key);
+	if (rawValue === null) return null;
+	const parsed = parseInt(rawValue, 10);
+	return Number.isFinite(parsed) ? parsed : null;
+}
+
+function writeStoredInt(key, value) {
+	localStorage.setItem(key, String(value));
+}
+
+function formatElapsedMs(milliseconds) {
+	const totalTenths = Math.max(0, Math.round(milliseconds / 100));
+	const minutes = Math.floor(totalTenths / 600);
+	const seconds = Math.floor((totalTenths % 600) / 10);
+	const tenths = totalTenths % 10;
+	return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${tenths}`;
+}
+
+let quizHighScore = readStoredInt(STORAGE_KEYS.quizHighScore) ?? 0;
+let bitClickingBestTimeMs = readStoredInt(STORAGE_KEYS.bitClickingBestTimeMs);
+let bitClickingTimerInterval = null;
+let bitClickingStartedAt = null;
+let bitClickingElapsedMs = 0;
+let bitClickingRunCompleted = false;
+let bitClickingCompletionLabel = "Run Complete";
+let bitClickingCompletionLine = "";
+
+function renderBitClickingTipHUD(label = "Timer", line = null) {
+	if (!tipHUD || !tipHUDText || !state.gameActive || state.gameMode !== "bit-clicking") return;
+	const personalBestText = bitClickingBestTimeMs === null
+		? "PB --:--.-"
+		: `PB ${formatElapsedMs(bitClickingBestTimeMs)}`;
+	const hudLine = line ?? `${formatElapsedMs(bitClickingElapsedMs)} • ${personalBestText}`;
+	tipHUD.setAttribute("data-tip-label", label);
+	tipHUDText.textContent = hudLine;
+	tipHUD.setAttribute("aria-label", `${label}: ${hudLine}`);
+	tipHUD.setAttribute("aria-hidden", "false");
+	tipHUD.classList.add("tip-visible");
+}
+
+function restorePersistentTipHUD() {
+	if (state.gameActive && state.gameMode === "bit-clicking") {
+		if (bitClickingRunCompleted && bitClickingCompletionLine) {
+			renderBitClickingTipHUD(bitClickingCompletionLabel, bitClickingCompletionLine);
+			return true;
+		}
+		if (bitClickingStartedAt !== null) {
+			renderBitClickingTipHUD("Timer");
+			return true;
+		}
+	}
+	return false;
+}
+
+function updateBitClickingTimerHUD() {
+	if (bitClickingStartedAt === null || bitClickingRunCompleted) return;
+	bitClickingElapsedMs = Date.now() - bitClickingStartedAt;
+	if (!tipTimer) renderBitClickingTipHUD("Timer");
+}
+
+function startBitClickingTimer() {
+	if (bitClickingStartedAt !== null || bitClickingRunCompleted) return;
+	if (tipTimer) {
+		clearTimeout(tipTimer);
+		tipTimer = null;
+	}
+	bitClickingStartedAt = Date.now();
+	bitClickingElapsedMs = 0;
+	renderBitClickingTipHUD("Timer");
+	bitClickingTimerInterval = setInterval(updateBitClickingTimerHUD, 100);
+}
+
+function stopBitClickingTimer() {
+	if (bitClickingTimerInterval) {
+		clearInterval(bitClickingTimerInterval);
+		bitClickingTimerInterval = null;
+	}
+	if (bitClickingStartedAt === null) return null;
+	bitClickingElapsedMs = Date.now() - bitClickingStartedAt;
+	bitClickingStartedAt = null;
+	return bitClickingElapsedMs;
+}
+
+function resetBitClickingTimer() {
+	stopBitClickingTimer();
+	bitClickingElapsedMs = 0;
+	bitClickingRunCompleted = false;
+	bitClickingCompletionLabel = "Run Complete";
+	bitClickingCompletionLine = "";
+}
+
+function completeBitClickingRun() {
+	const completionMs = stopBitClickingTimer();
+	const previousBestTimeMs = bitClickingBestTimeMs;
+	const hasMeasuredRun = completionMs !== null;
+	const isNewBest = hasMeasuredRun && (previousBestTimeMs === null || completionMs < previousBestTimeMs);
+
+	bitClickingRunCompleted = true;
+	if (isNewBest) {
+		bitClickingBestTimeMs = completionMs;
+		writeStoredInt(STORAGE_KEYS.bitClickingBestTimeMs, completionMs);
+	}
+
+	bitClickingCompletionLabel = isNewBest ? "New Best" : "Run Complete";
+	bitClickingCompletionLine = !hasMeasuredRun
+		? "18-bit run complete. Timer starts on your first bit click."
+		: isNewBest
+			? `18-bit run ${formatElapsedMs(completionMs)} • New PB`
+			: `18-bit run ${formatElapsedMs(completionMs)} • PB ${formatElapsedMs(bitClickingBestTimeMs ?? completionMs)}`;
+
+	renderBitClickingTipHUD(bitClickingCompletionLabel, bitClickingCompletionLine);
+}
 
 // ---------------------------------------------------------------------------
 // Help tips — shown after 3 consecutive wrong answers in bit-clicking mode
@@ -122,6 +236,7 @@ const LEVEL_UP_FEEDBACK = {
 let levelWindowCorrect = 0;
 let levelWindowWrong = 0;
 let levelWindowTotalMs = 0;
+const BIT_CLICKING_QUESTIONS_PER_LEVEL = 10;
 
 function resetLevelWindow() {
 	levelWindowCorrect = 0;
@@ -156,16 +271,23 @@ function showLevelUpTip(newLevel, maxLevel, grade) {
 		: suffix;
 
 	tipHUD.setAttribute("data-tip-label", labelText);
-	tipHUD.textContent = levelLine;
+	if (tipHUDText) tipHUDText.textContent = levelLine;
 	tipHUD.setAttribute("aria-label", `Level Up: ${levelLine}`);
 	tipHUD.setAttribute("aria-hidden", "false");
 	tipHUD.classList.add("tip-visible");
 	tipTimer = setTimeout(() => {
 		tipHUD.classList.remove("tip-visible");
 		tipTimer = setTimeout(() => {
-			tipHUD.setAttribute("aria-hidden", "true");
+			if (restorePersistentTipHUD()) {
+				tipTimer = null;
+				return;
+			}
+			if (!state.gameActive || state.gameMode !== "quiz") {
+				tipHUD.setAttribute("aria-hidden", "true");
+			}
 			tipHUD.removeAttribute("data-tip-label");
 			tipHUD.removeAttribute("aria-label");
+			if (tipHUDText) tipHUDText.textContent = "";
 			tipTimer = null;
 		}, TIP_FADE_MS);
 	}, Math.max(0, TIP_TOTAL_VISIBLE_MS - TIP_FADE_MS));
@@ -268,14 +390,23 @@ function showHelpTip(category = "general") {
 	const tip = source[Math.floor(Math.random() * source.length)];
 	const label = TIP_CATEGORY_LABELS[category] ?? TIP_CATEGORY_LABELS.general;
 	tipHUD.setAttribute("data-tip-label", label);
-	tipHUD.textContent = tip;
+	if (tipHUDText) tipHUDText.textContent = tip;
 	tipHUD.setAttribute("aria-label", `${label}: ${tip}`);
 	tipHUD.setAttribute("aria-hidden", "false");
 	tipHUD.classList.add("tip-visible");
 	tipTimer = setTimeout(() => {
 		tipHUD.classList.remove("tip-visible");
 		tipTimer = setTimeout(() => {
-			tipHUD.setAttribute("aria-hidden", "true");
+			if (restorePersistentTipHUD()) {
+				tipTimer = null;
+				return;
+			}
+			if (!state.gameActive || state.gameMode !== "quiz") {
+				tipHUD.setAttribute("aria-hidden", "true");
+			}
+			tipHUD.removeAttribute("data-tip-label");
+			tipHUD.removeAttribute("aria-label");
+			if (tipHUDText) tipHUDText.textContent = "";
 			tipTimer = null;
 		}, TIP_FADE_MS);
 	}, Math.max(0, TIP_TOTAL_VISIBLE_MS - TIP_FADE_MS));
@@ -288,9 +419,17 @@ function clearHelpTip() {
 	}
 	if (tipHUD) {
 		tipHUD.classList.remove("tip-visible");
-		tipHUD.setAttribute("aria-hidden", "true");
+		if (restorePersistentTipHUD()) {
+			consecutiveWrong = 0;
+			resetMistakeCounters();
+			return;
+		}
+		if (!state.gameActive || state.gameMode !== "quiz") {
+			tipHUD.setAttribute("aria-hidden", "true");
+		}
 		tipHUD.removeAttribute("data-tip-label");
 		tipHUD.removeAttribute("aria-label");
+		if (tipHUDText) tipHUDText.textContent = "";
 	}
 	consecutiveWrong = 0;
 	resetMistakeCounters();
@@ -315,17 +454,20 @@ function getBitClickingOrderedNodes() {
 	for (const idx of indices) {
 		ordered.push(sixBitNodes.minutes[idx]);
 	}
+	for (const idx of indices) {
+		ordered.push(sixBitNodes.hours[idx]);
+	}
 
 	return ordered;
 }
 
 function getBitClickingNodes() {
-	return [...sixBitNodes.seconds, ...sixBitNodes.minutes];
+	return [...sixBitNodes.seconds, ...sixBitNodes.minutes, ...sixBitNodes.hours];
 }
 
 function getBitNodeWeight(node) {
 	// Game weighting is progressive across ordered game bits.
-	// This keeps seconds as 1..32 (or 1..8 in 4-bit) and minutes continuing at 64+.
+	// Seconds: 1..32 (6-bit) or 1..8 (4-bit), minutes: 64..2048, hours: 4096..131072.
 	const ordered = getBitClickingOrderedNodes();
 	const orderedIndex = ordered.indexOf(node);
 	if (orderedIndex === -1) return 0;
@@ -343,8 +485,9 @@ function getBitClickingMaxLevel() {
 
 function syncBitClickingBodyClasses() {
 	const perColumnBits = getBitClickingColumnIndices().length;
-	const minutesActive = getLevelBitCount() > perColumnBits;
-	document.body.classList.toggle("game-minutes-active", minutesActive);
+	const bitCount = getLevelBitCount();
+	document.body.classList.toggle("game-minutes-active", bitCount > perColumnBits);
+	document.body.classList.toggle("game-hours-active", bitCount > perColumnBits * 2);
 }
 
 /** Number of active bits for the current level and clock mode. */
@@ -412,6 +555,12 @@ function clearFeedbackClasses() {
 export function updateGameHUD() {
 	if (!gameHUD.panel) return;
 	const player = readPlayerValue();
+	const atCompletedMaxWindow = bitClickingRunCompleted
+		&& state.gameLevel >= getBitClickingMaxLevel()
+		&& state.gameQuestionsAnswered % BIT_CLICKING_QUESTIONS_PER_LEVEL === 0;
+	const currentQuestion = atCompletedMaxWindow
+		? BIT_CLICKING_QUESTIONS_PER_LEVEL
+		: Math.min((state.gameQuestionsAnswered % BIT_CLICKING_QUESTIONS_PER_LEVEL) + 1, BIT_CLICKING_QUESTIONS_PER_LEVEL);
 	if (gameHUD.targetDisplay) {
 		gameHUD.targetDisplay.textContent = String(state.gameTargetValue ?? 0);
 	}
@@ -419,7 +568,8 @@ export function updateGameHUD() {
 		gameHUD.playerDisplay.textContent = String(player);
 	}
 	if (gameHUD.scoreDisplay) {
-		gameHUD.scoreDisplay.textContent = String(state.gameScore);
+		gameHUD.scoreDisplay.textContent = `${currentQuestion}/${BIT_CLICKING_QUESTIONS_PER_LEVEL}`;
+		gameHUD.scoreDisplay.setAttribute("aria-label", `Current question ${currentQuestion} of ${BIT_CLICKING_QUESTIONS_PER_LEVEL}`);
 	}
 	if (gameHUD.levelDisplay) {
 		gameHUD.levelDisplay.textContent = `L${state.gameLevel}`;
@@ -460,6 +610,7 @@ export function handleGameBitClick(bitNode) {
 	// Ignore during feedback (brief lock-out)
 	if (feedbackTimer !== null) return;
 
+	startBitClickingTimer();
 	bitNode.classList.toggle("on");
 	updateGameHUD();
 }
@@ -485,12 +636,10 @@ export function submitGameAnswer() {
 		levelWindowCorrect++;
 		consecutiveWrong = 0;
 		resetMistakeCounters();
-		state.gameScore += 10 + state.gameStreak * 2;
 		state.gameStreak++;
 	} else {
 		levelWindowWrong++;
 		state.gameStreak = 0;
-		state.gameScore = Math.max(0, state.gameScore - 2);
 		addMistakeSignals(categorizeMistake(player, state.gameTargetValue, elapsedMs));
 		consecutiveWrong++;
 		if (consecutiveWrong >= 3) {
@@ -504,8 +653,19 @@ export function submitGameAnswer() {
 	// Level up every 10 questions.
 	// In 6-bit mode this reaches L9 (seconds first, then minutes).
 	const maxLevel = getBitClickingMaxLevel();
-	if (state.gameQuestionsAnswered % 10 === 0) {
-		const grade = gradeLevelWindow(levelWindowCorrect, levelWindowWrong, levelWindowTotalMs, 10);
+	const completedRun = state.gameQuestionsAnswered % BIT_CLICKING_QUESTIONS_PER_LEVEL === 0
+		&& state.gameLevel >= maxLevel;
+	if (completedRun) {
+		completeBitClickingRun();
+		updateGameHUD();
+		feedbackTimer = setTimeout(() => {
+			feedbackTimer = null;
+			clearFeedbackClasses();
+		}, isCorrect ? 1000 : 1500);
+		return;
+	}
+	if (state.gameQuestionsAnswered % BIT_CLICKING_QUESTIONS_PER_LEVEL === 0) {
+		const grade = gradeLevelWindow(levelWindowCorrect, levelWindowWrong, levelWindowTotalMs, BIT_CLICKING_QUESTIONS_PER_LEVEL);
 		resetLevelWindow();
 		if (state.gameLevel < maxLevel) {
 			state.gameLevel = Math.min(state.gameLevel + 1, maxLevel);
@@ -529,6 +689,7 @@ export function submitGameAnswer() {
 export function startBitClickingGame() {
 	clearHelpTip();
 	resetLevelWindow();
+	resetBitClickingTimer();
 	state.gameScore = 0;
 	state.gameLevel = 1;
 	state.gameQuestionsAnswered = 0;
@@ -548,9 +709,10 @@ export function stopBitClickingGame() {
 		clearTimeout(feedbackTimer);
 		feedbackTimer = null;
 	}
+	resetBitClickingTimer();
 	clearHelpTip();
 	clearGameClasses();
-	document.body.classList.remove("game-minutes-active");
+	document.body.classList.remove("game-minutes-active", "game-hours-active");
 
 	if (gameHUD.panel) {
 		gameHUD.panel.setAttribute("aria-hidden", "true");
@@ -563,14 +725,35 @@ export function stopBitClickingGame() {
 // ===========================================================================
 
 const QUIZ_LEVEL_CONFIG = [
-	{ bits: 4, type: "decimal-to-binary", timerSec: 0 },  // L1
-	{ bits: 4, type: "binary-to-decimal", timerSec: 0 },  // L2
-	{ bits: 5, type: "decimal-to-binary", timerSec: 0 },  // L3
-	{ bits: 5, type: "binary-to-decimal", timerSec: 0 },  // L4
-	{ bits: 6, type: "decimal-to-binary", timerSec: 0 },  // L5
-	{ bits: 6, type: "binary-to-decimal", timerSec: 0 },  // L6
-	{ bits: 6, type: "mixed",             timerSec: 15 }, // L7
-	{ bits: 6, type: "mixed",             timerSec: 10 }, // L8
+	// Group 1 — Seconds column only (values 0–63)
+	{ bits: 4,  type: "decimal-to-binary", timerSec: 0  },  // L1
+	{ bits: 4,  type: "binary-to-decimal", timerSec: 0  },  // L2
+	{ bits: 5,  type: "decimal-to-binary", timerSec: 0  },  // L3
+	{ bits: 5,  type: "binary-to-decimal", timerSec: 0  },  // L4
+	{ bits: 6,  type: "decimal-to-binary", timerSec: 0  },  // L5
+	{ bits: 6,  type: "binary-to-decimal", timerSec: 0  },  // L6
+	{ bits: 6,  type: "mixed",             timerSec: 15 },  // L7  ← timed
+	{ bits: 6,  type: "mixed",             timerSec: 10 },  // L8  ← timed
+	// Group 2 — Seconds + Minutes columns (values 0–4095)
+	{ bits: 8,  type: "decimal-to-binary", timerSec: 0  },  // L9
+	{ bits: 8,  type: "binary-to-decimal", timerSec: 0  },  // L10
+	{ bits: 10, type: "decimal-to-binary", timerSec: 0  },  // L11
+	{ bits: 10, type: "binary-to-decimal", timerSec: 0  },  // L12
+	{ bits: 12, type: "decimal-to-binary", timerSec: 0  },  // L13
+	{ bits: 12, type: "binary-to-decimal", timerSec: 0  },  // L14
+	{ bits: 12, type: "mixed",             timerSec: 20 },  // L15 ← timed
+	{ bits: 12, type: "mixed",             timerSec: 15 },  // L16 ← timed
+	// Group 3 — Seconds + Minutes + Hours columns (values 0–262143)
+	{ bits: 14, type: "decimal-to-binary", timerSec: 0  },  // L17
+	{ bits: 14, type: "binary-to-decimal", timerSec: 0  },  // L18
+	{ bits: 16, type: "decimal-to-binary", timerSec: 0  },  // L19
+	{ bits: 16, type: "binary-to-decimal", timerSec: 0  },  // L20
+	{ bits: 18, type: "decimal-to-binary", timerSec: 0  },  // L21
+	{ bits: 18, type: "binary-to-decimal", timerSec: 0  },  // L22
+	{ bits: 18, type: "mixed",             timerSec: 30 },  // L23 ← timed
+	{ bits: 18, type: "mixed",             timerSec: 20 },  // L24 ← timed
+	// Final challenge — 25% less time than L24
+	{ bits: 18, type: "mixed",             timerSec: 15 },  // L25 ← timed
 ];
 const QUIZ_MAX_LEVEL = QUIZ_LEVEL_CONFIG.length;
 const QUIZ_QUESTIONS_PER_LEVEL = 10;
@@ -579,61 +762,110 @@ let quizTimerInterval = null;
 let quizQuestionType = null;
 let quizFeedbackTimer = null;
 let quizGameOver = false;
+let rollingScoreTimer = null;
+let displayedScore = 0;
+
+const QUIZ_MAX_LIVES = 5;
+let quizLives = QUIZ_MAX_LIVES;
+
+function updateQuizLivesDisplay() {
+	if (!quizLivesBitNodes?.length) return;
+	// 3 bits, MSB→LSB: weights [4, 2, 1]
+	const weights = [4, 2, 1];
+	quizLivesBitNodes.forEach((node, i) => {
+		node.classList.toggle("on", (quizLives & weights[i]) !== 0);
+	});
+	if (tipHUD) tipHUD.dataset.lives = String(quizLives);
+	const livesBar = document.getElementById("quizLivesBar");
+	if (livesBar) livesBar.setAttribute("aria-label", `${quizLives} of ${QUIZ_MAX_LIVES} lives remaining`);
+}
 
 function getQuizConfig() {
 	return QUIZ_LEVEL_CONFIG[Math.min(state.gameLevel - 1, QUIZ_MAX_LEVEL - 1)];
 }
 
 function getQuizBitCount() {
-	const maxBits = state.mode === "6-bit" ? 6 : 4;
+	const maxBits = state.mode === "6-bit" ? 18 : 4;
 	return Math.min(getQuizConfig().bits, maxBits);
 }
 
-function getQuizStartIndex() {
-	return 6 - getQuizBitCount();
+/** Returns active quiz bit nodes in order, LSB (weight 1) first. */
+function getQuizOrderedNodes() {
+	const count = getQuizBitCount();
+	const nodes = [];
+	const secCount = Math.min(count, 6);
+	for (let i = 0; i < secCount; i++) nodes.push(sixBitNodes.seconds[5 - i]);
+	if (count > 6) {
+		const minCount = Math.min(count - 6, 6);
+		for (let i = 0; i < minCount; i++) nodes.push(sixBitNodes.minutes[5 - i]);
+	}
+	if (count > 12) {
+		const hrCount = Math.min(count - 12, 6);
+		for (let i = 0; i < hrCount; i++) nodes.push(sixBitNodes.hours[5 - i]);
+	}
+	return nodes;
 }
 
 function getQuizMaxValue() {
-	return (1 << getQuizBitCount()) - 1;
+	const count = getQuizBitCount();
+	return count >= 31 ? 0x7FFFFFFF : (1 << count) - 1;
+}
+
+function syncQuizBodyClasses() {
+	const count = getQuizBitCount();
+	document.body.classList.toggle("quiz-minutes-active", count > 6);
+	document.body.classList.toggle("quiz-hours-active", count > 12);
+}
+
+function startRollingScore(target) {
+	if (rollingScoreTimer) { clearInterval(rollingScoreTimer); rollingScoreTimer = null; }
+	if (displayedScore === target) return;
+	const start = displayedScore;
+	const delta = target - start;
+	const steps = 16;
+	let step = 0;
+	rollingScoreTimer = setInterval(() => {
+		step++;
+		const t = Math.min(step / steps, 1);
+		displayedScore = Math.round(start + delta * t);
+		if (quizHUD.scoreDisplay) quizHUD.scoreDisplay.textContent = String(displayedScore);
+		if (step >= steps) { clearInterval(rollingScoreTimer); rollingScoreTimer = null; }
+	}, 25);
 }
 
 function setQuizBitsToValue(value) {
-	const nodes = sixBitNodes.seconds;
-	const start = getQuizStartIndex();
-	for (let i = 0; i < start; i++) {
-		nodes[i].classList.remove("on");
-		nodes[i].classList.add("game-bit-inactive");
-	}
-	for (let i = start; i < 6; i++) {
-		nodes[i].classList.remove("game-bit-inactive", "game-bit-correct", "game-bit-incorrect");
-		nodes[i].classList.toggle("on", (value & HELP_WEIGHTS[i]) !== 0);
+	const ordered = getQuizOrderedNodes();
+	const activeSet = new Set(ordered);
+	[...sixBitNodes.seconds, ...sixBitNodes.minutes, ...sixBitNodes.hours].forEach(n => {
+		n.classList.remove("on", "game-bit-inactive", "game-bit-correct", "game-bit-incorrect");
+		if (!activeSet.has(n)) n.classList.add("game-bit-inactive");
+	});
+	for (let i = 0; i < ordered.length; i++) {
+		ordered[i].classList.toggle("on", ((value >> i) & 1) === 1);
 	}
 }
 
 function clearQuizBits() {
-	sixBitNodes.seconds.forEach(n => {
+	[...sixBitNodes.seconds, ...sixBitNodes.minutes, ...sixBitNodes.hours].forEach(n => {
 		n.classList.remove("on", "game-bit-correct", "game-bit-incorrect", "game-bit-inactive");
 	});
 }
 
 function flashQuizBitFeedback(isCorrect) {
 	const cls = isCorrect ? "game-bit-correct" : "game-bit-incorrect";
-	const start = getQuizStartIndex();
-	for (let i = start; i < 6; i++) {
-		sixBitNodes.seconds[i].classList.add(cls);
-	}
+	getQuizOrderedNodes().forEach(n => n.classList.add(cls));
 }
 
 function clearQuizFeedbackClasses() {
-	sixBitNodes.seconds.forEach(n => n.classList.remove("game-bit-correct", "game-bit-incorrect"));
+	[...sixBitNodes.seconds, ...sixBitNodes.minutes, ...sixBitNodes.hours].forEach(n =>
+		n.classList.remove("game-bit-correct", "game-bit-incorrect"));
 }
 
 function readQuizPlayerBits() {
-	const nodes = sixBitNodes.seconds;
-	const start = getQuizStartIndex();
+	const ordered = getQuizOrderedNodes();
 	let value = 0;
-	for (let i = start; i < 6; i++) {
-		if (nodes[i].classList.contains("on")) value += HELP_WEIGHTS[i];
+	for (let i = 0; i < ordered.length; i++) {
+		if (ordered[i].classList.contains("on")) value += (1 << i);
 	}
 	return value;
 }
@@ -665,7 +897,14 @@ function handleQuizTimeout() {
 	if (quizFeedbackTimer !== null) return;
 	state.gameStreak = 0;
 	state.gameScore = Math.max(0, state.gameScore - 2);
+	quizLives = Math.max(0, quizLives - 1);
+	updateQuizLivesDisplay();
 	state.gameQuestionsAnswered++;
+	if (quizLives <= 0) {
+		updateQuizHUD();
+		showQuizSummary();
+		return;
+	}
 	if (state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL === 0 && state.gameLevel >= QUIZ_MAX_LEVEL) {
 		updateQuizHUD();
 		showQuizSummary();
@@ -691,7 +930,7 @@ function setQuizBodyType(type) {
 
 export function updateQuizHUD() {
 	if (!quizHUD.panel) return;
-	if (quizHUD.scoreDisplay) quizHUD.scoreDisplay.textContent = String(state.gameScore);
+	startRollingScore(state.gameScore);
 	if (quizHUD.levelDisplay) quizHUD.levelDisplay.textContent = `L${state.gameLevel}`;
 	const qInLevel = (state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL) + 1;
 	if (quizHUD.progress) quizHUD.progress.textContent = `${qInLevel}/${QUIZ_QUESTIONS_PER_LEVEL}`;
@@ -702,6 +941,7 @@ export function generateQuizQuestion() {
 	if (quizFeedbackTimer) { clearTimeout(quizFeedbackTimer); quizFeedbackTimer = null; }
 	stopQuizTimer();
 	clearQuizBits();
+	syncQuizBodyClasses();
 
 	const config = getQuizConfig();
 	quizQuestionType = config.type === "mixed"
@@ -714,8 +954,10 @@ export function generateQuizQuestion() {
 	state.gameTargetValue = randomTargetExcluding(maxValue, previousValue);
 
 	if (quizQuestionType === "decimal-to-binary") {
-		const start = getQuizStartIndex();
-		for (let i = 0; i < start; i++) sixBitNodes.seconds[i].classList.add("game-bit-inactive");
+		const activeSet = new Set(getQuizOrderedNodes());
+		[...sixBitNodes.seconds, ...sixBitNodes.minutes, ...sixBitNodes.hours].forEach(n => {
+			if (!activeSet.has(n)) n.classList.add("game-bit-inactive");
+		});
 		if (quizHUD.valueDisplay) quizHUD.valueDisplay.textContent = String(state.gameTargetValue);
 		if (quizHUD.panel) quizHUD.panel.dataset.type = "decimal-to-binary";
 		if (quizHUD.label) quizHUD.label.textContent = "bin";
@@ -729,6 +971,7 @@ export function generateQuizQuestion() {
 		quizHUD.submitButton.disabled = false;
 		quizHUD.submitButton.textContent = "✓";
 	}
+	if (quizHUD.actions) quizHUD.actions.setAttribute("aria-hidden", "true");
 
 	if (config.timerSec > 0) startQuizTimer(config.timerSec);
 	updateQuizHUD();
@@ -739,7 +982,7 @@ export function handleQuizBitClick(bitNode) {
 	if (quizGameOver) return;
 	if (quizQuestionType !== "decimal-to-binary") return;
 	if (bitNode.classList.contains("game-bit-inactive")) return;
-	if (!sixBitNodes.seconds.includes(bitNode)) return;
+	if (!getQuizOrderedNodes().includes(bitNode)) return;
 	if (quizFeedbackTimer !== null) return;
 	bitNode.classList.toggle("on");
 }
@@ -749,14 +992,41 @@ function showQuizSummary() {
 	stopQuizTimer();
 	setQuizBodyType(null);
 
+	const failedOut = quizLives <= 0;
+	const previousHighScore = quizHighScore;
+	const isNewHighScore = state.gameScore > previousHighScore;
+	if (isNewHighScore) {
+		quizHighScore = state.gameScore;
+		writeStoredInt(STORAGE_KEYS.quizHighScore, quizHighScore);
+	}
+	const bestScore = Math.max(quizHighScore, state.gameScore);
+
 	if (quizHUD.panel) quizHUD.panel.dataset.type = "summary";
 	if (quizHUD.label) quizHUD.label.textContent = "score";
 	if (quizHUD.valueDisplay) quizHUD.valueDisplay.textContent = String(state.gameScore);
-	if (quizHUD.progress) quizHUD.progress.textContent = "Complete";
-	if (quizHUD.levelDisplay) quizHUD.levelDisplay.textContent = `L${QUIZ_MAX_LEVEL}`;
+	if (quizHUD.progress) quizHUD.progress.textContent = failedOut ? "Game Over" : "Complete";
+	if (quizHUD.scoreDisplay) {
+		quizHUD.scoreDisplay.textContent = isNewHighScore ? `New best ${bestScore}` : `Best ${bestScore}`;
+		quizHUD.scoreDisplay.setAttribute("aria-label", `Best score ${bestScore}`);
+	}
+	if (quizHUD.levelDisplay) quizHUD.levelDisplay.textContent = `L${state.gameLevel}`;
+	if (quizHUD.actions) quizHUD.actions.setAttribute("aria-hidden", "false");
 	if (quizHUD.submitButton) {
 		quizHUD.submitButton.disabled = true;
-		quizHUD.submitButton.textContent = "Done";
+		quizHUD.submitButton.textContent = "✓";
+	}
+
+	if (tipHUD && tipHUDText) {
+		if (tipTimer) { clearTimeout(tipTimer); tipTimer = null; }
+		const summaryLabel = failedOut ? "Game Over" : "Complete";
+		const msg = isNewHighScore
+			? `New high score: ${state.gameScore}`
+			: `Final score: ${state.gameScore} • Best: ${bestScore}`;
+		tipHUD.setAttribute("data-tip-label", summaryLabel);
+		tipHUDText.textContent = msg;
+		tipHUD.setAttribute("aria-label", msg);
+		tipHUD.setAttribute("aria-hidden", "false");
+		tipHUD.classList.add("tip-visible");
 	}
 }
 
@@ -784,8 +1054,16 @@ export function submitQuizAnswer() {
 	} else {
 		state.gameStreak = 0;
 		state.gameScore = Math.max(0, state.gameScore - 2);
+		quizLives = Math.max(0, quizLives - 1);
+		updateQuizLivesDisplay();
 	}
 	state.gameQuestionsAnswered++;
+
+	if (quizLives <= 0) {
+		updateQuizHUD();
+		showQuizSummary();
+		return;
+	}
 
 	if (state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL === 0) {
 		if (state.gameLevel >= QUIZ_MAX_LEVEL) {
@@ -814,6 +1092,15 @@ export function startQuizGame() {
 	state.gameTargetValue = 0;
 	quizQuestionType = null;
 	quizGameOver = false;
+	displayedScore = 0;
+	quizLives = QUIZ_MAX_LIVES;
+	updateQuizLivesDisplay();
+	if (tipHUD) {
+		tipHUD.setAttribute("aria-hidden", "false");
+		tipHUD.removeAttribute("data-tip-label");
+		if (tipHUDText) tipHUDText.textContent = "";
+	}
+	if (quizHUD.actions) quizHUD.actions.setAttribute("aria-hidden", "true");
 	generateQuizQuestion();
 	if (quizHUD.panel) quizHUD.panel.setAttribute("aria-hidden", "false");
 	showHelpTip("quizStart");
@@ -822,11 +1109,16 @@ export function startQuizGame() {
 export function stopQuizGame() {
 	stopQuizTimer();
 	clearHelpTip();
+	if (rollingScoreTimer) { clearInterval(rollingScoreTimer); rollingScoreTimer = null; }
 	if (quizFeedbackTimer) { clearTimeout(quizFeedbackTimer); quizFeedbackTimer = null; }
 	clearQuizBits();
 	setQuizBodyType(null);
+	document.body.classList.remove("quiz-minutes-active", "quiz-hours-active");
 	quizQuestionType = null;
 	quizGameOver = false;
+	quizLives = QUIZ_MAX_LIVES;
+	updateQuizLivesDisplay();
+	if (tipHUD) tipHUD.removeAttribute("data-lives");
 	if (quizHUD.panel) {
 		quizHUD.panel.setAttribute("aria-hidden", "true");
 		quizHUD.panel.dataset.type = "decimal-to-binary";
@@ -835,4 +1127,5 @@ export function stopQuizGame() {
 		quizHUD.submitButton.disabled = false;
 		quizHUD.submitButton.textContent = "✓";
 	}
+	if (quizHUD.actions) quizHUD.actions.setAttribute("aria-hidden", "true");
 }

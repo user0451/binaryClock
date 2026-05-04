@@ -93,6 +93,10 @@ body.game-type-bit-clicking .timeGroup[data-unit="minutes"] {
 	transition: opacity 400ms ease;
 }
 
+body.game-type-bit-clicking.game-hours-active .timeGroup[data-unit="hours"] {
+	opacity: 1;
+}
+
 body.game-type-bit-clicking .timeGroup[data-unit="seconds"] {
 	opacity: 1;
 	transition: opacity 400ms ease;
@@ -116,12 +120,24 @@ body.game-type-bit-clicking.game-minutes-active .timeGroup[data-unit="minutes"] 
 	border-radius: 6px;
 }
 
+body.game-type-bit-clicking.game-hours-active .timeGroup[data-unit="hours"] .digit,
+body.game-type-bit-clicking.game-hours-active .timeGroup[data-unit="hours"] .helpRows6 {
+	outline: 1px solid color-mix(in srgb, var(--theme-accent-color, #aaa) 40%, transparent);
+	outline-offset: 6px;
+	border-radius: 6px;
+}
+
 body.game-type-bit-clicking .timeGroup[data-unit="seconds"] .bit:not(.game-bit-inactive) {
 	cursor: pointer;
 	transition: transform 120ms ease, filter 120ms ease;
 }
 
 body.game-type-bit-clicking.game-minutes-active .timeGroup[data-unit="minutes"] .bit:not(.game-bit-inactive) {
+	cursor: pointer;
+	transition: transform 120ms ease, filter 120ms ease;
+}
+
+body.game-type-bit-clicking.game-hours-active .timeGroup[data-unit="hours"] .bit:not(.game-bit-inactive) {
 	cursor: pointer;
 	transition: transform 120ms ease, filter 120ms ease;
 }
@@ -138,6 +154,12 @@ body.game-type-bit-clicking .timeGroup[data-unit="minutes"] .bit[data-not6bit] {
 	pointer-events: none !important;
 }
 
+body.game-type-bit-clicking .timeGroup[data-unit="hours"] .bit[data-not6bit] {
+	opacity: 0.18 !important;
+	cursor: default !important;
+	pointer-events: none !important;
+}
+
 body.game-type-bit-clicking .timeGroup[data-unit="seconds"] .bit:not(.game-bit-inactive):hover {
 	transform: scale(1.08);
 	filter: brightness(1.25);
@@ -148,11 +170,20 @@ body.game-type-bit-clicking.game-minutes-active .timeGroup[data-unit="minutes"] 
 	filter: brightness(1.25);
 }
 
+body.game-type-bit-clicking.game-hours-active .timeGroup[data-unit="hours"] .bit:not(.game-bit-inactive):hover {
+	transform: scale(1.08);
+	filter: brightness(1.25);
+}
+
 body.game-type-bit-clicking .timeGroup[data-unit="seconds"] .bit:not(.game-bit-inactive):active {
 	transform: scale(0.94);
 }
 
 body.game-type-bit-clicking.game-minutes-active .timeGroup[data-unit="minutes"] .bit:not(.game-bit-inactive):active {
+	transform: scale(0.94);
+}
+
+body.game-type-bit-clicking.game-hours-active .timeGroup[data-unit="hours"] .bit:not(.game-bit-inactive):active {
 	transform: scale(0.94);
 }
 
@@ -277,6 +308,8 @@ body:not(.game-type-bit-clicking) .gameHUD {
 	font-variant-numeric: tabular-nums;
 	opacity: 0.75;
 	line-height: 1;
+	min-width: 4.5ch;
+	text-align: right;
 }
 
 .gameHUDLevel {
@@ -390,13 +423,13 @@ body:not(.game-type-quiz) .quizHUD {
 	font-weight: 700;
 	font-variant-numeric: tabular-nums;
 	color: var(--theme-accent-color, inherit);
-	min-width: 2.8ch;
+	min-width: 6ch;
 	text-align: center;
 	margin: 0 10px;
 }
 
 .quizHUDInput {
-	width: 5ch;
+	width: 7ch;
 	font-size: 1.25rem;
 	font-weight: 700;
 	font-variant-numeric: tabular-nums;
@@ -434,6 +467,10 @@ body:not(.game-type-quiz) .quizHUD {
 
 .quizHUD[data-type="summary"] .quizHUDInput {
 	display: none;
+}
+
+.quizHUD[data-type="summary"] .quizHUDValue {
+	min-width: auto;
 }
 
 .quizHUDMeta {
@@ -496,9 +533,48 @@ body:not(.game-type-quiz) .quizHUD {
 	transform: scale(0.92);
 }
 
+.quizHUDActions {
+	display: none;
+	gap: 10px;
+	padding: 0 12px 12px;
+}
+
+.quizHUDActions[aria-hidden="false"] {
+	display: flex;
+}
+
+.quizHUDActionButton {
+	flex: 1 1 0;
+	min-height: 40px;
+	border-radius: 10px;
+	border: 1px solid color-mix(in srgb, var(--theme-accent-color, #aaa) 35%, transparent);
+	background: color-mix(in srgb, var(--surface-bg, #111) 82%, var(--theme-accent-color, #aaa) 12%);
+	color: inherit;
+	font-size: 0.78rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition: transform 120ms ease, filter 120ms ease, border-color 200ms ease, background 200ms ease;
+}
+
+.quizHUDActionButton:hover {
+	transform: translateY(-1px);
+	filter: brightness(1.08);
+}
+
+.quizHUDActionButton:active {
+	transform: translateY(0);
+	filter: brightness(0.98);
+}
+
+.quizHUDActionButtonClose {
+	border-color: color-mix(in srgb, #ef4444 35%, transparent);
+	background: color-mix(in srgb, var(--surface-bg, #111) 84%, #ef4444 16%);
+}
+
 .quizHUD[data-type="summary"] .quizHUDSubmit {
-	cursor: default;
-	opacity: 0.7;
+	display: none;
 }
 
 body.game-type-quiz .quizHUDLabel,
@@ -550,8 +626,30 @@ body.game-type-quiz .timeGroup[data-unit="seconds"] {
 	transition: opacity 400ms ease;
 }
 
+body.game-type-quiz.quiz-minutes-active .timeGroup[data-unit="minutes"] {
+	opacity: 1;
+}
+
+body.game-type-quiz.quiz-hours-active .timeGroup[data-unit="hours"] {
+	opacity: 1;
+}
+
 body.game-type-quiz .timeGroup[data-unit="seconds"] .digit,
 body.game-type-quiz .timeGroup[data-unit="seconds"] .helpRows6 {
+	outline: 1px solid color-mix(in srgb, var(--theme-accent-color, #aaa) 40%, transparent);
+	outline-offset: 6px;
+	border-radius: 6px;
+}
+
+body.game-type-quiz.quiz-minutes-active .timeGroup[data-unit="minutes"] .digit,
+body.game-type-quiz.quiz-minutes-active .timeGroup[data-unit="minutes"] .helpRows6 {
+	outline: 1px solid color-mix(in srgb, var(--theme-accent-color, #aaa) 40%, transparent);
+	outline-offset: 6px;
+	border-radius: 6px;
+}
+
+body.game-type-quiz.quiz-hours-active .timeGroup[data-unit="hours"] .digit,
+body.game-type-quiz.quiz-hours-active .timeGroup[data-unit="hours"] .helpRows6 {
 	outline: 1px solid color-mix(in srgb, var(--theme-accent-color, #aaa) 40%, transparent);
 	outline-offset: 6px;
 	border-radius: 6px;
@@ -563,7 +661,27 @@ body.game-type-quiz.quiz-type-decimal-to-binary .timeGroup[data-unit="seconds"] 
 	transition: transform 120ms ease, filter 120ms ease;
 }
 
+body.game-type-quiz.quiz-type-decimal-to-binary.quiz-minutes-active .timeGroup[data-unit="minutes"] .bit:not(.game-bit-inactive) {
+	cursor: pointer;
+	transition: transform 120ms ease, filter 120ms ease;
+}
+
+body.game-type-quiz.quiz-type-decimal-to-binary.quiz-hours-active .timeGroup[data-unit="hours"] .bit:not(.game-bit-inactive) {
+	cursor: pointer;
+	transition: transform 120ms ease, filter 120ms ease;
+}
+
 body.game-type-quiz.quiz-type-decimal-to-binary .timeGroup[data-unit="seconds"] .bit:not(.game-bit-inactive):hover {
+	transform: scale(1.08);
+	filter: brightness(1.25);
+}
+
+body.game-type-quiz.quiz-type-decimal-to-binary.quiz-minutes-active .timeGroup[data-unit="minutes"] .bit:not(.game-bit-inactive):hover {
+	transform: scale(1.08);
+	filter: brightness(1.25);
+}
+
+body.game-type-quiz.quiz-type-decimal-to-binary.quiz-hours-active .timeGroup[data-unit="hours"] .bit:not(.game-bit-inactive):hover {
 	transform: scale(1.08);
 	filter: brightness(1.25);
 }
@@ -575,7 +693,9 @@ body.game-type-quiz.quiz-type-decimal-to-binary .timeGroup[data-unit="seconds"] 
 }
 
 /* binary-to-decimal: bits are locked display */
-body.game-type-quiz.quiz-type-binary-to-decimal .timeGroup[data-unit="seconds"] .bit {
+body.game-type-quiz.quiz-type-binary-to-decimal .timeGroup[data-unit="seconds"] .bit,
+body.game-type-quiz.quiz-type-binary-to-decimal .timeGroup[data-unit="minutes"] .bit,
+body.game-type-quiz.quiz-type-binary-to-decimal .timeGroup[data-unit="hours"] .bit {
 	cursor: default !important;
 	pointer-events: none !important;
 }
@@ -617,8 +737,88 @@ body.game-type-quiz.quiz-type-binary-to-decimal .timeGroup[data-unit="seconds"] 
 }
 
 /* =========================================================================
-   Help Tip HUD — pops in after 3 consecutive wrong answers
+   Help Tip HUD — bit-clicking: tips after 3 wrong; quiz: persistent lives display
    ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   Quiz lives bar (inside tipHUD, visible only in quiz mode)
+   ------------------------------------------------------------------------- */
+
+.quizLivesBar {
+	display: none;
+	align-items: center;
+	gap: 10px;
+	justify-content: center;
+}
+
+body.game-type-quiz .quizLivesBar {
+	display: flex;
+}
+
+.quizLivesLabel {
+	font-size: 0.6rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	opacity: 0.45;
+	flex-shrink: 0;
+}
+
+.quizLivesBits {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+}
+
+/* Mimic clock bits — round pill, off-state uses theme off vars */
+.quizLivesBit {
+	width: clamp(14px, 1.4vw, 20px);
+	height: clamp(14px, 1.4vw, 20px);
+	border-radius: 999px;
+	border: 1px solid var(--bit-off-border, rgba(255, 255, 255, 0.12));
+	background: var(--bit-off, rgba(255, 255, 255, 0.06));
+	box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+	transition: background 250ms ease, box-shadow 250ms ease, border-color 250ms ease;
+}
+
+.quizLivesBit.on {
+	background: radial-gradient(circle at 30% 28%, #ffd4dc 3%, var(--hours-on, var(--theme-accent-color, #aaa)) 68%);
+	border-color: color-mix(in srgb, var(--hours-on, var(--theme-accent-color, #aaa)) 70%, white);
+	box-shadow: var(--bit-on-shadow-shape, 0 0 6px 2px) var(--hours-glow, var(--theme-accent-color, rgba(255, 100, 100, 0.4))),
+		inset 0 0 6px rgba(255, 255, 255, 0.3);
+}
+
+/* Low lives warning: 1 or 2 lives left — force red regardless of theme */
+.tipHUD[data-lives="2"] .quizLivesBit.on,
+.tipHUD[data-lives="1"] .quizLivesBit.on {
+	background: radial-gradient(circle at 30% 28%, #ffd4d4 3%, #ef4444 68%);
+	border-color: #f87171;
+	box-shadow: 0 0 8px 3px rgba(239, 68, 68, 0.55), inset 0 0 6px rgba(255, 255, 255, 0.3);
+}
+
+/* In quiz mode: tipHUD is always visible (lives must persist) */
+body.game-type-quiz .tipHUD {
+	opacity: 1;
+	transform: translateX(-50%) translateY(0);
+	pointer-events: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 20px 12px;
+}
+
+/* In quiz mode the ::before label badge appears above lives when a tip fires */
+body.game-type-quiz .tipHUD[data-tip-label]::before {
+	margin-right: 0;
+	display: block;
+	margin-bottom: 2px;
+}
+
+/* tipHUDText: always shown inside tipHUD but invisible when empty */
+.tipHUDText:empty {
+	display: none;
+}
 
 .tipHUD {
 	position: fixed;

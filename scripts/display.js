@@ -242,20 +242,24 @@ function updateInlineBitHelp(values, mode) {
 
 export function updateTimeDisplayForMode(values, mode) {
 	const skipSeconds = state.gameActive && (state.gameMode === "bit-clicking" || state.gameMode === "quiz");
-	const bitClickingMinutesActive = state.gameActive
-		&& state.gameMode === "bit-clicking"
-		&& (state.mode === "6-bit" ? state.gameLevel > 3 : state.gameLevel > 1);
+	const skipHours = state.gameActive;
+	const skipMinutes = state.gameActive;
 	if (mode === "6-bit") {
-		applySixBit("hours", values.hours);
-		if (!bitClickingMinutesActive) applySixBit("minutes", values.minutes);
+		if (!skipHours) applySixBit("hours", values.hours);
+		if (!skipMinutes) applySixBit("minutes", values.minutes);
 		if (!skipSeconds) applySixBit("seconds", values.seconds);
 	} else {
-		applyFourBit("hours", values.hours);
-		if (!bitClickingMinutesActive) applyFourBit("minutes", values.minutes);
+		if (!skipHours) applyFourBit("hours", values.hours);
+		if (!skipMinutes) applyFourBit("minutes", values.minutes);
 		if (!skipSeconds) applyFourBit("seconds", values.seconds);
 	}
 	updateMeridiemBadge(values);
 	updateInlineBitHelp(values, mode);
+}
+
+export function clearClockBitsForGame() {
+	applySixBit("hours", 0);
+	applySixBit("minutes", 0);
 }
 
 export function updateTimeDisplay(values) {

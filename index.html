@@ -203,7 +203,8 @@
 						</button>
 						<button type="button" class="gameTypeOption" data-game-type="quiz">
 							<span class="gameTypeTitle">Quiz: Challenge Mode</span>
-							<span class="gameTypeDesc">Test your binary knowledge with 8 difficulty levels</span>
+							<span class="gameTypeDesc">Test your binary knowledge across 25 difficulty levels — 5 lives
+								to survive</span>
 						</button>
 						<button type="button" class="gameTypeOption gameTypeClose" data-game-type="close">
 							<span class="gameTypeTitle">Close Game</span>
@@ -268,12 +269,28 @@
 				</span>
 				<button type="button" id="quizHUDSubmit" class="quizHUDSubmit" aria-label="Submit answer">✓</button>
 			</div>
+			<div class="quizHUDActions" id="quizHUDActions" aria-hidden="true">
+				<button type="button" id="quizHUDRestart"
+					class="quizHUDActionButton quizHUDActionButtonRestart">Restart</button>
+				<button type="button" id="quizHUDClose"
+					class="quizHUDActionButton quizHUDActionButtonClose">Close</button>
+			</div>
 			<div id="quizHUDTimerTrack" class="quizHUDTimerTrack" aria-hidden="true">
 				<div id="quizHUDTimerFill" class="quizHUDTimerFill"></div>
 			</div>
 		</div>
-		<!-- Help Tip (bit-clicking: shown after 3 consecutive wrong answers) -->
-		<div id="tipHUD" class="tipHUD" aria-hidden="true" aria-live="polite" role="status"></div>
+		<!-- Help Tip / Quiz Lives — quiz mode: always shows lives; bit-clicking: shows tips after 3 wrong -->
+		<div id="tipHUD" class="tipHUD" aria-hidden="true" aria-live="polite" role="status">
+			<div class="quizLivesBar" id="quizLivesBar" aria-label="Lives remaining">
+				<span class="quizLivesLabel">lives</span>
+				<div class="quizLivesBits" aria-hidden="true">
+					<div class="quizLivesBit on" id="quizLifeA"></div>
+					<div class="quizLivesBit on" id="quizLifeB"></div>
+					<div class="quizLivesBit on" id="quizLifeC"></div>
+				</div>
+			</div>
+			<span class="tipHUDText" id="tipHUDText"></span>
+		</div>
 	</main>
 	<script type="module" src="code.js"></script>
 </body>
