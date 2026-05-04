@@ -66,8 +66,8 @@ Both are useful: 6-bit builds fluency, 4-bit builds understanding.
 
 ### Interactive Practice Modes
 
-- **Bit-clicking mode**: click bits to match target values, level up, and receive performance-based feedback
-- **Quiz mode**: convert between binary and decimal with time pressure
+- **Bit-clicking mode**: click bits to match target values, level up, and beat your previous time
+- **Quiz mode**: convert between binary and decimal with time pressure for some rounds
 
 The goal is to move from passive observation to active recall.
 
@@ -79,6 +79,7 @@ The goal is to move from passive observation to active recall.
 - `Vertical / Horizontal`: change spatial reading direction
 - `MSB / LSB`: reverse bit significance order
 - `24h / 12h`: switch time format
+- `Game`: choose between bit-clicking practice or quiz mode
 - `Theme`: choose visual style or shuffle through themes
 
 ## Run Locally
