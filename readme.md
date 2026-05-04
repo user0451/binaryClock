@@ -6,7 +6,7 @@ An interactive binary clock designed to subtly teach how binary works through vi
 
 Live demo: https://spinningrock.net/binary/
 
-[demo](https://github.com/user0451/binaryClock/blob/master/media/binaryclock.gif)
+![demo](https://github.com/user0451/binaryClock/blob/master/media/binaryclock.gif)
 ---
 ## Why This Exists
 Most binary clocks are visual novelty. Mine isn't far off to be fair, but is really designed to teach:
