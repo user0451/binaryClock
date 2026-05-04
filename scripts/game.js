@@ -8,10 +8,198 @@
  */
 
 import { HELP_WEIGHTS } from "./config.js";
-import { gameHUD, quizHUD, sixBitNodes } from "./dom.js";
+import { gameHUD, quizHUD, sixBitNodes, tipHUD } from "./dom.js";
 import { state } from "./state.js";
 
 let feedbackTimer = null;
+let questionStartedAt = Date.now();
+
+// ---------------------------------------------------------------------------
+// Help tips — shown after 3 consecutive wrong answers in bit-clicking mode
+// ---------------------------------------------------------------------------
+
+const BIT_TIPS = {
+	missedBit: [
+		"Odd/even check: if the 1 bit (LSB) is on, the answer must be odd.",
+		"Use the LSB as a fast parity check before you submit.",
+		"If the target parity is wrong, fix the 1 bit first.",
+		"The LSB decides odd vs even instantly.",
+	],
+	overshotBit: [
+		"You overshot: start from the MSB and only keep it if you still fit.",
+		"Turn on large bits carefully; the MSB alone can add a big jump.",
+		"If your total is too high, clear the highest lit bit first.",
+		"Build up value from largest to smallest to avoid overshooting.",
+	],
+	slowResponse: [
+		"Try pattern recognition: 7, 15, and 31 are all lower bits on.",
+		"Chunk the sum into groups instead of calculating each bit from scratch.",
+		"Use a quick mental flow: MSB check -> remainder -> next bit.",
+		"Practice a top-down scan to speed up your decisions.",
+	],
+	undershotBit: [
+		"You were low: check if a larger bit should be on.",
+		"If you are under target, try enabling the next highest useful bit.",
+		"Large misses below target usually mean a missing high-value bit.",
+	],
+	nearMiss: [
+		"Close one: compare against target and adjust one bit at a time.",
+		"Near miss usually means one wrong bit toggle.",
+		"When you are off by 1, check the LSB first.",
+	],
+	largeMiss: [
+		"Big gap: break the target into powers of two before toggling.",
+		"Estimate range first, then place the biggest matching bit.",
+		"Think binary decomposition: target = sum of active bit weights.",
+	],
+	streakRecovery: [
+		"Reset calmly: accuracy first, speed second.",
+		"Use a consistent method each round to reduce repeat mistakes.",
+		"Read, plan, then toggle. A steady routine improves streaks.",
+	],
+	general: [
+		"Each bit is a power of two: 1, 2, 4, 8, 16, 32.",
+		"If all bits are off, the value is 0.",
+		"If all active bits are on, the value is 2^n - 1.",
+		"Each extra bit doubles the representable range.",
+	],
+};
+
+const TIP_CATEGORY_LABELS = {
+	missedBit: "Parity Check",
+	overshotBit: "Overshot",
+	slowResponse: "Speed Pattern",
+	undershotBit: "Undershot",
+	nearMiss: "Near Miss",
+	largeMiss: "Big Gap",
+	streakRecovery: "Streak Recovery",
+	general: "Binary Tip",
+};
+
+let consecutiveWrong = 0;
+let tipTimer = null;
+let recentMistakeCounts = {
+	missedBit: 0,
+	overshotBit: 0,
+	slowResponse: 0,
+	undershotBit: 0,
+	nearMiss: 0,
+	largeMiss: 0,
+	streakRecovery: 0,
+};
+
+function resetMistakeCounters() {
+	recentMistakeCounts = {
+		missedBit: 0,
+		overshotBit: 0,
+		slowResponse: 0,
+		undershotBit: 0,
+		nearMiss: 0,
+		largeMiss: 0,
+		streakRecovery: 0,
+	};
+}
+
+function addMistakeSignals(categories) {
+	for (const category of categories) {
+		if (Object.hasOwn(recentMistakeCounts, category)) {
+			recentMistakeCounts[category] += 1;
+		}
+	}
+}
+
+function pickTopMistakeCategory() {
+	let topCategory = "general";
+	let topCount = 0;
+	for (const [category, count] of Object.entries(recentMistakeCounts)) {
+		if (count > topCount) {
+			topCategory = category;
+			topCount = count;
+		}
+	}
+	return topCategory;
+}
+
+function getSlowThresholdMs() {
+	return Math.max(4500, getLevelBitCount() * 1200);
+}
+
+function categorizeMistake(player, target, elapsedMs) {
+	const categories = [];
+	const diff = player - target;
+	const absDiff = Math.abs(diff);
+
+	if ((player & 1) !== (target & 1)) {
+		categories.push("missedBit");
+	}
+
+	if (diff > 0) {
+		categories.push("overshotBit");
+	} else if (diff < 0) {
+		categories.push("undershotBit");
+	}
+
+	if (elapsedMs >= getSlowThresholdMs()) {
+		categories.push("slowResponse");
+	}
+
+	if (absDiff > 0 && absDiff <= 2) {
+		categories.push("nearMiss");
+	}
+
+	const maxValue = Math.max(1, getMaxValue());
+	if (absDiff >= Math.ceil(maxValue * 0.45)) {
+		categories.push("largeMiss");
+	}
+
+	if (consecutiveWrong >= 2) {
+		categories.push("streakRecovery");
+	}
+
+	if (categories.length === 0) {
+		categories.push("general");
+	}
+
+	return categories;
+}
+
+function showHelpTip(category = "general") {
+	if (!tipHUD) return;
+	if (tipTimer) {
+		clearTimeout(tipTimer);
+		tipTimer = null;
+	}
+	const source = BIT_TIPS[category] ?? BIT_TIPS.general;
+	const tip = source[Math.floor(Math.random() * source.length)];
+	const label = TIP_CATEGORY_LABELS[category] ?? TIP_CATEGORY_LABELS.general;
+	tipHUD.setAttribute("data-tip-label", label);
+	tipHUD.textContent = tip;
+	tipHUD.setAttribute("aria-label", `${label}: ${tip}`);
+	tipHUD.setAttribute("aria-hidden", "false");
+	tipHUD.classList.add("tip-visible");
+	tipTimer = setTimeout(() => {
+		tipHUD.classList.remove("tip-visible");
+		tipTimer = setTimeout(() => {
+			tipHUD.setAttribute("aria-hidden", "true");
+			tipTimer = null;
+		}, 400);
+	}, 14600);
+}
+
+function clearHelpTip() {
+	if (tipTimer) {
+		clearTimeout(tipTimer);
+		tipTimer = null;
+	}
+	if (tipHUD) {
+		tipHUD.classList.remove("tip-visible");
+		tipHUD.setAttribute("aria-hidden", "true");
+		tipHUD.removeAttribute("data-tip-label");
+		tipHUD.removeAttribute("aria-label");
+	}
+	consecutiveWrong = 0;
+	resetMistakeCounters();
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -73,6 +261,12 @@ function getLevelBitCount() {
 /** Max target value for current level / mode. */
 function getMaxValue() {
 	return getActiveBitNodes().reduce((sum, node) => sum + getBitNodeWeight(node), 0);
+}
+
+function randomTargetExcluding(maxValue, previousValue) {
+	if (maxValue <= 0) return 0;
+	const next = Math.floor(Math.random() * maxValue);
+	return next >= previousValue ? next + 1 : next;
 }
 
 /** Read the decimal value the player has currently set in active game bits. */
@@ -152,7 +346,10 @@ export function generateNewQuestion() {
 	clearGameClasses();
 	markInactiveBits();
 
-	state.gameTargetValue = Math.floor(Math.random() * (getMaxValue() + 1));
+	const maxValue = getMaxValue();
+	const previousValue = state.gameTargetValue;
+	state.gameTargetValue = randomTargetExcluding(maxValue, previousValue);
+	questionStartedAt = Date.now();
 	updateGameHUD();
 }
 
@@ -188,11 +385,21 @@ export function submitGameAnswer() {
 	flashBitFeedback(isCorrect);
 
 	if (isCorrect) {
+		consecutiveWrong = 0;
+		resetMistakeCounters();
 		state.gameScore += 10 + state.gameStreak * 2;
 		state.gameStreak++;
 	} else {
 		state.gameStreak = 0;
 		state.gameScore = Math.max(0, state.gameScore - 2);
+		const elapsedMs = Date.now() - questionStartedAt;
+		addMistakeSignals(categorizeMistake(player, state.gameTargetValue, elapsedMs));
+		consecutiveWrong++;
+		if (consecutiveWrong >= 3) {
+			showHelpTip(pickTopMistakeCategory());
+			consecutiveWrong = 0;
+			resetMistakeCounters();
+		}
 	}
 	state.gameQuestionsAnswered++;
 
@@ -217,6 +424,7 @@ export function submitGameAnswer() {
 // ---------------------------------------------------------------------------
 
 export function startBitClickingGame() {
+	clearHelpTip();
 	state.gameScore = 0;
 	state.gameLevel = 1;
 	state.gameQuestionsAnswered = 0;
@@ -235,6 +443,7 @@ export function stopBitClickingGame() {
 		clearTimeout(feedbackTimer);
 		feedbackTimer = null;
 	}
+	clearHelpTip();
 	clearGameClasses();
 	document.body.classList.remove("game-minutes-active");
 
@@ -395,7 +604,9 @@ export function generateQuizQuestion() {
 		: config.type;
 
 	setQuizBodyType(quizQuestionType);
-	state.gameTargetValue = Math.floor(Math.random() * (getQuizMaxValue() + 1));
+	const maxValue = getQuizMaxValue();
+	const previousValue = state.gameTargetValue;
+	state.gameTargetValue = randomTargetExcluding(maxValue, previousValue);
 
 	if (quizQuestionType === "decimal-to-binary") {
 		const start = getQuizStartIndex();

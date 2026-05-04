@@ -191,6 +191,7 @@ function selectGameType(gameType) {
 	if (controls.gameTypeSelect) {
 		controls.gameTypeSelect.setAttribute("aria-hidden", "true");
 	}
+	setSettingsOpen(false);
 
 	if (gameType === "bit-clicking") {
 		startBitClickingGame();

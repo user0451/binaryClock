@@ -52,6 +52,7 @@ export const allBitNodes = Array.from(document.querySelectorAll(".clock .bit"));
 export const helpRowNodes = Array.from(document.querySelectorAll(".clock .helpRows4, .clock .helpRows6"));
 export const digitalPanel = document.querySelector(".digitalPanel");
 export const meridiemBadge = document.getElementById("meridiemBadge");
+export const tipHUD = document.getElementById("tipHUD");
 
 export const digitalNodes = {
 	sixBit: {

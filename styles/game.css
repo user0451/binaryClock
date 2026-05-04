@@ -588,3 +588,51 @@ body.game-type-quiz.quiz-type-binary-to-decimal .timeGroup[data-unit="seconds"] 
 		max-width: calc(100vw - 32px);
 	}
 }
+
+/* =========================================================================
+   Help Tip HUD — pops in after 3 consecutive wrong answers
+   ========================================================================= */
+
+.tipHUD {
+	position: fixed;
+	top: 20px;
+	left: 50%;
+	transform: translateX(-50%) translateY(-8px);
+	max-width: min(480px, calc(100vw - 32px));
+	padding: 14px 20px;
+	background: color-mix(in srgb, var(--surface-bg, #111) 94%, transparent);
+	border: 1px solid color-mix(in srgb, var(--theme-accent-color, #aaa) 40%, transparent);
+	border-radius: 10px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+	font-size: 1rem;
+	line-height: 1.5;
+	text-align: center;
+	color: inherit;
+	opacity: 0;
+	pointer-events: none;
+	z-index: 850;
+	transition: opacity 350ms ease, transform 350ms ease;
+}
+
+.tipHUD[data-tip-label]::before {
+	content: attr(data-tip-label);
+	display: inline-block;
+	margin-bottom: 8px;
+	padding: 2px 10px;
+	border-radius: 999px;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--theme-accent-color, #ddd);
+	background: color-mix(in srgb, var(--theme-accent-color, #aaa) 18%, transparent);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tipHUD[aria-hidden="false"].tip-visible {
+	opacity: 1;
+	transform: translateX(-50%) translateY(0);
+	pointer-events: auto;
+}
