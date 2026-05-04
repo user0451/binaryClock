@@ -148,6 +148,7 @@ body.settings-open .settingsTrigger {
 
 .switch {
 	position: relative;
+	--switch-pad: 0.2rem;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -175,15 +176,16 @@ body.settings-open .settingsTrigger {
 .slider::before {
 	content: "";
 	position: absolute;
-	left: 0.2rem;
-	top: 0.2rem;
+	left: var(--switch-pad);
+	top: 50%;
+	transform: translateY(-50%);
 	width: var(--switch-knob);
 	height: var(--switch-knob);
 	border-radius: 999px;
 	background: var(--bit-off);
 	border: 1px solid var(--bit-off-border);
 	box-shadow: inset 0 -0.22rem 0.45rem rgba(0, 0, 0, 0.28);
-	transition: left var(--motion-base) var(--ease-primary), background var(--motion-base) var(--ease-soft), border-color var(--motion-base) var(--ease-soft), box-shadow var(--motion-base) var(--ease-soft);
+	transition: left var(--motion-base) var(--ease-primary), background var(--motion-base) var(--ease-soft), border-color var(--motion-base) var(--ease-soft), box-shadow var(--motion-base) var(--ease-soft), transform var(--motion-base) var(--ease-primary);
 }
 
 .switch input:checked+.slider {
@@ -193,7 +195,7 @@ body.settings-open .settingsTrigger {
 }
 
 .switch input:checked+.slider::before {
-	left: calc(100% - var(--switch-knob) - 0.2rem);
+	left: calc(100% - var(--switch-knob) - var(--switch-pad));
 	background: radial-gradient(circle at 30% 28%, #d6ffe0 3%, var(--seconds-on) 68%);
 	border-color: #a8ffbc;
 	box-shadow: var(--bit-on-shadow-shape) var(--seconds-glow), inset 0 0 0.65rem rgba(255, 255, 255, 0.28);
@@ -441,6 +443,44 @@ body.random-shuffle-active .shuffle-btn {
 
 	.shuffle-btn {
 		font-size: clamp(0.88rem, 3.25vw, 1.04rem);
+	}
+}
+
+@media (pointer: coarse) and (orientation: landscape) {
+
+	/* In mobile landscape, keep panel close to trigger and allow full control list scrolling. */
+	#settingsOverlay {
+		overflow-y: auto;
+		padding-top: calc(clamp(0.42rem, 1.2vw, 0.75rem) + 2.05rem + 0.18rem);
+		padding-right: clamp(0.45rem, 1.4vw, 0.9rem);
+		padding-bottom: 0.4rem;
+	}
+
+	#switch-container {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		align-items: center;
+		justify-items: stretch;
+		justify-content: stretch;
+		gap: 0.42rem 0.5rem;
+		width: min(94vw, 31rem);
+		max-height: calc(100svh - (clamp(0.42rem, 1.2vw, 0.75rem) + 2.05rem + 0.18rem) - 0.6rem);
+		overflow-y: auto;
+		padding: 0.5rem;
+	}
+
+	.settingsHeader,
+	.themeSelect {
+		grid-column: 1 / -1;
+	}
+
+	.switch,
+	.themeSelect {
+		width: 100%;
+	}
+
+	.switch {
+		--switch-pad: 0.16rem;
 	}
 }
 

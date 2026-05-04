@@ -4,7 +4,7 @@
    Everything below adapts for larger screens.
 ───────────────────────────────────────────────────────────────────── */
 
-@media (min-width: 40rem) {
+@media (min-width: 40rem) and (hover: hover) and (pointer: fine) {
 	:root {
 		/* Larger-screen bit geometry: viewport-width based scaling */
 		--bit-size: clamp(2.35rem, 5.1vw, 4.9rem);
@@ -116,14 +116,45 @@
 }
 
 /* ── Mobile only: hide orientation toggle (auto-orient handles it) ──── */
-@media (max-width: 39.9999rem) {
+@media (max-width: 39.9999rem),
+(pointer: coarse) {
 	label[for="orientationToggle"] {
 		display: none;
 	}
 }
 
+/* ── Mobile landscape: compact controls + robust centering ─────────── */
+@media (pointer: coarse) and (orientation: landscape) {
+	:root {
+		--control-height: clamp(1.8rem, 3.2vw, 2.05rem);
+		--control-width: clamp(5.3rem, 10vw, 6.2rem);
+		--switch-knob: calc(var(--control-height) - 0.36rem);
+	}
+
+	.appShell {
+		width: 100%;
+		max-width: 100%;
+		justify-items: center;
+	}
+
+	.clock {
+		max-width: min(100%, calc(100vw - 1rem));
+		margin-inline: auto;
+	}
+
+	#switch-container {
+		width: min(94vw, 30rem);
+		gap: 0.45rem;
+		padding: 0.55rem;
+	}
+
+	.switch {
+		width: min(100%, 13.8rem);
+	}
+}
+
 /* ── Large desktop: amplify scale and motion ─────────────────────────── */
-@media (min-width: 90rem) {
+@media (min-width: 90rem) and (hover: hover) and (pointer: fine) {
 	:root {
 		--bit-size: clamp(4rem, 4.7vw, 6.3rem);
 		--bit-gap: clamp(0.62rem, 0.95vw, 1rem);

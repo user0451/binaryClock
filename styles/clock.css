@@ -6,7 +6,7 @@
 	position: relative;
 	/* Mobile-first: transparent, fills viewport, no card chrome */
 	width: max-content;
-	max-width: calc(100vw - 1.2rem);
+	max-width: min(100%, calc(100vw - 1.2rem));
 	min-height: clamp(22rem, 76dvh, 44rem);
 	padding: clamp(0.24rem, 1.7vmin, 0.75rem);
 	border-radius: 0;
@@ -247,7 +247,7 @@ body.digital-visible .digitalPanel:active {
 	font-family: var(--font-mono);
 	line-height: 1;
 	pointer-events: none;
-	-webkkit-user-select: none;
+	-webkit-user-select: none;
 	-moz-user-select: none;
 	user-select: none;
 }

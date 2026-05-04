@@ -96,7 +96,7 @@ function toggleThemeDropdown() {
 function toggleMode() {
 	const targetMode = controls.modeToggle.checked ? "4-bit" : "6-bit";
 	transitionToMode(targetMode);
-	applyAutoOrientation();
+	applyAutoOrientation(targetMode);
 }
 
 function toggleTimeFormat() {
@@ -190,28 +190,97 @@ function startClock() {
 	runTick();
 }
 
-const orientationMQL = window.matchMedia("(orientation: portrait)");
-const mobileMQL = window.matchMedia("(max-width: 39.9999rem)");
+const portraitMQL = window.matchMedia("(orientation: portrait)");
+const landscapeMQL = window.matchMedia("(orientation: landscape)");
+const coarsePointerMQL = window.matchMedia("(pointer: coarse)");
 
-function getAutoOrientation() {
-	const isPortrait = orientationMQL.matches;
-	if (state.mode === "6-bit") {
-		return isPortrait ? "vertical" : "horizontal";
+function getDeviceOrientation() {
+	const orientationType = window.screen?.orientation?.type;
+	if (typeof orientationType === "string") {
+		if (orientationType.includes("portrait")) {
+			return "portrait";
+		}
+		if (orientationType.includes("landscape")) {
+			return "landscape";
+		}
 	}
-	// 4-bit: opposite — portrait = horizontal, landscape = vertical
-	return isPortrait ? "horizontal" : "vertical";
+
+	if (portraitMQL.matches) {
+		return "portrait";
+	}
+	if (landscapeMQL.matches) {
+		return "landscape";
+	}
+
+	return window.innerHeight >= window.innerWidth ? "portrait" : "landscape";
 }
 
-function applyAutoOrientation() {
-	if (!mobileMQL.matches) {
+function isAutoOrientationDevice() {
+	// Use capability + viewport heuristics so desktop resize doesn't trigger auto-orient.
+	const hasTouch = navigator.maxTouchPoints > 0;
+	const coarsePointer = coarsePointerMQL.matches;
+	const shortEdge = Math.min(window.innerWidth, window.innerHeight);
+	const isPhoneOrTabletViewport = shortEdge <= 1024;
+
+	return (hasTouch || coarsePointer) && isPhoneOrTabletViewport;
+}
+
+function getAutoOrientation(mode = state.mode) {
+	const orientation = getDeviceOrientation();
+	if (!orientation) {
+		return state.bitOrientation;
+	}
+
+	if (mode === "6-bit") {
+		return orientation === "portrait" ? "vertical" : "horizontal";
+	}
+
+	// 4-bit: opposite mapping for readability.
+	return orientation === "portrait" ? "horizontal" : "vertical";
+}
+
+function applyAutoOrientation(modeOverride) {
+	if (!state.autoOrient || !isAutoOrientationDevice()) {
 		return;
 	}
-	const target = getAutoOrientation();
+
+	const mode = typeof modeOverride === "string" ? modeOverride : state.mode;
+	const target = getAutoOrientation(mode);
 	if (target !== state.bitOrientation) {
 		state.bitOrientation = target;
+		controls.orientationToggle.checked = target === "horizontal";
 		setOrientationLabel();
 		transitionToOrientation(target);
+		persistState();
 	}
+}
+
+function addMediaQueryChangeListener(mediaQueryList, listener) {
+	if (typeof mediaQueryList.addEventListener === "function") {
+		mediaQueryList.addEventListener("change", listener);
+		return;
+	}
+	if (typeof mediaQueryList.addListener === "function") {
+		mediaQueryList.addListener(listener);
+	}
+}
+
+function wireAutoOrientationListeners() {
+	addMediaQueryChangeListener(portraitMQL, applyAutoOrientation);
+	addMediaQueryChangeListener(landscapeMQL, applyAutoOrientation);
+	addMediaQueryChangeListener(coarsePointerMQL, applyAutoOrientation);
+
+	if (window.screen?.orientation && typeof window.screen.orientation.addEventListener === "function") {
+		window.screen.orientation.addEventListener("change", applyAutoOrientation);
+	}
+
+	window.addEventListener("resize", applyAutoOrientation);
+	window.addEventListener("pageshow", applyAutoOrientation);
+	document.addEventListener("visibilitychange", () => {
+		if (!document.hidden) {
+			applyAutoOrientation();
+		}
+	});
 }
 
 function wireBitLiquidInteractions() {
@@ -437,9 +506,6 @@ function wireBitLiquidInteractions() {
 		bitNode.addEventListener("pointerdown", (event) => {
 			startLiquid(bitNode, event.pointerType);
 			onLiquidPointerMove(event, bitNode);
-			if (event.pointerType === "touch") {
-				bitNode.setPointerCapture(event.pointerId);
-			}
 		});
 
 		bitNode.addEventListener("pointermove", (event) => {
@@ -447,16 +513,10 @@ function wireBitLiquidInteractions() {
 		});
 
 		bitNode.addEventListener("pointerup", (event) => {
-			if (event.pointerType === "touch") {
-				bitNode.releasePointerCapture(event.pointerId);
-			}
 			releaseLiquid(bitNode);
 		});
 
 		bitNode.addEventListener("pointercancel", (event) => {
-			if (event.pointerType === "touch") {
-				bitNode.releasePointerCapture(event.pointerId);
-			}
 			releaseLiquid(bitNode);
 		});
 
@@ -498,7 +558,7 @@ function wireEvents() {
 			}
 		});
 	}
-	orientationMQL.addEventListener("change", applyAutoOrientation);
+	wireAutoOrientationListeners();
 	document.addEventListener("click", (event) => {
 		if (!controls.themeSelectDisplay || !controls.themeSelectList) {
 			return;

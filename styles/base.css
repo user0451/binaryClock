@@ -65,6 +65,12 @@ html,
 body {
 	margin: 0;
 	padding: 0;
+	touch-action: auto;
+}
+
+.clock,
+.clock .bit {
+	touch-action: pan-x pan-y pinch-zoom;
 }
 
 /* Arcade CRT scanline overlay */
