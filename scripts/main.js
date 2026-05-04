@@ -606,6 +606,14 @@ function wireBitLiquidInteractions() {
 }
 
 function wireEvents() {
+	function animateSubmitPress(button) {
+		if (!button || button.disabled) return;
+		button.classList.add("hud-submit-press");
+		window.setTimeout(() => {
+			button.classList.remove("hud-submit-press");
+		}, 130);
+	}
+
 	buildThemeDropdownOptions();
 	wireBitLiquidInteractions();
 	controls.modeToggle.addEventListener("change", toggleMode);
@@ -656,6 +664,15 @@ function wireEvents() {
 	if (gameHUDSubmit) {
 		gameHUDSubmit.addEventListener("click", submitGameAnswer);
 	}
+	const gameHUDPanel = document.getElementById("gameHUD");
+	if (gameHUDPanel && gameHUDSubmit) {
+		gameHUDPanel.addEventListener("click", (event) => {
+			if (!state.gameActive || state.gameMode !== "bit-clicking") return;
+			if (event.target.closest("#gameHUDSubmit")) return;
+			animateSubmitPress(gameHUDSubmit);
+			submitGameAnswer();
+		});
+	}
 
 	// Quiz HUD submit button + Enter key on input
 	const quizHUDSubmit = document.getElementById("quizHUDSubmit");
@@ -663,6 +680,17 @@ function wireEvents() {
 		quizHUDSubmit.addEventListener("click", submitQuizAnswer);
 	}
 	const quizHUDInput = document.getElementById("quizHUDInput");
+	const quizHUDPanel = document.getElementById("quizHUD");
+	if (quizHUDPanel && quizHUDSubmit) {
+		quizHUDPanel.addEventListener("click", (event) => {
+			if (!state.gameActive || state.gameMode !== "quiz") return;
+			if (quizHUDSubmit.disabled) return;
+			if (event.target.closest("#quizHUDSubmit")) return;
+			if (event.target.closest("#quizHUDInput")) return;
+			animateSubmitPress(quizHUDSubmit);
+			submitQuizAnswer();
+		});
+	}
 	if (quizHUDInput) {
 		quizHUDInput.addEventListener("keydown", (event) => {
 			if (event.key === "Enter") submitQuizAnswer();

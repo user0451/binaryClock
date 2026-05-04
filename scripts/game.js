@@ -13,6 +13,8 @@ import { state } from "./state.js";
 
 let feedbackTimer = null;
 let questionStartedAt = Date.now();
+const TIP_TOTAL_VISIBLE_MS = 10000;
+const TIP_FADE_MS = 400;
 
 // ---------------------------------------------------------------------------
 // Help tips — shown after 3 consecutive wrong answers in bit-clicking mode
@@ -26,7 +28,7 @@ const BIT_TIPS = {
 		"The LSB decides odd vs even instantly.",
 	],
 	overshotBit: [
-		"You overshot: start from the MSB and only keep it if you still fit.",
+		"You overshot: start from the MSB and only keep it if it still fits.",
 		"Turn on large bits carefully; the MSB alone can add a big jump.",
 		"If your total is too high, clear the highest lit bit first.",
 		"Build up value from largest to smallest to avoid overshooting.",
@@ -57,6 +59,14 @@ const BIT_TIPS = {
 		"Use a consistent method each round to reduce repeat mistakes.",
 		"Read, plan, then toggle. A steady routine improves streaks.",
 	],
+	bitClickingStart: [
+		"Bit Clicking: set the lit bits so your value matches the target, then submit.",
+		"Bit Clicking: toggle bits on/off to hit the target number exactly.",
+	],
+	quizStart: [
+		"Quiz: in binary mode, click bits to match the decimal target; in decimal mode, type the decimal value and submit.",
+		"Quiz: alternate between building binary and reading binary back to decimal.",
+	],
 	general: [
 		"Each bit is a power of two: 1, 2, 4, 8, 16, 32.",
 		"If all bits are off, the value is 0.",
@@ -73,6 +83,8 @@ const TIP_CATEGORY_LABELS = {
 	nearMiss: "Near Miss",
 	largeMiss: "Big Gap",
 	streakRecovery: "Streak Recovery",
+	bitClickingStart: "How To Play",
+	quizStart: "How To Play",
 	general: "Binary Tip",
 };
 
@@ -182,8 +194,8 @@ function showHelpTip(category = "general") {
 		tipTimer = setTimeout(() => {
 			tipHUD.setAttribute("aria-hidden", "true");
 			tipTimer = null;
-		}, 400);
-	}, 14600);
+		}, TIP_FADE_MS);
+	}, Math.max(0, TIP_TOTAL_VISIBLE_MS - TIP_FADE_MS));
 }
 
 function clearHelpTip() {
@@ -229,13 +241,12 @@ function getBitClickingNodes() {
 }
 
 function getBitNodeWeight(node) {
-	const secondsIndex = sixBitNodes.seconds.indexOf(node);
-	if (secondsIndex !== -1) return HELP_WEIGHTS[secondsIndex];
-
-	const minutesIndex = sixBitNodes.minutes.indexOf(node);
-	if (minutesIndex !== -1) return HELP_WEIGHTS[minutesIndex];
-
-	return 0;
+	// Game weighting is progressive across ordered game bits.
+	// This keeps seconds as 1..32 (or 1..8 in 4-bit) and minutes continuing at 64+.
+	const ordered = getBitClickingOrderedNodes();
+	const orderedIndex = ordered.indexOf(node);
+	if (orderedIndex === -1) return 0;
+	return 2 ** orderedIndex;
 }
 
 function getActiveBitNodes() {
@@ -436,6 +447,7 @@ export function startBitClickingGame() {
 	if (gameHUD.panel) {
 		gameHUD.panel.setAttribute("aria-hidden", "false");
 	}
+	showHelpTip("bitClickingStart");
 }
 
 export function stopBitClickingGame() {
@@ -700,6 +712,7 @@ export function submitQuizAnswer() {
 }
 
 export function startQuizGame() {
+	clearHelpTip();
 	state.gameScore = 0;
 	state.gameLevel = 1;
 	state.gameQuestionsAnswered = 0;
@@ -709,10 +722,12 @@ export function startQuizGame() {
 	quizGameOver = false;
 	generateQuizQuestion();
 	if (quizHUD.panel) quizHUD.panel.setAttribute("aria-hidden", "false");
+	showHelpTip("quizStart");
 }
 
 export function stopQuizGame() {
 	stopQuizTimer();
+	clearHelpTip();
 	if (quizFeedbackTimer) { clearTimeout(quizFeedbackTimer); quizFeedbackTimer = null; }
 	clearQuizBits();
 	setQuizBodyType(null);
