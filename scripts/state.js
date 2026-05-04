@@ -21,5 +21,16 @@ export const state = {
 	orientationTransitionArmId: null,
 	orientationTransitionActivateId: null,
 	pendingTick: null,
-	intervalId: null
+	intervalId: null,
+	// Game mode state
+	gameMode: null, // null | "bit-clicking" | "quiz"
+	gameActive: false,
+	gameScore: 0,
+	gameLevel: 1,
+	gameQuestionsAnswered: 0,
+	gameStreak: 0,
+	gameTimerSeconds: 0,
+	gameDifficulty: "normal", // normal, hard
+	gameTargetValue: 0,
+	quizTimeRemaining: 0
 };

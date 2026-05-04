@@ -1,0 +1,590 @@
+/* Game Mode UI Styling */
+
+/* =========================================================================
+   Game Type Selection Menu
+   ========================================================================= */
+
+.gameTypeSelect {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	background: var(--surface-bg);
+	border: 1px solid var(--theme-accent-color, #fff);
+	border-radius: 8px;
+	margin-top: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	z-index: 1000;
+	min-width: 280px;
+	overflow: hidden;
+}
+
+.gameTypeSelect[aria-hidden="true"] {
+	display: none;
+}
+
+.gameTypeMenu {
+	display: flex;
+	flex-direction: column;
+}
+
+.gameTypeOption {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding: 12px 16px;
+	border: none;
+	background: transparent;
+	color: inherit;
+	cursor: pointer;
+	text-align: left;
+	transition: background-color 200ms ease;
+	font-size: 0.875rem;
+}
+
+.gameTypeOption:hover {
+	background-color: color-mix(in srgb, var(--theme-accent-color, #fff) 12%, transparent);
+}
+
+.gameTypeOption:active {
+	background-color: color-mix(in srgb, var(--theme-accent-color, #fff) 22%, transparent);
+}
+
+.gameTypeTitle {
+	font-weight: 600;
+	margin-bottom: 4px;
+	display: block;
+}
+
+.gameTypeDesc {
+	font-size: 0.75rem;
+	opacity: 0.7;
+	display: block;
+}
+
+.gameTypeClose {
+	border-top: 1px solid color-mix(in srgb, var(--theme-accent-color, #fff) 25%, transparent);
+}
+
+/* =========================================================================
+   Game Mode Active — dim non-game controls
+   ========================================================================= */
+
+body.game-mode-active .modeToggle,
+body.game-mode-active .orientationToggle,
+body.game-mode-active .scanlinesToggle,
+body.game-mode-active .shuffleButton,
+body.game-mode-active .themeSelectDisplay,
+body.game-mode-active .helpToggle {
+	opacity: 0.45;
+	pointer-events: none;
+}
+
+body.game-mode-active .digitalPanel {
+	display: none;
+}
+
+/* =========================================================================
+   Bit-Clicking Game — clock column highlights
+   ========================================================================= */
+
+body.game-type-bit-clicking .timeGroup[data-unit="hours"],
+body.game-type-bit-clicking .timeGroup[data-unit="minutes"] {
+	opacity: 0.35;
+	transition: opacity 400ms ease;
+}
+
+body.game-type-bit-clicking .timeGroup[data-unit="seconds"] {
+	opacity: 1;
+	transition: opacity 400ms ease;
+}
+
+body.game-type-bit-clicking.game-minutes-active .timeGroup[data-unit="minutes"] {
+	opacity: 1;
+}
+
+body.game-type-bit-clicking .timeGroup[data-unit="seconds"] .digit,
+body.game-type-bit-clicking .timeGroup[data-unit="seconds"] .helpRows6 {
+	outline: 1px solid color-mix(in srgb, var(--theme-accent-color, #aaa) 40%, transparent);
+	outline-offset: 6px;
+	border-radius: 6px;
+}
+
+body.game-type-bit-clicking.game-minutes-active .timeGroup[data-unit="minutes"] .digit,
+body.game-type-bit-clicking.game-minutes-active .timeGroup[data-unit="minutes"] .helpRows6 {
+	outline: 1px solid color-mix(in srgb, var(--theme-accent-color, #aaa) 40%, transparent);
+	outline-offset: 6px;
+	border-radius: 6px;
+}
+
+body.game-type-bit-clicking .timeGroup[data-unit="seconds"] .bit:not(.game-bit-inactive) {
+	cursor: pointer;
+	transition: transform 120ms ease, filter 120ms ease;
+}
+
+body.game-type-bit-clicking.game-minutes-active .timeGroup[data-unit="minutes"] .bit:not(.game-bit-inactive) {
+	cursor: pointer;
+	transition: transform 120ms ease, filter 120ms ease;
+}
+
+body.game-type-bit-clicking .timeGroup[data-unit="seconds"] .bit[data-not6bit] {
+	opacity: 0.18 !important;
+	cursor: default !important;
+	pointer-events: none !important;
+}
+
+body.game-type-bit-clicking .timeGroup[data-unit="minutes"] .bit[data-not6bit] {
+	opacity: 0.18 !important;
+	cursor: default !important;
+	pointer-events: none !important;
+}
+
+body.game-type-bit-clicking .timeGroup[data-unit="seconds"] .bit:not(.game-bit-inactive):hover {
+	transform: scale(1.08);
+	filter: brightness(1.25);
+}
+
+body.game-type-bit-clicking.game-minutes-active .timeGroup[data-unit="minutes"] .bit:not(.game-bit-inactive):hover {
+	transform: scale(1.08);
+	filter: brightness(1.25);
+}
+
+body.game-type-bit-clicking .timeGroup[data-unit="seconds"] .bit:not(.game-bit-inactive):active {
+	transform: scale(0.94);
+}
+
+body.game-type-bit-clicking.game-minutes-active .timeGroup[data-unit="minutes"] .bit:not(.game-bit-inactive):active {
+	transform: scale(0.94);
+}
+
+.game-bit-inactive {
+	opacity: 0.18 !important;
+	cursor: default !important;
+	pointer-events: none;
+}
+
+.game-bit-correct {
+	filter: drop-shadow(0 0 8px #22c55e) brightness(1.4) !important;
+	animation: gameBitCorrect 600ms ease forwards;
+}
+
+@keyframes gameBitCorrect {
+	0% {
+		filter: drop-shadow(0 0 10px #22c55e) brightness(1.6);
+	}
+
+	100% {
+		filter: drop-shadow(0 0 4px #22c55e) brightness(1.2);
+	}
+}
+
+.game-bit-incorrect {
+	filter: drop-shadow(0 0 8px #ef4444) brightness(1.3) !important;
+	animation: gameBitIncorrect 800ms ease forwards;
+}
+
+@keyframes gameBitIncorrect {
+	0% {
+		filter: drop-shadow(0 0 12px #ef4444) brightness(1.5);
+	}
+
+	50% {
+		filter: drop-shadow(0 0 6px #ef4444) brightness(1.1);
+	}
+
+	100% {
+		filter: drop-shadow(0 0 4px #ef4444) brightness(1.0);
+	}
+}
+
+/* =========================================================================
+   Game HUD — bit-clicking compact pill
+   ========================================================================= */
+
+.gameHUD {
+	position: fixed;
+	bottom: max(env(safe-area-inset-bottom, 0px) + 16px, 20px);
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+	background: color-mix(in srgb, var(--surface-bg, #111) 92%, transparent);
+	border: 1px solid color-mix(in srgb, var(--theme-accent-color, #aaa) 50%, transparent);
+	border-radius: 40px;
+	padding: 8px 8px 8px 20px;
+	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	z-index: 900;
+	white-space: nowrap;
+	transition: border-color 300ms ease, box-shadow 300ms ease;
+}
+
+.gameHUD[aria-hidden="true"] {
+	display: none;
+}
+
+body:not(.game-type-bit-clicking) .gameHUD {
+	display: none;
+}
+
+.gameHUDTarget {
+	font-size: 1.6rem;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.02em;
+	min-width: 2.6ch;
+	text-align: center;
+	color: var(--theme-accent-color, inherit);
+}
+
+.gameHUDDivider {
+	display: block;
+	width: 1px;
+	height: 28px;
+	background: color-mix(in srgb, var(--theme-accent-color, #aaa) 30%, transparent);
+	margin: 0 12px;
+	flex-shrink: 0;
+}
+
+.gameHUDPlayer {
+	font-size: 1.1rem;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	opacity: 0.6;
+	min-width: 2ch;
+	text-align: center;
+	transition: opacity 200ms ease, color 200ms ease;
+}
+
+.gameHUD.game-hud-match .gameHUDPlayer {
+	opacity: 1;
+	color: #22c55e;
+}
+
+.gameHUDMeta {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 2px;
+	margin-left: 12px;
+	margin-right: 10px;
+}
+
+.gameHUDScore {
+	font-size: 0.8rem;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	opacity: 0.75;
+	line-height: 1;
+}
+
+.gameHUDLevel {
+	font-size: 0.65rem;
+	font-weight: 500;
+	opacity: 0.5;
+	letter-spacing: 0.06em;
+	line-height: 1;
+}
+
+.gameHUDSubmit {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	border: none;
+	background: var(--theme-accent-color, #aaa);
+	color: var(--surface-bg, #000);
+	font-size: 1rem;
+	font-weight: 700;
+	cursor: pointer;
+	flex-shrink: 0;
+	transition: transform 120ms ease, filter 120ms ease, background 200ms ease;
+}
+
+.gameHUDSubmit:hover {
+	transform: scale(1.1);
+	filter: brightness(1.15);
+}
+
+.gameHUDSubmit:active {
+	transform: scale(0.92);
+}
+
+.gameHUD.game-hud-match {
+	border-color: #22c55e;
+	box-shadow: 0 4px 24px rgba(34, 197, 94, 0.25);
+}
+
+.gameHUD.game-hud-match .gameHUDSubmit {
+	background: #22c55e;
+}
+
+/* =========================================================================
+   Quiz HUD — card with input + timer bar
+   ========================================================================= */
+
+.quizHUD {
+	position: fixed;
+	bottom: max(env(safe-area-inset-bottom, 0px) + 16px, 20px);
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	flex-direction: column;
+	background: color-mix(in srgb, var(--surface-bg, #111) 92%, transparent);
+	border: 1px solid color-mix(in srgb, var(--theme-accent-color, #aaa) 50%, transparent);
+	border-radius: 16px;
+	overflow: hidden;
+	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	z-index: 900;
+	min-width: 280px;
+	max-width: 360px;
+	transition: border-color 300ms ease, box-shadow 300ms ease;
+}
+
+.quizHUD[aria-hidden="true"] {
+	display: none;
+}
+
+body:not(.game-type-quiz) .quizHUD {
+	display: none;
+}
+
+.quizHUDBody {
+	display: flex;
+	align-items: center;
+	padding: 8px 8px 8px 16px;
+}
+
+.quizHUDLabel {
+	font-size: 0.58rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	opacity: 0.45;
+	min-width: 22px;
+	flex-shrink: 0;
+}
+
+.quizHUDValue {
+	font-size: 1.5rem;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	color: var(--theme-accent-color, inherit);
+	min-width: 2.8ch;
+	text-align: center;
+	margin: 0 10px;
+}
+
+.quizHUDInput {
+	width: 5ch;
+	font-size: 1.25rem;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	background: color-mix(in srgb, var(--theme-accent-color, #fff) 8%, transparent);
+	border: 1px solid color-mix(in srgb, var(--theme-accent-color, #aaa) 35%, transparent);
+	border-radius: 6px;
+	color: inherit;
+	text-align: center;
+	padding: 4px 6px;
+	margin: 0 10px;
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
+
+.quizHUDInput::-webkit-outer-spin-button,
+.quizHUDInput::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.quizHUDInput:focus {
+	outline: none;
+	border-color: var(--theme-accent-color, #aaa);
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--theme-accent-color, #aaa) 20%, transparent);
+}
+
+/* Show/hide value vs input based on question type */
+.quizHUD[data-type="decimal-to-binary"] .quizHUDInput {
+	display: none;
+}
+
+.quizHUD[data-type="binary-to-decimal"] .quizHUDValue {
+	display: none;
+}
+
+.quizHUD[data-type="summary"] .quizHUDInput {
+	display: none;
+}
+
+.quizHUDMeta {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 2px;
+	margin-left: auto;
+	margin-right: 10px;
+	flex-shrink: 0;
+}
+
+.quizHUDProgress {
+	font-size: 0.78rem;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	opacity: 0.65;
+	line-height: 1;
+}
+
+.quizHUDScore {
+	font-size: 0.65rem;
+	font-weight: 500;
+	font-variant-numeric: tabular-nums;
+	opacity: 0.45;
+	line-height: 1;
+}
+
+.quizHUDLevel {
+	font-size: 0.6rem;
+	font-weight: 500;
+	opacity: 0.4;
+	letter-spacing: 0.06em;
+	line-height: 1;
+}
+
+.quizHUDSubmit {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	border: none;
+	background: var(--theme-accent-color, #aaa);
+	color: var(--surface-bg, #000);
+	font-size: 1rem;
+	font-weight: 700;
+	cursor: pointer;
+	flex-shrink: 0;
+	transition: transform 120ms ease, filter 120ms ease, background 200ms ease;
+}
+
+.quizHUDSubmit:hover {
+	transform: scale(1.1);
+	filter: brightness(1.15);
+}
+
+.quizHUDSubmit:active {
+	transform: scale(0.92);
+}
+
+.quizHUD[data-type="summary"] .quizHUDSubmit {
+	cursor: default;
+	opacity: 0.7;
+}
+
+/* Timer bar — spans full card width at bottom */
+.quizHUDTimerTrack {
+	height: 3px;
+	background: color-mix(in srgb, var(--theme-accent-color, #fff) 10%, transparent);
+	flex-shrink: 0;
+}
+
+.quizHUDTimerTrack[aria-hidden="true"] {
+	display: none;
+}
+
+.quizHUDTimerFill {
+	height: 100%;
+	width: 100%;
+	background: var(--theme-accent-color, #aaa);
+	transition: width 100ms linear, background-color 200ms ease;
+	transform-origin: left;
+}
+
+.quizHUDTimerTrack.quiz-timer-warning .quizHUDTimerFill {
+	background: #ef4444;
+}
+
+/* =========================================================================
+   Quiz Mode — seconds column interaction
+   ========================================================================= */
+
+body.game-type-quiz .timeGroup[data-unit="hours"],
+body.game-type-quiz .timeGroup[data-unit="minutes"] {
+	opacity: 0.35;
+	transition: opacity 400ms ease;
+}
+
+body.game-type-quiz .timeGroup[data-unit="seconds"] {
+	opacity: 1;
+	transition: opacity 400ms ease;
+}
+
+body.game-type-quiz .timeGroup[data-unit="seconds"] .digit,
+body.game-type-quiz .timeGroup[data-unit="seconds"] .helpRows6 {
+	outline: 1px solid color-mix(in srgb, var(--theme-accent-color, #aaa) 40%, transparent);
+	outline-offset: 6px;
+	border-radius: 6px;
+}
+
+/* decimal-to-binary: user clicks bits */
+body.game-type-quiz.quiz-type-decimal-to-binary .timeGroup[data-unit="seconds"] .bit:not(.game-bit-inactive) {
+	cursor: pointer;
+	transition: transform 120ms ease, filter 120ms ease;
+}
+
+body.game-type-quiz.quiz-type-decimal-to-binary .timeGroup[data-unit="seconds"] .bit:not(.game-bit-inactive):hover {
+	transform: scale(1.08);
+	filter: brightness(1.25);
+}
+
+body.game-type-quiz.quiz-type-decimal-to-binary .timeGroup[data-unit="seconds"] .bit[data-not6bit] {
+	opacity: 0.18 !important;
+	cursor: default !important;
+	pointer-events: none !important;
+}
+
+/* binary-to-decimal: bits are locked display */
+body.game-type-quiz.quiz-type-binary-to-decimal .timeGroup[data-unit="seconds"] .bit {
+	cursor: default !important;
+	pointer-events: none !important;
+}
+
+/* =========================================================================
+   Mobile responsive
+   ========================================================================= */
+
+@media (max-width: 640px) {
+	.gameTypeSelect {
+		min-width: 240px;
+		right: auto;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	.gameHUD {
+		padding: 6px 6px 6px 16px;
+		border-radius: 32px;
+	}
+
+	.gameHUDTarget {
+		font-size: 1.35rem;
+	}
+
+	.gameHUDDivider {
+		margin: 0 8px;
+	}
+
+	.gameHUDMeta {
+		margin-left: 8px;
+		margin-right: 6px;
+	}
+
+	.quizHUD {
+		min-width: 260px;
+		max-width: calc(100vw - 32px);
+	}
+}

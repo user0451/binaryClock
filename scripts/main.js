@@ -3,7 +3,8 @@ import { applyModeJitterDelays, runTick } from "./display.js";
 import { PAGE_ASSEMBLY_WINDOW_MS, RANDOM_THEME_INTERVAL_MS, SHUFFLEABLE_THEMES, QUERY_PARAM_KEYS, parseQueryParams } from "./config.js";
 import { state } from "./state.js";
 import { runThemeMotionBurst, transitionToMode, transitionToOrientation } from "./transitions.js";
-import { applyBitOrientationState, applyDigitalState, applyHelpState, applyLSBState, applyScanlineState, applyTheme, persistState, restoreState, setLSBLabel, setModeLabel, setOrientationLabel, setSettingsOpen, setTimeFormatLabel, toggleSettings } from "./ui.js";
+import { applyBitOrientationState, applyDigitalState, applyGameModeState, applyGameTypeState, applyHelpState, applyLSBState, applyScanlineState, applyTheme, persistState, restoreState, setGameModeLabel, setLSBLabel, setModeLabel, setOrientationLabel, setSettingsOpen, setTimeFormatLabel, toggleSettings } from "./ui.js";
+import { handleGameBitClick, startBitClickingGame, stopBitClickingGame, submitGameAnswer, handleQuizBitClick, startQuizGame, stopQuizGame, submitQuizAnswer } from "./game.js";
 
 function closeThemeDropdown() {
 	if (!controls.themeSelectList || !controls.themeSelectDisplay) {
@@ -138,6 +139,83 @@ function toggleScanlines() {
 	state.scanlinesVisible = controls.scanlinesToggle.checked;
 	applyScanlineState();
 	persistState();
+}
+
+function scrollGameSettingsIntoView() {
+	const isMobileView = window.innerWidth <= 700 || window.matchMedia("(pointer: coarse)").matches;
+	if (!isMobileView) return;
+
+	const target = controls.gameTypeSelect || controls.gameModeToggle?.closest(".switch");
+	if (!target) return;
+
+	requestAnimationFrame(() => {
+		target.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+	});
+}
+
+function toggleGameMode() {
+	if (controls.gameModeToggle.checked) {
+		// Show game type selection menu
+		if (controls.gameTypeSelect) {
+			controls.gameTypeSelect.setAttribute("aria-hidden", "false");
+		}
+		scrollGameSettingsIntoView();
+	} else {
+		// Hide game type selection menu and exit game
+		if (controls.gameTypeSelect) {
+			controls.gameTypeSelect.setAttribute("aria-hidden", "true");
+		}
+		exitGameMode();
+	}
+}
+
+function selectGameType(gameType) {
+	if (gameType === "close") {
+		controls.gameModeToggle.checked = false;
+		toggleGameMode();
+		return;
+	}
+
+	state.gameMode = gameType;
+	state.gameActive = true;
+	state.gameScore = 0;
+	state.gameLevel = 1;
+	state.gameQuestionsAnswered = 0;
+	state.gameStreak = 0;
+
+	applyGameModeState();
+	applyGameTypeState(gameType);
+	persistState();
+
+	// Hide game type menu after selection
+	if (controls.gameTypeSelect) {
+		controls.gameTypeSelect.setAttribute("aria-hidden", "true");
+	}
+
+	if (gameType === "bit-clicking") {
+		startBitClickingGame();
+	} else if (gameType === "quiz") {
+		startQuizGame();
+	}
+}
+
+function exitGameMode() {
+	if (state.gameMode === "bit-clicking") {
+		stopBitClickingGame();
+	} else if (state.gameMode === "quiz") {
+		stopQuizGame();
+	}
+
+	state.gameMode = null;
+	state.gameActive = false;
+	state.gameScore = 0;
+	state.gameLevel = 1;
+	state.gameQuestionsAnswered = 0;
+	state.gameStreak = 0;
+
+	applyGameModeState();
+	persistState();
+	document.body.classList.remove("game-type-bit-clicking", "game-type-quiz");
 }
 
 function pickRandomTheme() {
@@ -535,6 +613,10 @@ function wireEvents() {
 	controls.orientationToggle.addEventListener("change", toggleOrientation);
 	controls.digitalToggle.addEventListener("change", toggleDigital);
 	controls.scanlinesToggle.addEventListener("change", toggleScanlines);
+	controls.gameModeToggle.addEventListener("change", toggleGameMode);
+	controls.gameTypeOptions.forEach(option => {
+		option.addEventListener("click", () => selectGameType(option.dataset.gameType));
+	});
 	if (controls.lsbToggle) {
 		controls.lsbToggle.addEventListener("change", toggleLSB);
 	}
@@ -558,6 +640,33 @@ function wireEvents() {
 			}
 		});
 	}
+
+	// Game: delegate clicks on the clock face
+	clockElement.addEventListener("click", (event) => {
+		if (!state.gameActive) return;
+		const bitNode = event.target.closest(".bit");
+		if (!bitNode) return;
+		if (state.gameMode === "bit-clicking") handleGameBitClick(bitNode);
+		else if (state.gameMode === "quiz") handleQuizBitClick(bitNode);
+	});
+
+	// Bit-clicking HUD submit button
+	const gameHUDSubmit = document.getElementById("gameHUDSubmit");
+	if (gameHUDSubmit) {
+		gameHUDSubmit.addEventListener("click", submitGameAnswer);
+	}
+
+	// Quiz HUD submit button + Enter key on input
+	const quizHUDSubmit = document.getElementById("quizHUDSubmit");
+	if (quizHUDSubmit) {
+		quizHUDSubmit.addEventListener("click", submitQuizAnswer);
+	}
+	const quizHUDInput = document.getElementById("quizHUDInput");
+	if (quizHUDInput) {
+		quizHUDInput.addEventListener("keydown", (event) => {
+			if (event.key === "Enter") submitQuizAnswer();
+		});
+	}
 	wireAutoOrientationListeners();
 	document.addEventListener("click", (event) => {
 		if (!controls.themeSelectDisplay || !controls.themeSelectList) {
@@ -571,6 +680,10 @@ function wireEvents() {
 	document.addEventListener("keydown", (event) => {
 		if (event.key === "Escape") {
 			closeThemeDropdown();
+		}
+		if (event.key === "Escape" && state.gameActive) {
+			exitGameMode();
+			controls.gameModeToggle.checked = false;
 		}
 		if (event.key === "Escape" && document.body.classList.contains("settings-open")) {
 			setSettingsOpen(false);

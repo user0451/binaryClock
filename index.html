@@ -190,6 +190,26 @@
 					<span class="slider round" aria-hidden="true"></span>
 					<span class="label-text" id="helpLabel">Help</span>
 				</label>
+				<label class="switch" for="gameModeToggle">
+					<input type="checkbox" id="gameModeToggle">
+					<span class="slider round" aria-hidden="true"></span>
+					<span class="label-text" id="gameModeLabel">Game</span>
+				</label>
+				<div class="gameTypeSelect" id="gameTypeSelect" aria-hidden="true">
+					<div class="gameTypeMenu">
+						<button type="button" class="gameTypeOption" data-game-type="bit-clicking">
+							<span class="gameTypeTitle">Bit Clicking</span>
+							<span class="gameTypeDesc">Match the target number by clicking bits</span>
+						</button>
+						<button type="button" class="gameTypeOption" data-game-type="quiz">
+							<span class="gameTypeTitle">Quiz</span>
+							<span class="gameTypeDesc">Test your binary knowledge with 8 difficulty levels</span>
+						</button>
+						<button type="button" class="gameTypeOption gameTypeClose" data-game-type="close">
+							<span class="gameTypeTitle">Close Game</span>
+						</button>
+					</div>
+				</div>
 				<div class="themeSelect">
 					<button type="button" id="shuffleButton" class="shuffle-btn label-text"
 						title="Shuffle off. Click to rotate themes automatically every 10 minutes."
@@ -220,6 +240,37 @@
 					</select>
 				</div>
 			</section>
+		</div>
+
+		<!-- Bit-Clicking Game HUD (visible only in game-type-bit-clicking mode) -->
+		<div id="gameHUD" class="gameHUD" aria-hidden="true" aria-live="polite" aria-atomic="true">
+			<span id="gameHUDTarget" class="gameHUDTarget" aria-label="Target">0</span>
+			<span class="gameHUDDivider" aria-hidden="true"></span>
+			<span id="gameHUDPlayer" class="gameHUDPlayer" aria-label="Your value">0</span>
+			<span class="gameHUDMeta">
+				<span id="gameHUDScore" class="gameHUDScore" aria-label="Score">0</span>
+				<span id="gameHUDLevel" class="gameHUDLevel" aria-label="Level">L1</span>
+			</span>
+			<button type="button" id="gameHUDSubmit" class="gameHUDSubmit" aria-label="Submit answer">✓</button>
+		</div>
+
+		<!-- Quiz Game HUD (visible only in game-type-quiz mode) -->
+		<div id="quizHUD" class="quizHUD" aria-hidden="true" data-type="decimal-to-binary">
+			<div class="quizHUDBody">
+				<span id="quizHUDLabel" class="quizHUDLabel" aria-hidden="true">bin</span>
+				<span id="quizHUDValue" class="quizHUDValue" aria-label="Target decimal">0</span>
+				<input type="number" id="quizHUDInput" class="quizHUDInput" min="0" max="63" inputmode="numeric"
+					autocomplete="off" aria-label="Your decimal answer" placeholder="?">
+				<span class="quizHUDMeta">
+					<span id="quizHUDProgress" class="quizHUDProgress">1/10</span>
+					<span id="quizHUDScore" class="quizHUDScore">0</span>
+					<span id="quizHUDLevel" class="quizHUDLevel">L1</span>
+				</span>
+				<button type="button" id="quizHUDSubmit" class="quizHUDSubmit" aria-label="Submit answer">✓</button>
+			</div>
+			<div id="quizHUDTimerTrack" class="quizHUDTimerTrack" aria-hidden="true">
+				<div id="quizHUDTimerFill" class="quizHUDTimerFill"></div>
+			</div>
 		</div>
 	</main>
 	<script type="module" src="code.js"></script>

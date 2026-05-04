@@ -12,6 +12,10 @@ export const controls = {
 	digitalLabel: document.getElementById("digitalLabel"),
 	scanlinesToggle: document.getElementById("scanlinesToggle"),
 	scanlinesLabel: document.getElementById("scanlinesLabel"),
+	gameModeToggle: document.getElementById("gameModeToggle"),
+	gameModeLabel: document.getElementById("gameModeLabel"),
+	gameTypeSelect: document.getElementById("gameTypeSelect"),
+	gameTypeOptions: Array.from(document.querySelectorAll(".gameTypeOption")),
 	shuffleButton: document.getElementById("shuffleButton"),
 	themeSelectDisplay: document.getElementById("themeSelectDisplay"),
 	themeSelectList: document.getElementById("themeSelectList"),
@@ -19,6 +23,28 @@ export const controls = {
 	settingsButton: document.getElementById("settingsButton"),
 	settingsOverlay: document.getElementById("settingsOverlay"),
 	settingsClose: document.getElementById("settingsClose")
+};
+
+export const gameHUD = {
+	panel: document.getElementById("gameHUD"),
+	targetDisplay: document.getElementById("gameHUDTarget"),
+	playerDisplay: document.getElementById("gameHUDPlayer"),
+	scoreDisplay: document.getElementById("gameHUDScore"),
+	levelDisplay: document.getElementById("gameHUDLevel"),
+	submitButton: document.getElementById("gameHUDSubmit")
+};
+
+export const quizHUD = {
+	panel: document.getElementById("quizHUD"),
+	label: document.getElementById("quizHUDLabel"),
+	valueDisplay: document.getElementById("quizHUDValue"),
+	input: document.getElementById("quizHUDInput"),
+	progress: document.getElementById("quizHUDProgress"),
+	scoreDisplay: document.getElementById("quizHUDScore"),
+	levelDisplay: document.getElementById("quizHUDLevel"),
+	submitButton: document.getElementById("quizHUDSubmit"),
+	timerTrack: document.getElementById("quizHUDTimerTrack"),
+	timerFill: document.getElementById("quizHUDTimerFill")
 };
 
 export const clockElement = document.querySelector(".clock");

@@ -60,6 +60,9 @@ export function persistState() {
 	localStorage.setItem(STORAGE_KEYS.theme, state.randomMode ? "random-shuffle" : state.theme);
 	localStorage.setItem(STORAGE_KEYS.bitOrientation, state.bitOrientation);
 	localStorage.setItem(STORAGE_KEYS.lsbFirst, state.lsbFirst ? "on" : "off");
+	// Game state (only save high score, not active session)
+	localStorage.setItem(STORAGE_KEYS.gameScore, state.gameScore);
+	localStorage.setItem(STORAGE_KEYS.gameLevel, state.gameLevel);
 }
 
 export function applyHelpState() {
@@ -132,6 +135,55 @@ export function applyTheme() {
 	}
 }
 
+export function applyGameModeState() {
+	const isGameActive = state.gameActive;
+	document.body.classList.toggle("game-mode-active", isGameActive);
+	
+	if (isGameActive) {
+		// Disable controls that would interfere with the game
+		controls.modeToggle.disabled = true;
+		controls.orientationToggle.disabled = true;
+		controls.scanlinesToggle.disabled = true;
+		controls.shuffleButton.disabled = true;
+		controls.themeSelectDisplay.disabled = true;
+		// Help shows the answers – disable it during game
+		if (controls.helpToggle) {
+			if (state.helpVisible) {
+				state.helpVisible = false;
+				controls.helpToggle.checked = false;
+				applyHelpState();
+			}
+			controls.helpToggle.disabled = true;
+		}
+	} else {
+		// Re-enable controls when exiting game
+		controls.modeToggle.disabled = false;
+		controls.orientationToggle.disabled = false;
+		controls.scanlinesToggle.disabled = false;
+		controls.shuffleButton.disabled = false;
+		controls.themeSelectDisplay.disabled = false;
+		if (controls.helpToggle) {
+			controls.helpToggle.disabled = false;
+		}
+	}
+}
+
+export function applyGameTypeState(gameType) {
+	document.body.classList.remove("game-type-bit-clicking", "game-type-quiz");
+	
+	if (gameType === "bit-clicking") {
+		document.body.classList.add("game-type-bit-clicking");
+	} else if (gameType === "quiz") {
+		document.body.classList.add("game-type-quiz");
+	}
+}
+
+export function setGameModeLabel() {
+	if (controls.gameModeLabel) {
+		controls.gameModeLabel.textContent = state.gameActive ? "Close Game" : "Game";
+	}
+}
+
 export function setSettingsOpen(isOpen) {
 	document.body.classList.toggle("settings-open", isOpen);
 	controls.settingsOverlay.setAttribute("aria-hidden", isOpen ? "false" : "true");
@@ -186,12 +238,23 @@ export function restoreState() {
 	const lsbFirst = localStorage.getItem(STORAGE_KEYS.lsbFirst);
 	state.lsbFirst = lsbFirst === "on";
 
+	// Restore game state (high score and level only)
+	const gameScore = localStorage.getItem(STORAGE_KEYS.gameScore);
+	if (gameScore) {
+		state.gameScore = parseInt(gameScore, 10);
+	}
+	const gameLevel = localStorage.getItem(STORAGE_KEYS.gameLevel);
+	if (gameLevel) {
+		state.gameLevel = parseInt(gameLevel, 10);
+	}
+
 	controls.modeToggle.checked = state.mode === "4-bit";
 	controls.timeFormatToggle.checked = state.show24HourFormat;
 	controls.helpToggle.checked = state.helpVisible;
 	controls.digitalToggle.checked = state.digitalVisible;
 	controls.scanlinesToggle.checked = state.scanlinesVisible;
 	controls.orientationToggle.checked = state.bitOrientation === "horizontal";
+	controls.gameModeToggle.checked = false; // Game mode always starts unchecked
 	if (controls.lsbToggle) {
 		controls.lsbToggle.checked = state.lsbFirst;
 	}
@@ -200,6 +263,7 @@ export function restoreState() {
 	setDigitalLabel();
 	setScanlinesLabel();
 	setOrientationLabel();
+	setGameModeLabel();
 	setLSBLabel();
 	applyHelpState();
 	applyDigitalState();

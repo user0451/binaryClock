@@ -6,7 +6,10 @@ export const STORAGE_KEYS = {
 	scanlines: "binaryClockScanlines",
 	theme: "binaryClockTheme",
 	bitOrientation: "binaryClockBitOrientation",
-	lsbFirst: "binaryClockLSBFirst"
+	lsbFirst: "binaryClockLSBFirst",
+	gameMode: "binaryClockGameMode",
+	gameScore: "binaryClockGameScore",
+	gameLevel: "binaryClockGameLevel"
 };
 
 export const HELP_WEIGHTS = [32, 16, 8, 4, 2, 1];
