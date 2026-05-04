@@ -88,6 +88,89 @@ const TIP_CATEGORY_LABELS = {
 	general: "Binary Tip",
 };
 
+// Performance feedback messages keyed by grade (0–4, best to worst).
+// Grade is determined after each 10-question level window.
+const LEVEL_UP_FEEDBACK = {
+	perfect: [
+		"Flawless! Every answer correct.",
+		"Perfect round — not a single mistake!",
+		"Clean sweep! 10 out of 10.",
+	],
+	strong: [
+		"Strong round — only a slip or two.",
+		"Really solid. Minor mistakes, but great control.",
+		"Nearly perfect — nice consistency.",
+	],
+	steady: [
+		"Decent round. A few corrections needed, but steady overall.",
+		"More right than wrong — keep building on that.",
+		"Reasonable accuracy. The patterns will get easier with practice.",
+	],
+	shaky: [
+		"Struggled a bit — review the bit weights before the next round.",
+		"Rough level, but you pushed through. Focus on the MSB first.",
+		"More misses than hits — try a top-down approach next time.",
+	],
+	slow: [
+		"Good accuracy but taking time — try chunking the bits into groups.",
+		"Accurate but slow — practice reading the MSB first to speed up.",
+		"Nice correctness — now work on reading the pattern faster.",
+	],
+};
+
+// Tracks performance across the current 10-question level window.
+let levelWindowCorrect = 0;
+let levelWindowWrong = 0;
+let levelWindowTotalMs = 0;
+
+function resetLevelWindow() {
+	levelWindowCorrect = 0;
+	levelWindowWrong = 0;
+	levelWindowTotalMs = 0;
+}
+
+function gradeLevelWindow(correct, wrong, totalMs, questionCount) {
+	const accuracy = questionCount > 0 ? correct / questionCount : 0;
+	const avgMs = questionCount > 0 ? totalMs / questionCount : 0;
+	const slowThreshold = getSlowThresholdMs() * 1.4;
+
+	if (accuracy === 1) return "perfect";
+	if (accuracy >= 0.8) return avgMs > slowThreshold ? "slow" : "strong";
+	if (accuracy >= 0.6) return "steady";
+	return avgMs > slowThreshold ? "slow" : "shaky";
+}
+
+function showLevelUpTip(newLevel, maxLevel, grade) {
+	if (!tipHUD) return;
+	if (tipTimer) { clearTimeout(tipTimer); tipTimer = null; }
+
+	const feedbackPool = LEVEL_UP_FEEDBACK[grade] ?? LEVEL_UP_FEEDBACK.steady;
+	const feedback = feedbackPool[Math.floor(Math.random() * feedbackPool.length)];
+	const remaining = maxLevel - newLevel;
+	const suffix = remaining > 0
+		? `${remaining} level${remaining === 1 ? "" : "s"} to go.`
+		: "Max level — the clock keeps running. How long can you hold it?";
+	const labelText = remaining > 0 ? "Level Up" : "Max Level";
+	const levelLine = remaining > 0
+		? `Level ${newLevel}. ${feedback} ${suffix}`
+		: suffix;
+
+	tipHUD.setAttribute("data-tip-label", labelText);
+	tipHUD.textContent = levelLine;
+	tipHUD.setAttribute("aria-label", `Level Up: ${levelLine}`);
+	tipHUD.setAttribute("aria-hidden", "false");
+	tipHUD.classList.add("tip-visible");
+	tipTimer = setTimeout(() => {
+		tipHUD.classList.remove("tip-visible");
+		tipTimer = setTimeout(() => {
+			tipHUD.setAttribute("aria-hidden", "true");
+			tipHUD.removeAttribute("data-tip-label");
+			tipHUD.removeAttribute("aria-label");
+			tipTimer = null;
+		}, TIP_FADE_MS);
+	}, Math.max(0, TIP_TOTAL_VISIBLE_MS - TIP_FADE_MS));
+}
+
 let consecutiveWrong = 0;
 let tipTimer = null;
 let recentMistakeCounts = {
@@ -395,15 +478,19 @@ export function submitGameAnswer() {
 
 	flashBitFeedback(isCorrect);
 
+	const elapsedMs = Date.now() - questionStartedAt;
+	levelWindowTotalMs += elapsedMs;
+
 	if (isCorrect) {
+		levelWindowCorrect++;
 		consecutiveWrong = 0;
 		resetMistakeCounters();
 		state.gameScore += 10 + state.gameStreak * 2;
 		state.gameStreak++;
 	} else {
+		levelWindowWrong++;
 		state.gameStreak = 0;
 		state.gameScore = Math.max(0, state.gameScore - 2);
-		const elapsedMs = Date.now() - questionStartedAt;
 		addMistakeSignals(categorizeMistake(player, state.gameTargetValue, elapsedMs));
 		consecutiveWrong++;
 		if (consecutiveWrong >= 3) {
@@ -418,7 +505,12 @@ export function submitGameAnswer() {
 	// In 6-bit mode this reaches L9 (seconds first, then minutes).
 	const maxLevel = getBitClickingMaxLevel();
 	if (state.gameQuestionsAnswered % 10 === 0) {
-		state.gameLevel = Math.min(state.gameLevel + 1, maxLevel);
+		const grade = gradeLevelWindow(levelWindowCorrect, levelWindowWrong, levelWindowTotalMs, 10);
+		resetLevelWindow();
+		if (state.gameLevel < maxLevel) {
+			state.gameLevel = Math.min(state.gameLevel + 1, maxLevel);
+		}
+		showLevelUpTip(state.gameLevel, maxLevel, grade);
 	}
 
 	updateGameHUD();
@@ -436,6 +528,7 @@ export function submitGameAnswer() {
 
 export function startBitClickingGame() {
 	clearHelpTip();
+	resetLevelWindow();
 	state.gameScore = 0;
 	state.gameLevel = 1;
 	state.gameQuestionsAnswered = 0;
@@ -701,6 +794,7 @@ export function submitQuizAnswer() {
 			return;
 		}
 		state.gameLevel = Math.min(state.gameLevel + 1, QUIZ_MAX_LEVEL);
+		showLevelUpTip(state.gameLevel, QUIZ_MAX_LEVEL, "steady");
 	}
 
 	updateQuizHUD();

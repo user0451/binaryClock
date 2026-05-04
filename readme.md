@@ -1,201 +1,106 @@
 # Binary Clock
 
-An animated, CSS-forward binary clock with learning overlays, a rolling digital readout, theme switching, and responsive controls.
+Learn binary by reading real time.
 
-https://spinningrock.net/binary/
+An interactive binary clock designed to subtly teach how binary works through visualisation and simple, progressive features.
 
+Live demo: https://spinningrock.net/binary/
 
-## Current State
-- Two display modes: 6-bit (default) and 4-bit.
-- Two bit orientations: vertical (default) and horizontal.
-- Two time formats: 24-hour (default) and 12-hour — also toggled by clicking the digital panel.
-- Configurable bit order: MSB-first (default) or LSB-first.
-- Optional learning overlays and optional digital panel.
-- Theme picker with 18 built-in themes, plus a shuffle mode that rotates automatically every 10 minutes.
-- Page-load assembly animation and per-bit randomised easing on mode/theme transitions.
-- Animated CRT-style scan lines on the background.
-- Pointer-responsive liquid bits: bits morph and shift toward the cursor or touch point.
-- Smart auto-orientation on mobile: the clock switches between vertical and horizontal layout automatically based on device orientation.
-- Responsive layout for desktop and mobile, including an optimised landscape mode for phones.
-- State persistence in localStorage.
+[demo](https://github.com/user0451/binaryClock/blob/master/media/binaryclock.gif)
+---
+## Why This Exists
+Most binary clocks are visual novelty. Mine isn't far off to be fair, but is really designed to teach:
 
-## Modes
-- **6-bit mode**: Each time unit (hours, minutes, seconds) is represented by 6 bits, allowing for a direct binary representation of values up to 63. This mode emphasises the binary nature of the clock and is ideal for users familiar with binary counting.
-- **4-bit mode**: Each time unit is split into two columns representing the tens and units place. This mode is more pedagogical, designed to teach binary concepts by breaking down each time unit into its decimal place values. For example, the hours are represented with a tens column (0–2) and a units column (0–9), with the tens place only using 2 bits since the maximum hour value is 23.
+- how binary values are built from powers of two
+- how the same value can be shown as bits, digits, and decimal time
+- how quickly your brain can move from "adding weights" to "recognizing patterns"
 
-### Where to Start
-- Hardcore: 6-bit mode only.
-- General: 6-bit mode, Horizontal orientation with the digital panel on.
-- Beginner: 4-bit mode, Vertical orientation with digital and help values on.
-- 12/24-hour format is a personal preference.
+## What You Will Learn
+- Bit weights (`1, 2, 4, 8, 16, 32`)
+- How active bits add into a decimal value
+- Why MSB-first vs LSB-first changes reading flow
+- How BCD (4-bit mode) differs from direct binary (6-bit mode)
+- How to convert both directions through interactive game modes
 
-## Run
-No build step is required.
+## Quick Binary Primer
+Each row is a power of two. Add the rows that are on.
 
-1. Open [index.html](index.html) in a browser.
-2. The app bootstraps through [code.js](code.js), which initialises [scripts/main.js](scripts/main.js).
+```text
+8  4  2  1
+0  1  1  0  -> 4 + 2 = 6
+```
 
-## Controls
-- **6-bit / 4-bit**: switches binary representation mode with animated transition choreography. The label updates instantly on click.
-- **24 / 12**: switches time format.
-- **Digital**: toggles the rolling digital companion panel.
-- **Digital panel (click)**: clicking the digital panel itself also toggles 12/24-hour format.
-- **Vertical / Horizontal**: switches bit orientation. Bits animate between layouts using the same jitter-delay infrastructure as mode transitions.
-- **LSB / MSB**: toggles bit order between least-significant-bit-first and most-significant-bit-first. Arrows in the label indicate the current direction.
-- **Help**: toggles inline binary weight annotations and forces the digital panel on while active (restores previous digital state on exit).
-- **Auto-orient** *(mobile only)*: when enabled, the clock automatically switches between vertical and horizontal layout to match the device's physical orientation. The toggle is hidden on desktop.
-- **Theme (button)**: click to toggle automatic shuffle mode — the container sways gently while shuffle is active. Tooltip and `aria-pressed` state reflect the current mode.
-- **Theme (dropdown)**: selects a specific theme. Picking any theme manually stops the shuffle.
+## Learning Path (Recommended)
+1. Start in default view and watch bit changes over time.
+2. Enable Help mode to see per-bit values.
+3. Turn on the Digital panel and compare binary with decimal instantly.
+4. Switch to 0/1 themes (`Bit Boring` or `Boring Bit`) to focus on binary digits.
+5. Try 4-bit mode to understand decimal digits as binary-coded chunks.
+6. Use game modes to practice active recall under feedback.
 
-## Display Behaviour
+## Features Built For Learning
 
-### 6-bit Mode
-- Hours, minutes, and seconds are each shown as six binary rows; most significant bit at the top (or left in horizontal orientation).
-- Help values map to row weights: 32, 16, 8, 4, 2, 1.
+### Help Mode
 
-### 4-bit Mode
-- Each time unit is split into tens and units digits, each up to 4 bits.
-- Tens and units show weighted help contributions in help mode.
-- Hours tens only uses 2 active bits (max value 2).
-- In horizontal orientation, tens stacks above units; bits within each digit run left to right.
+- Shows bit weights and additive structure
+- Makes value construction explicit instead of decorative
+- Keeps a decimal reference visible for verification
 
-### Orientation
-- **Vertical** (default): bits stack top to bottom within each time unit; time groups are arranged in a row.
-- **Horizontal**: bits run left to right; time groups are stacked vertically with a divider line between them.
-- Switching orientation triggers the full jitter-delay bit animation with randomised easing, mirroring the mode-switch choreography.
-- On mobile devices, **auto-orientation** maps vertical layout to portrait and horizontal layout to landscape automatically. The detection uses the Screen Orientation API with `matchMedia` and resize/visibilitychange fallbacks. The orientation control is hidden on desktop.
+### Multiple Representations
 
-### Digital Panel
-- Rolling two-slot H:M:S values with per-slot digit animation.
-- In 24-hour mode, hours are zero-padded.
-- In 12-hour mode, hours do not show a leading zero.
-- AM/PM badge is visible only in 12-hour mode.
-- Clicking the digital panel toggles 12/24-hour format directly.
-- During help mode the digital panel is forced on and the Digital toggle is disabled; on help exit the previous digital state is restored.
+The same time value can be read in different forms:
 
-### Bit Order
-- **MSB-first** (default): most significant bit at the top (vertical) or left (horizontal), matching standard binary notation.
-- **LSB-first**: bit order is reversed — least significant bit at top or left. Useful for learning to read binary from the "natural" direction, or for a different visual challenge.
-- The LSB label shows directional arrows (↑ MSB→LSB / ↓ LSB→MSB) as a quick visual cue.
+- visual (on/off bits)
+- binary digits (`0/1` themes)
+- weighted rows (Help mode)
+- decimal (Digital panel)
 
-### Liquid Bits/Blobs
-- Each bit is a "blob" that morphs and shifts in response to pointer movement and
-- Bits respond to pointer movement and touch: they morph their border-radius and shift slightly toward the cursor or touch point, giving the clock face a fluid, tactile feel.
-- The effect is suppressed when `prefers-reduced-motion` is set.
-- Pinch-zoom on mobile is fully preserved.
+Switching representation is the core teaching method.
 
-### Scan Lines
-- A subtle animated CRT scan-line overlay plays on the background via `body::after`.
-- Two layered animations (`scanlineDrift`, `scanlineWave`) give a slow, organic drift.
-- Suppressed when `prefers-reduced-motion` is set.
+### 6-bit and 4-bit Modes
 
-### Page Load
-- On first render, all clock bits play a staggered assembly animation (`bitAssemble`) before the clock starts ticking, giving the initial experience a satisfying "power on" feel. Actually, it's not that great - nowhere near!
+- **6-bit mode**: direct binary for each time unit
+- **4-bit mode**: binary-coded decimal style (tens and units split)
 
-## Themes
-18 built-in themes, plus shuffle mode:
+Both are useful: 6-bit builds fluency, 4-bit builds understanding.
 
-1. Classic RGB Neon
-2. Amber Terminal
-3. Ice Glass
-4. Matrix Pulse
-5. Sunset Bloom
-6. Cyberpunk Grid
-7. Metallic Core
-8. Monochrome Noir
-9. Electric Storm
-10. Gloomy Mist
-11. Sunny Pop
-12. Christmas Glow
-13. Galactic Disco Inferno
-14. Enchanted Forest Glow
-15. Midnight Mirage
-16. Retro Pixel Crunch
-17. Bit Boring
-18. Boring Bit
+### Interactive Practice Modes
 
-Most themes include a custom `bit.on` animation tuned to a subtle theme-appropriate motion profile. **Shuffle mode** rotates through all 18 themes every 10 minutes; the theme selector container gently sways while active. Picking any theme manually disables shuffle.
+- **Bit-clicking mode**: click bits to match target values, level up, and receive performance-based feedback
+- **Quiz mode**: convert between binary and decimal with time pressure
 
-## Animations
-- **Mode transitions**: bits fly out and back in with per-bit randomised `--rand-delay-in/out` and `--rand-ease-in/out` CSS custom properties, drawn from a pool of easing curves. The direction of animation adapts to whether the target mode is 6-bit or 4-bit, and to the current bit orientation.
-- **Orientation transitions**: same jitter infrastructure fires when switching vertical ↔ horizontal. `bitFlyInHorizontal` is used when entering horizontal; `bitFlyIn` returns to vertical.
-- **Theme motion bursts**: triggered on theme change; uses the same bit animation window without changing the mode.
-- **Page assembly**: `bitAssemble` plays on all bits during the `page-assembling` body-class window (1800 ms) at startup.
-- All bit animations respect `column-offset` and `--rand-delay-*` for a staggered, non-uniform feel.
-- `prefers-reduced-motion` suppresses the shuffle-container sway animation.
+The goal is to move from passive observation to active recall.
 
-## Responsive Behaviour
-- **Desktop** (`min-width: 40rem` + `pointer: fine`): full layout with settings overlay, orientation toggle visible.
-- **Mobile portrait**: compact centred layout; settings overlay scrollable; auto-orientation switches to vertical layout.
-- **Mobile landscape** (`pointer: coarse` + `orientation: landscape`): reduced control sizes, settings panel uses a two-column grid to fit on screen, clock is centred with constrained max-width. Auto-orientation switches to horizontal layout.
-- The orientation toggle (`auto-orient`) is hidden on desktop via `@media (pointer: fine)` — it is only relevant on touch devices.
-- While settings are open, background scrolling is locked.
-- Pinch-zoom is fully preserved on mobile (no pointer capture on clock bits).
-- `touch-action: pan-x pan-y pinch-zoom` is applied to the clock and bits; `touch-action: auto` is restored on the root.
+## Controls At A Glance
 
-## Persistence
-Saved keys in localStorage:
+- `6-bit / 4-bit`: switch representation model
+- `Help`: show bit values and support guided reading
+- `Digital`: show decimal companion clock
+- `Vertical / Horizontal`: change spatial reading direction
+- `MSB / LSB`: reverse bit significance order
+- `24h / 12h`: switch time format
+- `Theme`: choose visual style or shuffle through themes
 
-| Key | Values |
-|---|---|
-| `binaryClockMode` | `6-bit` / `4-bit` |
-| `binaryClockFormat` | `24` / `12` |
-| `binaryClockHelp` | `on` / `off` |
-| `binaryClockDigital` | `on` / `off` |
-| `binaryClockTheme` | theme value or `random-shuffle` |
-| `binaryClockBitOrientation` | `vertical` / `horizontal` |
-| `binaryClockLSBFirst` | `true` / `false` |
+## Run Locally
+
+No install needed for normal use.
+```bash
+git clone https://github.com/user0451/binaryClock
+cd binaryClock
+```
+1. Open [index.html](index.html) in your browser.
+
 
 ## Project Structure
-- [index.html](index.html): markup and controls.
-- [style.css](style.css): stylesheet imports.
-- [styles/base.css](styles/base.css): CSS custom property tokens, foundational layout, scan-line overlay animation, touch-action rules.
-- [styles/clock.css](styles/clock.css): clock bit and digital panel styling, digital panel click affordance.
-- [styles/modes.css](styles/modes.css): 4-bit/6-bit layout rules, horizontal orientation rules, LSB-first bit-order reversal.
-- [styles/motion.css](styles/motion.css): transition and keyframe choreography, scan-line keyframes.
-- [styles/themes.css](styles/themes.css): per-theme CSS variable definitions and theme-specific bit animations.
-- [styles/controls.css](styles/controls.css): settings UI, toggle switches, shuffle button, disabled-switch style, landscape two-column grid.
-- [styles/interactions.css](styles/interactions.css): liquid bit pointer/touch response (`--liquid-offset-x/y`, `will-change`).
-- [styles/responsive.css](styles/responsive.css): desktop breakpoints (gated to `pointer: fine`), mobile landscape overrides, reduced-motion handling.
-- [scripts/main.js](scripts/main.js): event wiring, app lifecycle, shuffle interval management, auto-orientation logic (Screen Orientation API + fallbacks), liquid bit pointer/touch handlers.
-- [scripts/display.js](scripts/display.js): time logic, bit painting, help annotations, digital rolling text, jitter delay assignment.
-- [scripts/transitions.js](scripts/transitions.js): mode transition and orientation transition state machines, theme motion burst.
-- [scripts/ui.js](scripts/ui.js): UI state application, label updates (including LSB label), persistence hooks, restore-on-load, help-mode digital lock.
-- [scripts/state.js](scripts/state.js): global singleton state object (`lsbFirst`, `autoOrient`, `digitalVisibleBeforeHelp`).
-- [scripts/dom.js](scripts/dom.js): cached DOM element references (`lsbToggle`, `lsbLabel`).
-- [scripts/config.js](scripts/config.js): constants, timing windows, storage keys (`binaryClockLSBFirst`), easing pool, shuffleable theme list.
 
-## Future
-Some things I could do in the future if bored enough, but probably won't:
-- implement query string parameters to set initial mode, format, theme, etc. for easy sharing of specific configurations.
-- Redesign Help mode with 'bit boring' and 'boring bits' themes; the weight annotations are barley visible and not really correct for this theme. Also, these themes are perhaps our most educational themes, showing the actual binary values without any visual trickery, so it would be nice if the help annotations were more prominent for these themes in particular. For example, when we show 0110, tie it explicitly to the value 0110₂ = 6₁₀ somehow, to show the user that representation → number system mapping more clearly. This is one of our best learning features that could tie everything together for beginners, but it's a bit underwhelming in its current form.
-- The help annotations are a bit basic generally and could be more visually integrated with the clock face, perhaps with better typography or a more intuitive layout. We would nned to think about how that would fit into a vertical/horizontal layout and how to make it clear which annotations correspond to which bits without cluttering the interface.
-- We should add a separate "game mode" where bits become interactive and users can click them to toggle their state, with some kind of feedback on whether they got the correct binary representation. This would be a more active learning mode that encourages users to engage directly with the binary concepts, rather than just passively observing the clock. We would need to design a clear UI for this mode and decide how to provide feedback (e.g., highlighting correct/incorrect bits, showing the corresponding decimal value, etc.) without making it too overwhelming or cluttered. A quiz mode - we display n-bits , generate a random number between 0 and 2^n - 1, and ask the user to set the bits to match that number. We could have different difficulty levels by adjusting the time limit or the range of bits (start level 1 with 4 bits, 10 questions, next level add 1 bit; max 8 levels).
-	- what is this number in binary? (show decimal, user sets bits)
-	- what is this binary number in decimal? (show bits, user inputs decimal)
-Remember our UI/UX has minimal text and relies heavily on visual cues, so we would need to design this game mode in a way that fits with our existing aesthetic and doesn't require a lot of additional instructions or text. We could use tooltips or a brief overlay tutorial to explain the game mechanics when the user first enters this mode, but keep everything clean and slick as it currently is.
+- [index.html](index.html): UI markup and controls
+- [code.js](code.js): app entry bootstrap
+- [scripts](scripts): behavior and game logic
+- [styles](styles): layout, theme, motion, and interaction styles
 
-	
-
-
-- Expose the shuffle time interval in the UI for user control.
-- Add an optional seconds progress ring around the clock face.
-- Add a mode with only hours and minutes for a more minimalist look.
-- Add a "learn" mode with interactive quizzes to test binary understanding.
-- Add a "colorblind mode" with high-contrast patterns instead of colors for better accessibility.
-- Add a "darken inactive bits" toggle for better focus on the active bits.
-- Add some fun easter egg themes unlocked by clicking the title a certain number of times, for nobody to ever discover.
-- Add a "custom theme" mode where users can pick their own colors and animation profiles.
-- Add a "holiday mode" that automatically changes themes based on the time of year (spooky in October, festive in December, otherwise seasonal defaults).
-- Add a night mode that gradually darkens the color scheme as the night progresses, based on the user's local time.
-- Add sound effects that can be toggled — a satisfying click when bits change, a whoosh during transitions, maybe a tick-tock synced to seconds. I don't want to do this, but it would be fun if I had any audio skills at all.
-- Add particle effects during mode switches or time changes — little bursts of binary digits or colorful sparks from the clock face.
-- Add a celebration mode for special occasions like New Year's Eve, where midnight triggers confetti and general chaos.
-- Countdown timers or alarm functionality with a binary countdown and a fun completion animation.
-- Hide unused tens-hour bits in 4-bit mode, with an option to toggle them for symmetry.
-
-## Known Issues
-- auto-orientation switch missing from mobile view (hidden on desktop)
+## Philosophy
+- Teach with minimal text, clear visual feedback, and repeatable interaction. If you spend enough time with this clock, you should stop "calculating" and start "recognizing" binary patterns.
+- Go nuts with CSS...
 
 ## License
-Steal whatever you like, but don't blame me if it explodes. If you make something cool with this code, let me know!
+Steal whatever you like.
