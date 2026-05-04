@@ -103,4 +103,4 @@ cd binaryClock
 - Go nuts with CSS...
 
 ## License
-Steal whatever you like.
+MIT — do whatever you like with it.
