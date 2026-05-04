@@ -51,3 +51,68 @@ export const TRANSITION_EASINGS = [
 	"cubic-bezier(0.22, 1.36, 0.7, 1.01)",
 	"cubic-bezier(0.51, 0.92, 0.24, 1.15)"
 ]; // some weirdness inspired by https://easings.net/en
+
+// Query parameter validation
+export const VALID_MODES = ["6-bit", "4-bit"];
+export const VALID_FORMATS = ["12", "24"];
+export const VALID_ORIENTATIONS = ["vertical", "horizontal"];
+export const VALID_BOOLEAN_STRINGS = ["true", "false"];
+export const VALID_LSB_VALUES = ["true", "false"];
+
+export const QUERY_PARAM_KEYS = {
+	mode: "mode",
+	format: "format",
+	theme: "theme",
+	orientation: "orientation",
+	lsb: "lsb",
+	help: "help",
+	digital: "digital",
+	persist: "persist"
+};
+
+/**
+ * Validates a query parameter key-value pair
+ * @param {string} key - The parameter key
+ * @param {string} value - The parameter value (as string from URL)
+ * @returns {boolean} - True if valid, false otherwise
+ */
+export function isValidQueryParam(key, value) {
+	if (!key || !value) return false;
+
+	switch (key) {
+		case QUERY_PARAM_KEYS.mode:
+			return VALID_MODES.includes(value);
+		case QUERY_PARAM_KEYS.format:
+			return VALID_FORMATS.includes(value);
+		case QUERY_PARAM_KEYS.theme:
+			return SHUFFLEABLE_THEMES.includes(value);
+		case QUERY_PARAM_KEYS.orientation:
+			return VALID_ORIENTATIONS.includes(value);
+		case QUERY_PARAM_KEYS.lsb:
+		case QUERY_PARAM_KEYS.help:
+		case QUERY_PARAM_KEYS.digital:
+		case QUERY_PARAM_KEYS.persist:
+			return VALID_BOOLEAN_STRINGS.includes(value);
+		default:
+			return false;
+	}
+}
+
+/**
+ * Parses URL query parameters and returns a validated object
+ * @returns {Object} - Object with validated query parameters
+ */
+export function parseQueryParams() {
+	const params = new URLSearchParams(window.location.search);
+	const result = {};
+
+	for (const [key, value] of params.entries()) {
+		if (isValidQueryParam(key, value)) {
+			result[key] = value;
+		} else if (value) {
+			console.warn(`Ignored invalid query parameter: ${key}=${value}`);
+		}
+	}
+
+	return result;
+}

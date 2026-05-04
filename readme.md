@@ -167,7 +167,17 @@ Saved keys in localStorage:
 
 ## Future
 Some things I could do in the future if bored enough, but probably won't:
-- The help annotations are a bit basic and could be more visually integrated with the clock face, perhaps with better typography or a more intuitive layout.
+- implement query string parameters to set initial mode, format, theme, etc. for easy sharing of specific configurations.
+- Redesign Help mode with 'bit boring' and 'boring bits' themes; the weight annotations are barley visible and not really correct for this theme. Also, these themes are perhaps our most educational themes, showing the actual binary values without any visual trickery, so it would be nice if the help annotations were more prominent for these themes in particular. For example, when we show 0110, tie it explicitly to the value 0110₂ = 6₁₀ somehow, to show the user that representation → number system mapping more clearly. This is one of our best learning features that could tie everything together for beginners, but it's a bit underwhelming in its current form.
+- The help annotations are a bit basic generally and could be more visually integrated with the clock face, perhaps with better typography or a more intuitive layout. We would nned to think about how that would fit into a vertical/horizontal layout and how to make it clear which annotations correspond to which bits without cluttering the interface.
+- We should add a separate "game mode" where bits become interactive and users can click them to toggle their state, with some kind of feedback on whether they got the correct binary representation. This would be a more active learning mode that encourages users to engage directly with the binary concepts, rather than just passively observing the clock. We would need to design a clear UI for this mode and decide how to provide feedback (e.g., highlighting correct/incorrect bits, showing the corresponding decimal value, etc.) without making it too overwhelming or cluttered. A quiz mode - we display n-bits , generate a random number between 0 and 2^n - 1, and ask the user to set the bits to match that number. We could have different difficulty levels by adjusting the time limit or the range of bits (start level 1 with 4 bits, 10 questions, next level add 1 bit; max 8 levels).
+	- what is this number in binary? (show decimal, user sets bits)
+	- what is this binary number in decimal? (show bits, user inputs decimal)
+Remember our UI/UX has minimal text and relies heavily on visual cues, so we would need to design this game mode in a way that fits with our existing aesthetic and doesn't require a lot of additional instructions or text. We could use tooltips or a brief overlay tutorial to explain the game mechanics when the user first enters this mode, but keep everything clean and slick as it currently is.
+
+	
+
+
 - Expose the shuffle time interval in the UI for user control.
 - Add an optional seconds progress ring around the clock face.
 - Add a mode with only hours and minutes for a more minimalist look.

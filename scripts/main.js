@@ -1,9 +1,9 @@
-import { allBitNodes, controls, digitalPanel } from "./dom.js";
+import { allBitNodes, clockElement, controls, digitalPanel } from "./dom.js";
 import { applyModeJitterDelays, runTick } from "./display.js";
-import { PAGE_ASSEMBLY_WINDOW_MS, RANDOM_THEME_INTERVAL_MS, SHUFFLEABLE_THEMES } from "./config.js";
+import { PAGE_ASSEMBLY_WINDOW_MS, RANDOM_THEME_INTERVAL_MS, SHUFFLEABLE_THEMES, QUERY_PARAM_KEYS, parseQueryParams } from "./config.js";
 import { state } from "./state.js";
 import { runThemeMotionBurst, transitionToMode, transitionToOrientation } from "./transitions.js";
-import { applyBitOrientationState, applyDigitalState, applyHelpState, applyLSBState, applyScanlineState, applyTheme, persistState, restoreState, setLSBLabel, setOrientationLabel, setSettingsOpen, setTimeFormatLabel, toggleSettings } from "./ui.js";
+import { applyBitOrientationState, applyDigitalState, applyHelpState, applyLSBState, applyScanlineState, applyTheme, persistState, restoreState, setLSBLabel, setModeLabel, setOrientationLabel, setSettingsOpen, setTimeFormatLabel, toggleSettings } from "./ui.js";
 
 function closeThemeDropdown() {
 	if (!controls.themeSelectList || !controls.themeSelectDisplay) {
@@ -583,9 +583,91 @@ function wireEvents() {
 	});
 }
 
+/**
+ * Applies query parameters to the application state
+ * Query params override localStorage values but don't persist unless ?persist=true
+ */
+function applyQueryParams() {
+	const queryParams = parseQueryParams();
+	if (Object.keys(queryParams).length === 0) {
+		return; // No query params to process
+	}
+
+	const shouldPersist = queryParams[QUERY_PARAM_KEYS.persist] === "true";
+
+	// Apply mode
+	if (queryParams[QUERY_PARAM_KEYS.mode]) {
+		state.mode = queryParams[QUERY_PARAM_KEYS.mode];
+	}
+
+	// Apply time format
+	if (queryParams[QUERY_PARAM_KEYS.format]) {
+		state.show24HourFormat = queryParams[QUERY_PARAM_KEYS.format] === "24";
+	}
+
+	// Apply theme
+	if (queryParams[QUERY_PARAM_KEYS.theme]) {
+		state.theme = queryParams[QUERY_PARAM_KEYS.theme];
+		state.randomMode = false; // Disable random mode when specific theme set
+	}
+
+	// Apply orientation
+	if (queryParams[QUERY_PARAM_KEYS.orientation]) {
+		state.bitOrientation = queryParams[QUERY_PARAM_KEYS.orientation];
+	}
+
+	// Apply LSB setting
+	if (queryParams[QUERY_PARAM_KEYS.lsb]) {
+		state.lsbFirst = queryParams[QUERY_PARAM_KEYS.lsb] === "true";
+	}
+
+	// Apply help visibility
+	if (queryParams[QUERY_PARAM_KEYS.help]) {
+		state.helpVisible = queryParams[QUERY_PARAM_KEYS.help] === "true";
+	}
+
+	// Apply digital display visibility
+	if (queryParams[QUERY_PARAM_KEYS.digital]) {
+		state.digitalVisible = queryParams[QUERY_PARAM_KEYS.digital] === "true";
+	}
+
+	// Sync controls with updated state
+	controls.modeToggle.checked = state.mode === "4-bit";
+	controls.timeFormatToggle.checked = state.show24HourFormat;
+	controls.helpToggle.checked = state.helpVisible;
+	controls.digitalToggle.checked = state.digitalVisible;
+	controls.orientationToggle.checked = state.bitOrientation === "horizontal";
+	if (controls.lsbToggle) {
+		controls.lsbToggle.checked = state.lsbFirst;
+	}
+
+	// Update labels
+	setModeLabel();
+	setTimeFormatLabel();
+	setOrientationLabel();
+	setLSBLabel();
+
+	// Apply UI states
+	applyHelpState();
+	applyDigitalState();
+	applyBitOrientationState();
+	applyLSBState();
+	applyTheme();
+	clockElement.setAttribute("data-mode", state.mode === "4-bit" ? "4bit" : "6bit");
+
+	// Optionally persist if ?persist=true
+	if (shouldPersist) {
+		persistState();
+	}
+
+	// Log applied params for debugging
+	console.log("Query parameters applied:", queryParams);
+}
+
 export function initApp() {
 	wireEvents();
 	restoreState();
+	applyQueryParams();
 	if (state.randomMode) {
 		startRandomMode();
 	}
