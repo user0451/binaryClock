@@ -701,6 +701,107 @@ body.game-type-quiz.quiz-type-binary-to-decimal .timeGroup[data-unit="hours"] .b
 }
 
 /* =========================================================================
+   Jeopardy question — snake border chase
+   ========================================================================= */
+@property --jeopardy-angle {
+	syntax: '<angle>';
+	inherits: false;
+	initial-value: 0deg;
+}
+
+@keyframes jeopardyBorderChase {
+	to {
+		--jeopardy-angle: 360deg;
+	}
+}
+
+body.game-type-quiz.quiz-jeopardy-question .clock {
+	isolation: isolate;
+}
+
+body.game-type-quiz.quiz-jeopardy-result-correct .clock,
+body.game-type-quiz.quiz-jeopardy-result-wrong .clock {
+	isolation: isolate;
+}
+
+/* The ::after fills the clock area; the mask punches out the interior,
+   leaving only a 3px-wide border strip visible — the snake rides that strip. */
+body.game-type-quiz:is(.quiz-jeopardy-question, .quiz-jeopardy-result-correct, .quiz-jeopardy-result-wrong) .clock::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	padding: 3px;
+	background: conic-gradient(from var(--jeopardy-angle),
+			transparent 0%,
+			transparent 72%,
+			rgba(59, 130, 246, 0) 76%,
+			#3b82f6 82%,
+			#38bdf8 87%,
+			#e0f2fe 90%,
+			#38bdf8 93%,
+			rgba(56, 189, 248, 0) 98%,
+			transparent 100%);
+	-webkit-mask:
+		linear-gradient(#fff 0 0) content-box,
+		linear-gradient(#fff 0 0);
+	-webkit-mask-composite: xor;
+	mask-composite: exclude;
+	pointer-events: none;
+	z-index: 10;
+	animation: jeopardyBorderChase 1.4s linear infinite;
+}
+
+body.game-type-quiz.quiz-jeopardy-result-correct .clock::after {
+	background: conic-gradient(from var(--jeopardy-angle),
+			transparent 0%,
+			transparent 72%,
+			rgba(34, 197, 94, 0) 76%,
+			#22c55e 82%,
+			#4ade80 87%,
+			#ecfdf5 90%,
+			#4ade80 93%,
+			rgba(74, 222, 128, 0) 98%,
+			transparent 100%);
+}
+
+body.game-type-quiz.quiz-jeopardy-result-wrong .clock::after {
+	background: conic-gradient(from var(--jeopardy-angle),
+			transparent 0%,
+			transparent 72%,
+			rgba(239, 68, 68, 0) 76%,
+			#ef4444 82%,
+			#f97316 87%,
+			#fee2e2 90%,
+			#f97316 93%,
+			rgba(249, 115, 22, 0) 98%,
+			transparent 100%);
+}
+
+body.game-type-quiz.quiz-jeopardy-question .quizHUD {
+	border-color: color-mix(in srgb, #3b82f6 62%, var(--theme-accent-color, #aaa));
+	box-shadow: 0 6px 30px rgba(59, 130, 246, 0.35), 0 0 18px rgba(56, 189, 248, 0.2);
+}
+
+body.game-type-quiz.quiz-jeopardy-result-correct .quizHUD {
+	border-color: color-mix(in srgb, #22c55e 65%, var(--theme-accent-color, #aaa));
+	box-shadow: 0 6px 30px rgba(34, 197, 94, 0.34), 0 0 18px rgba(74, 222, 128, 0.24);
+}
+
+body.game-type-quiz.quiz-jeopardy-result-wrong .quizHUD {
+	border-color: color-mix(in srgb, #ef4444 65%, var(--theme-accent-color, #aaa));
+	box-shadow: 0 6px 30px rgba(239, 68, 68, 0.35), 0 0 18px rgba(249, 115, 22, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.game-type-quiz:is(.quiz-jeopardy-question, .quiz-jeopardy-result-correct, .quiz-jeopardy-result-wrong) .clock::after {
+		animation: none;
+		background: conic-gradient(from 0deg,
+				transparent 0%, #3b82f6 10%, transparent 20%);
+	}
+}
+
+/* =========================================================================
    Mobile responsive
    ========================================================================= */
 

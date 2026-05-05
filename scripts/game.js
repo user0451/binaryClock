@@ -181,6 +181,18 @@ const BIT_TIPS = {
 		"Quiz: in binary mode, click bits to match the decimal target; in decimal mode, type the decimal value and submit.",
 		"Quiz: alternate between building binary and reading binary back to decimal.",
 	],
+	quizJeopardyRound: [
+		"Jeopardy round: one random question is hot. Correct wins +1 life, wrong costs 2 lives.",
+		"Jeopardy active: a hidden bonus question can restore a life or take two.",
+	],
+	quizJeopardyWin: [
+		"Jeopardy cleared: +1 life recovered.",
+		"Bonus nailed. You earned 1 life back.",
+	],
+	quizJeopardyFail: [
+		"Jeopardy missed: penalty is 2 lives.",
+		"Bonus failed. You lost 2 lives.",
+	],
 	general: [
 		"Each bit is a power of two: 1, 2, 4, 8, 16, 32.",
 		"If all bits are off, the value is 0.",
@@ -199,6 +211,9 @@ const TIP_CATEGORY_LABELS = {
 	streakRecovery: "Streak Recovery",
 	bitClickingStart: "How To Play",
 	quizStart: "How To Play",
+	quizJeopardyRound: "Jeopardy Mode",
+	quizJeopardyWin: "Jeopardy Bonus",
+	quizJeopardyFail: "Jeopardy Penalty",
 	general: "Binary Tip",
 };
 
@@ -764,9 +779,118 @@ let quizFeedbackTimer = null;
 let quizGameOver = false;
 let rollingScoreTimer = null;
 let displayedScore = 0;
+let quizLevelWindowCorrect = 0;
+let quizLevelWindowWrong = 0;
+let quizRoundLivesLost = 0;
+let quizPendingJeopardyRound = false;
+let quizJeopardyRoundActive = false;
+let quizJeopardyQuestionIndex = -1;
+let quizCurrentQuestionIsJeopardy = false;
+let quizJeopardyResultState = null;
+let quizJeopardyResultTimer = null;
+let quizRoundAnchor = -1;
 
 const QUIZ_MAX_LIVES = 5;
 let quizLives = QUIZ_MAX_LIVES;
+
+function resetQuizLevelWindow() {
+	quizLevelWindowCorrect = 0;
+	quizLevelWindowWrong = 0;
+}
+
+function getQuizLevelGrade() {
+	const total = quizLevelWindowCorrect + quizLevelWindowWrong;
+	if (total <= 0) return "steady";
+	const accuracy = quizLevelWindowCorrect / total;
+	if (accuracy === 1) return "perfect";
+	if (accuracy >= 0.8) return "strong";
+	if (accuracy >= 0.6) return "steady";
+	return "shaky";
+}
+
+function syncQuizJeopardyClasses() {
+	document.body.classList.toggle("quiz-jeopardy-mode", state.gameActive && state.gameMode === "quiz" && quizJeopardyRoundActive);
+	document.body.classList.toggle("quiz-jeopardy-question", state.gameActive && state.gameMode === "quiz" && quizCurrentQuestionIsJeopardy);
+	document.body.classList.toggle("quiz-jeopardy-result-correct", state.gameActive && state.gameMode === "quiz" && quizJeopardyResultState === "correct");
+	document.body.classList.toggle("quiz-jeopardy-result-wrong", state.gameActive && state.gameMode === "quiz" && quizJeopardyResultState === "wrong");
+}
+
+function clearQuizJeopardyResultFlash() {
+	if (quizJeopardyResultTimer) {
+		clearTimeout(quizJeopardyResultTimer);
+		quizJeopardyResultTimer = null;
+	}
+	if (quizJeopardyResultState) {
+		quizJeopardyResultState = null;
+		syncQuizJeopardyClasses();
+	}
+}
+
+function triggerQuizJeopardyResultFlash(result) {
+	clearQuizJeopardyResultFlash();
+	quizJeopardyResultState = result;
+	syncQuizJeopardyClasses();
+	quizJeopardyResultTimer = setTimeout(() => {
+		quizJeopardyResultTimer = null;
+		quizJeopardyResultState = null;
+		syncQuizJeopardyClasses();
+	}, 1000);
+}
+
+function resetQuizJeopardyState() {
+	clearQuizJeopardyResultFlash();
+	quizRoundLivesLost = 0;
+	quizPendingJeopardyRound = false;
+	quizJeopardyRoundActive = false;
+	quizJeopardyQuestionIndex = -1;
+	quizCurrentQuestionIsJeopardy = false;
+	quizJeopardyResultState = null;
+	quizRoundAnchor = -1;
+	syncQuizJeopardyClasses();
+}
+
+function loseQuizLives(amount) {
+	const safeAmount = Math.max(0, amount);
+	if (safeAmount <= 0) return 0;
+	const before = quizLives;
+	quizLives = Math.max(0, quizLives - safeAmount);
+	const lost = before - quizLives;
+	if (lost > 0) {
+		quizRoundLivesLost += lost;
+		updateQuizLivesDisplay();
+	}
+	return lost;
+}
+
+function gainQuizLives(amount) {
+	const safeAmount = Math.max(0, amount);
+	if (safeAmount <= 0) return 0;
+	const before = quizLives;
+	quizLives = Math.min(QUIZ_MAX_LIVES, quizLives + safeAmount);
+	const gained = quizLives - before;
+	if (gained > 0) updateQuizLivesDisplay();
+	return gained;
+}
+
+function prepareQuizRoundIfNeeded() {
+	const answered = state.gameQuestionsAnswered;
+	if (answered % QUIZ_QUESTIONS_PER_LEVEL !== 0) return;
+	if (quizRoundAnchor === answered) return;
+	quizRoundAnchor = answered;
+	quizCurrentQuestionIsJeopardy = false;
+	quizRoundLivesLost = 0;
+
+	if (quizPendingJeopardyRound) {
+		quizJeopardyRoundActive = true;
+		quizJeopardyQuestionIndex = Math.floor(Math.random() * QUIZ_QUESTIONS_PER_LEVEL);
+		quizPendingJeopardyRound = false;
+	} else {
+		quizJeopardyRoundActive = false;
+		quizJeopardyQuestionIndex = -1;
+	}
+
+	syncQuizJeopardyClasses();
+}
 
 function updateQuizLivesDisplay() {
 	if (!quizLivesBitNodes?.length) return;
@@ -897,13 +1021,24 @@ function handleQuizTimeout() {
 	if (quizFeedbackTimer !== null) return;
 	state.gameStreak = 0;
 	state.gameScore = Math.max(0, state.gameScore - 2);
-	quizLives = Math.max(0, quizLives - 1);
-	updateQuizLivesDisplay();
+	quizLevelWindowWrong++;
+	const wasJeopardyQuestion = quizCurrentQuestionIsJeopardy;
+	const lifePenalty = quizCurrentQuestionIsJeopardy ? 2 : 1;
+	loseQuizLives(lifePenalty);
+	if (wasJeopardyQuestion) {
+		showHelpTip("quizJeopardyFail");
+		triggerQuizJeopardyResultFlash("wrong");
+	}
 	state.gameQuestionsAnswered++;
+	quizCurrentQuestionIsJeopardy = false;
+	syncQuizJeopardyClasses();
 	if (quizLives <= 0) {
 		updateQuizHUD();
 		showQuizSummary();
 		return;
+	}
+	if (state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL === 0) {
+		quizPendingJeopardyRound = quizRoundLivesLost > 0;
 	}
 	if (state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL === 0 && state.gameLevel >= QUIZ_MAX_LEVEL) {
 		updateQuizHUD();
@@ -911,6 +1046,7 @@ function handleQuizTimeout() {
 		return;
 	}
 	if (state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL === 0) {
+		resetQuizLevelWindow();
 		state.gameLevel = Math.min(state.gameLevel + 1, QUIZ_MAX_LEVEL);
 	}
 	if (quizQuestionType === "decimal-to-binary") setQuizBitsToValue(state.gameTargetValue);
@@ -933,14 +1069,20 @@ export function updateQuizHUD() {
 	startRollingScore(state.gameScore);
 	if (quizHUD.levelDisplay) quizHUD.levelDisplay.textContent = `L${state.gameLevel}`;
 	const qInLevel = (state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL) + 1;
-	if (quizHUD.progress) quizHUD.progress.textContent = `${qInLevel}/${QUIZ_QUESTIONS_PER_LEVEL}`;
+	if (quizHUD.progress) {
+		if (quizGameOver) return;
+		const modePrefix = quizCurrentQuestionIsJeopardy ? "Jeopardy " : "";
+		quizHUD.progress.textContent = `${modePrefix}${qInLevel}/${QUIZ_QUESTIONS_PER_LEVEL}`;
+	}
 }
 
 export function generateQuizQuestion() {
 	if (quizGameOver) return;
 	if (quizFeedbackTimer) { clearTimeout(quizFeedbackTimer); quizFeedbackTimer = null; }
+	clearQuizJeopardyResultFlash();
 	stopQuizTimer();
 	clearQuizBits();
+	prepareQuizRoundIfNeeded();
 	syncQuizBodyClasses();
 
 	const config = getQuizConfig();
@@ -949,6 +1091,10 @@ export function generateQuizQuestion() {
 		: config.type;
 
 	setQuizBodyType(quizQuestionType);
+	const questionIndexInLevel = state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL;
+	quizCurrentQuestionIsJeopardy = quizJeopardyRoundActive && questionIndexInLevel === quizJeopardyQuestionIndex;
+	syncQuizJeopardyClasses();
+	if (quizCurrentQuestionIsJeopardy) showHelpTip("quizJeopardyRound");
 	const maxValue = getQuizMaxValue();
 	const previousValue = state.gameTargetValue;
 	state.gameTargetValue = randomTargetExcluding(maxValue, previousValue);
@@ -991,6 +1137,8 @@ function showQuizSummary() {
 	quizGameOver = true;
 	stopQuizTimer();
 	setQuizBodyType(null);
+	quizCurrentQuestionIsJeopardy = false;
+	syncQuizJeopardyClasses();
 
 	const failedOut = quizLives <= 0;
 	const previousHighScore = quizHighScore;
@@ -1047,17 +1195,31 @@ export function submitQuizAnswer() {
 	}
 
 	flashQuizBitFeedback(isCorrect);
+	const wasJeopardyQuestion = quizCurrentQuestionIsJeopardy;
 
 	if (isCorrect) {
 		state.gameScore += 10 + state.gameStreak * 2;
 		state.gameStreak++;
+		quizLevelWindowCorrect++;
+		if (wasJeopardyQuestion) {
+			gainQuizLives(1);
+			showHelpTip("quizJeopardyWin");
+			triggerQuizJeopardyResultFlash("correct");
+		}
 	} else {
 		state.gameStreak = 0;
 		state.gameScore = Math.max(0, state.gameScore - 2);
-		quizLives = Math.max(0, quizLives - 1);
-		updateQuizLivesDisplay();
+		quizLevelWindowWrong++;
+		const lifePenalty = wasJeopardyQuestion ? 2 : 1;
+		loseQuizLives(lifePenalty);
+		if (wasJeopardyQuestion) {
+			showHelpTip("quizJeopardyFail");
+			triggerQuizJeopardyResultFlash("wrong");
+		}
 	}
 	state.gameQuestionsAnswered++;
+	quizCurrentQuestionIsJeopardy = false;
+	syncQuizJeopardyClasses();
 
 	if (quizLives <= 0) {
 		updateQuizHUD();
@@ -1066,13 +1228,19 @@ export function submitQuizAnswer() {
 	}
 
 	if (state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL === 0) {
+		quizPendingJeopardyRound = quizRoundLivesLost > 0;
+	}
+
+	if (state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL === 0) {
 		if (state.gameLevel >= QUIZ_MAX_LEVEL) {
 			updateQuizHUD();
 			showQuizSummary();
 			return;
 		}
+		const grade = getQuizLevelGrade();
+		resetQuizLevelWindow();
 		state.gameLevel = Math.min(state.gameLevel + 1, QUIZ_MAX_LEVEL);
-		showLevelUpTip(state.gameLevel, QUIZ_MAX_LEVEL, "steady");
+		showLevelUpTip(state.gameLevel, QUIZ_MAX_LEVEL, grade);
 	}
 
 	updateQuizHUD();
@@ -1093,6 +1261,8 @@ export function startQuizGame() {
 	quizQuestionType = null;
 	quizGameOver = false;
 	displayedScore = 0;
+	resetQuizLevelWindow();
+	resetQuizJeopardyState();
 	quizLives = QUIZ_MAX_LIVES;
 	updateQuizLivesDisplay();
 	if (tipHUD) {
@@ -1116,6 +1286,7 @@ export function stopQuizGame() {
 	document.body.classList.remove("quiz-minutes-active", "quiz-hours-active");
 	quizQuestionType = null;
 	quizGameOver = false;
+	resetQuizJeopardyState();
 	quizLives = QUIZ_MAX_LIVES;
 	updateQuizLivesDisplay();
 	if (tipHUD) tipHUD.removeAttribute("data-lives");
