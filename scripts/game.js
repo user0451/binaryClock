@@ -765,13 +765,17 @@ const QUIZ_LEVEL_CONFIG = [
 	{ bits: 16, type: "binary-to-decimal", timerSec: 0  },  // L20
 	{ bits: 18, type: "decimal-to-binary", timerSec: 0  },  // L21
 	{ bits: 18, type: "binary-to-decimal", timerSec: 0  },  // L22
-	{ bits: 18, type: "mixed",             timerSec: 30 },  // L23 ← timed
-	{ bits: 18, type: "mixed",             timerSec: 20 },  // L24 ← timed
-	// Final challenge — 25% less time than L24
-	{ bits: 18, type: "mixed",             timerSec: 15 },  // L25 ← timed
+	{ bits: 18, type: "mixed",             timerSec: 20 },  // L23 ← timed
+	{ bits: 18, type: "mixed",             timerSec: 15 },  // L24 ← timed
+	// Final challenge 
+	{ bits: 18, type: "mixed",             timerSec: 12 },  // L25 ← timed
 ];
 const QUIZ_MAX_LEVEL = QUIZ_LEVEL_CONFIG.length;
-const QUIZ_QUESTIONS_PER_LEVEL = 10;
+const QUIZ_QUESTIONS_PER_LEVEL = 2; //2 for testing, 10 for real
+const QUIZ_JEOPARDY_TIMER_SEC = 12;
+const QUIZ_JEOPARDY_CRITICAL_SEC = 3;
+const QUIZ_JEOPARDY_REVEAL_SHAKE_MS = 170;
+const QUIZ_JEOPARDY_LOCK_IN_MS = 220;
 
 let quizTimerInterval = null;
 let quizQuestionType = null;
@@ -788,6 +792,13 @@ let quizJeopardyQuestionIndex = -1;
 let quizCurrentQuestionIsJeopardy = false;
 let quizJeopardyResultState = null;
 let quizJeopardyResultTimer = null;
+let quizJeopardyTimerCritical = false;
+let quizJeopardyRevealShakeActive = false;
+let quizJeopardyRevealShakeTimer = null;
+let quizJeopardyLockInActive = false;
+let quizJeopardyLockInTimer = null;
+let quizJeopardyLastHeartbeatTick = -1;
+let quizJeopardyAudioContext = null;
 let quizRoundAnchor = -1;
 
 const QUIZ_MAX_LIVES = 5;
@@ -813,6 +824,84 @@ function syncQuizJeopardyClasses() {
 	document.body.classList.toggle("quiz-jeopardy-question", state.gameActive && state.gameMode === "quiz" && quizCurrentQuestionIsJeopardy);
 	document.body.classList.toggle("quiz-jeopardy-result-correct", state.gameActive && state.gameMode === "quiz" && quizJeopardyResultState === "correct");
 	document.body.classList.toggle("quiz-jeopardy-result-wrong", state.gameActive && state.gameMode === "quiz" && quizJeopardyResultState === "wrong");
+	document.body.classList.toggle("quiz-jeopardy-timer-critical", state.gameActive && state.gameMode === "quiz" && quizJeopardyTimerCritical);
+	document.body.classList.toggle("quiz-jeopardy-reveal-shake", state.gameActive && state.gameMode === "quiz" && quizJeopardyRevealShakeActive);
+	document.body.classList.toggle("quiz-jeopardy-lock-in", state.gameActive && state.gameMode === "quiz" && quizJeopardyLockInActive);
+}
+
+function ensureQuizJeopardyAudioContext() {
+	if (quizJeopardyAudioContext) return quizJeopardyAudioContext;
+	const Ctx = window.AudioContext || window.webkitAudioContext;
+	if (!Ctx) return null;
+	quizJeopardyAudioContext = new Ctx();
+	return quizJeopardyAudioContext;
+}
+
+function playQuizJeopardyHeartbeat(urgent = false) {
+	try {
+		const ctx = ensureQuizJeopardyAudioContext();
+		if (!ctx) return;
+		if (ctx.state === "suspended") void ctx.resume();
+
+		const now = ctx.currentTime;
+		const osc = ctx.createOscillator();
+		const gain = ctx.createGain();
+		osc.type = "triangle";
+		osc.frequency.setValueAtTime(urgent ? 138 : 112, now);
+		gain.gain.setValueAtTime(0.0001, now);
+		gain.gain.exponentialRampToValueAtTime(urgent ? 0.055 : 0.035, now + 0.012);
+		gain.gain.exponentialRampToValueAtTime(0.0001, now + (urgent ? 0.09 : 0.12));
+		osc.connect(gain);
+		gain.connect(ctx.destination);
+		osc.start(now);
+		osc.stop(now + (urgent ? 0.11 : 0.14));
+	} catch {
+		// Audio is optional, fail silently if unavailable or blocked.
+	}
+}
+
+function clearQuizJeopardyRevealShake() {
+	if (quizJeopardyRevealShakeTimer) {
+		clearTimeout(quizJeopardyRevealShakeTimer);
+		quizJeopardyRevealShakeTimer = null;
+	}
+	if (quizJeopardyRevealShakeActive) {
+		quizJeopardyRevealShakeActive = false;
+		syncQuizJeopardyClasses();
+	}
+}
+
+function triggerQuizJeopardyRevealShake() {
+	clearQuizJeopardyRevealShake();
+	quizJeopardyRevealShakeActive = true;
+	syncQuizJeopardyClasses();
+	quizJeopardyRevealShakeTimer = setTimeout(() => {
+		quizJeopardyRevealShakeTimer = null;
+		quizJeopardyRevealShakeActive = false;
+		syncQuizJeopardyClasses();
+	}, QUIZ_JEOPARDY_REVEAL_SHAKE_MS);
+}
+
+function clearQuizJeopardyLockIn() {
+	if (quizJeopardyLockInTimer) {
+		clearTimeout(quizJeopardyLockInTimer);
+		quizJeopardyLockInTimer = null;
+	}
+	if (quizJeopardyLockInActive) {
+		quizJeopardyLockInActive = false;
+		syncQuizJeopardyClasses();
+	}
+}
+
+function triggerQuizJeopardyLockIn() {
+	clearQuizJeopardyLockIn();
+	quizJeopardyLockInActive = true;
+	syncQuizJeopardyClasses();
+	quizJeopardyLockInTimer = setTimeout(() => {
+		quizJeopardyLockInTimer = null;
+		quizJeopardyLockInActive = false;
+		syncQuizJeopardyClasses();
+	}, QUIZ_JEOPARDY_LOCK_IN_MS);
 }
 
 function clearQuizJeopardyResultFlash() {
@@ -839,12 +928,16 @@ function triggerQuizJeopardyResultFlash(result) {
 
 function resetQuizJeopardyState() {
 	clearQuizJeopardyResultFlash();
+	clearQuizJeopardyRevealShake();
+	clearQuizJeopardyLockIn();
 	quizRoundLivesLost = 0;
 	quizPendingJeopardyRound = false;
 	quizJeopardyRoundActive = false;
 	quizJeopardyQuestionIndex = -1;
 	quizCurrentQuestionIsJeopardy = false;
 	quizJeopardyResultState = null;
+	quizJeopardyTimerCritical = false;
+	quizJeopardyLastHeartbeatTick = -1;
 	quizRoundAnchor = -1;
 	syncQuizJeopardyClasses();
 }
@@ -880,14 +973,15 @@ function prepareQuizRoundIfNeeded() {
 	quizCurrentQuestionIsJeopardy = false;
 	quizRoundLivesLost = 0;
 
-	if (quizPendingJeopardyRound) {
+	const canStartJeopardyThisRound = quizPendingJeopardyRound && quizLives < QUIZ_MAX_LIVES;
+	if (canStartJeopardyThisRound) {
 		quizJeopardyRoundActive = true;
 		quizJeopardyQuestionIndex = Math.floor(Math.random() * QUIZ_QUESTIONS_PER_LEVEL);
-		quizPendingJeopardyRound = false;
 	} else {
 		quizJeopardyRoundActive = false;
 		quizJeopardyQuestionIndex = -1;
 	}
+	quizPendingJeopardyRound = false;
 
 	syncQuizJeopardyClasses();
 }
@@ -996,22 +1090,42 @@ function readQuizPlayerBits() {
 
 function stopQuizTimer() {
 	if (quizTimerInterval) { clearInterval(quizTimerInterval); quizTimerInterval = null; }
+	quizJeopardyTimerCritical = false;
+	quizJeopardyLastHeartbeatTick = -1;
+	syncQuizJeopardyClasses();
 	if (quizHUD.timerFill) quizHUD.timerFill.style.width = "0%";
 	if (quizHUD.timerTrack) quizHUD.timerTrack.classList.remove("quiz-timer-warning");
 }
 
-function startQuizTimer(seconds) {
+function startQuizTimer(seconds, options = {}) {
 	stopQuizTimer();
+	const isJeopardyTimer = options.isJeopardy === true;
 	const totalTicks = seconds * 10;
 	let remaining = totalTicks;
 	if (quizHUD.timerFill) quizHUD.timerFill.style.width = "100%";
 	if (quizHUD.timerTrack) quizHUD.timerTrack.setAttribute("aria-hidden", "false");
+	if (!isJeopardyTimer) {
+		quizJeopardyTimerCritical = false;
+		quizJeopardyLastHeartbeatTick = -1;
+		syncQuizJeopardyClasses();
+	}
 	quizTimerInterval = setInterval(() => {
 		remaining--;
 		const pct = ((remaining / totalTicks) * 100).toFixed(1) + "%";
 		if (quizHUD.timerFill) quizHUD.timerFill.style.width = pct;
 		if (quizHUD.timerTrack) {
 			quizHUD.timerTrack.classList.toggle("quiz-timer-warning", remaining <= totalTicks * 0.35);
+		}
+		if (isJeopardyTimer) {
+			const wasCritical = quizJeopardyTimerCritical;
+			quizJeopardyTimerCritical = remaining > 0 && remaining <= QUIZ_JEOPARDY_CRITICAL_SEC * 10;
+			if (quizJeopardyTimerCritical !== wasCritical) syncQuizJeopardyClasses();
+
+			const intervalTicks = remaining <= 30 ? 3 : remaining <= 60 ? 6 : 10;
+			if (remaining > 0 && remaining % intervalTicks === 0 && remaining !== quizJeopardyLastHeartbeatTick) {
+				quizJeopardyLastHeartbeatTick = remaining;
+				playQuizJeopardyHeartbeat(remaining <= 30);
+			}
 		}
 		if (remaining <= 0) { stopQuizTimer(); handleQuizTimeout(); }
 	}, 100);
@@ -1038,7 +1152,7 @@ function handleQuizTimeout() {
 		return;
 	}
 	if (state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL === 0) {
-		quizPendingJeopardyRound = quizRoundLivesLost > 0;
+		quizPendingJeopardyRound = quizLives < QUIZ_MAX_LIVES;
 	}
 	if (state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL === 0 && state.gameLevel >= QUIZ_MAX_LEVEL) {
 		updateQuizHUD();
@@ -1080,6 +1194,8 @@ export function generateQuizQuestion() {
 	if (quizGameOver) return;
 	if (quizFeedbackTimer) { clearTimeout(quizFeedbackTimer); quizFeedbackTimer = null; }
 	clearQuizJeopardyResultFlash();
+	clearQuizJeopardyRevealShake();
+	clearQuizJeopardyLockIn();
 	stopQuizTimer();
 	clearQuizBits();
 	prepareQuizRoundIfNeeded();
@@ -1094,7 +1210,10 @@ export function generateQuizQuestion() {
 	const questionIndexInLevel = state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL;
 	quizCurrentQuestionIsJeopardy = quizJeopardyRoundActive && questionIndexInLevel === quizJeopardyQuestionIndex;
 	syncQuizJeopardyClasses();
-	if (quizCurrentQuestionIsJeopardy) showHelpTip("quizJeopardyRound");
+	if (quizCurrentQuestionIsJeopardy) {
+		showHelpTip("quizJeopardyRound");
+		triggerQuizJeopardyRevealShake();
+	}
 	const maxValue = getQuizMaxValue();
 	const previousValue = state.gameTargetValue;
 	state.gameTargetValue = randomTargetExcluding(maxValue, previousValue);
@@ -1119,7 +1238,10 @@ export function generateQuizQuestion() {
 	}
 	if (quizHUD.actions) quizHUD.actions.setAttribute("aria-hidden", "true");
 
-	if (config.timerSec > 0) startQuizTimer(config.timerSec);
+	const timerSec = quizCurrentQuestionIsJeopardy
+		? Math.max(config.timerSec, QUIZ_JEOPARDY_TIMER_SEC)
+		: config.timerSec;
+	if (timerSec > 0) startQuizTimer(timerSec, { isJeopardy: quizCurrentQuestionIsJeopardy });
 	updateQuizHUD();
 }
 
@@ -1196,6 +1318,7 @@ export function submitQuizAnswer() {
 
 	flashQuizBitFeedback(isCorrect);
 	const wasJeopardyQuestion = quizCurrentQuestionIsJeopardy;
+	if (wasJeopardyQuestion) triggerQuizJeopardyLockIn();
 
 	if (isCorrect) {
 		state.gameScore += 10 + state.gameStreak * 2;
@@ -1228,7 +1351,7 @@ export function submitQuizAnswer() {
 	}
 
 	if (state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL === 0) {
-		quizPendingJeopardyRound = quizRoundLivesLost > 0;
+		quizPendingJeopardyRound = quizLives < QUIZ_MAX_LIVES;
 	}
 
 	if (state.gameQuestionsAnswered % QUIZ_QUESTIONS_PER_LEVEL === 0) {

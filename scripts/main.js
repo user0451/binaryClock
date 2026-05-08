@@ -829,8 +829,52 @@ function applyQueryParams() {
 	console.log("Query parameters applied:", queryParams);
 }
 
+// ---------------------------------------------------------------------------
+// Virtual keyboard detection via visualViewport API
+// When the soft keyboard appears it shrinks window.innerHeight but not
+// document layout height. We expose --vkb-available-height and the
+// body class "vkb-visible" so CSS can compact the clock to fit the gap.
+// ---------------------------------------------------------------------------
+function wireVirtualKeyboardDetector() {
+	if (!window.visualViewport) return;
+
+	// Body class is only set when quiz binary-to-decimal input is focused.
+	// The bit compaction CSS keys off both "vkb-visible" and the quiz type
+	// class so normal clock use is unaffected.
+	let vkbActive = false;
+
+	function updateVKB() {
+		const vvHeight = Math.round(window.visualViewport.height);
+		const fullHeight = window.innerHeight;
+		const keyboardHeight = Math.max(0, fullHeight - vvHeight);
+		const quizHUD = document.querySelector(".quizHUD");
+		const hudHeight = quizHUD
+			? Math.round(quizHUD.getBoundingClientRect().height)
+			: 0;
+		// Keyboard is considered open when visual viewport is >15% smaller
+		// than the layout height — covers most mobile keyboards.
+		const keyboardOpen = vvHeight < fullHeight * 0.85;
+
+		if (keyboardOpen !== vkbActive) {
+			vkbActive = keyboardOpen;
+			document.body.classList.toggle("vkb-visible", vkbActive);
+		}
+		// Always keep these up-to-date so CSS can use them.
+		document.documentElement.style.setProperty("--vkb-available-height", `${vvHeight}px`);
+		document.documentElement.style.setProperty("--vkb-keyboard-height", `${keyboardHeight}px`);
+		if (hudHeight > 0) {
+			document.documentElement.style.setProperty("--vkb-hud-height", `${hudHeight}px`);
+		}
+	}
+
+	window.visualViewport.addEventListener("resize", updateVKB);
+	window.visualViewport.addEventListener("scroll", updateVKB);
+	updateVKB();
+}
+
 export function initApp() {
 	wireEvents();
+	wireVirtualKeyboardDetector();
 	restoreState();
 	applyQueryParams();
 	if (state.randomMode) {

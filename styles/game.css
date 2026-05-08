@@ -715,6 +715,95 @@ body.game-type-quiz.quiz-type-binary-to-decimal .timeGroup[data-unit="hours"] .b
 	}
 }
 
+@keyframes jeopardyBorderFlashChaos {
+	0% {
+		filter: saturate(1.05) brightness(1.0) hue-rotate(0deg);
+	}
+
+	14% {
+		filter: saturate(1.55) brightness(1.2) hue-rotate(34deg);
+	}
+
+	27% {
+		filter: saturate(1.2) brightness(1.45) hue-rotate(108deg);
+	}
+
+	39% {
+		filter: saturate(1.75) brightness(1.1) hue-rotate(196deg);
+	}
+
+	56% {
+		filter: saturate(1.15) brightness(1.35) hue-rotate(258deg);
+	}
+
+	73% {
+		filter: saturate(1.8) brightness(1.08) hue-rotate(322deg);
+	}
+
+	88% {
+		filter: saturate(1.3) brightness(1.42) hue-rotate(22deg);
+	}
+
+	100% {
+		filter: saturate(1.05) brightness(1.0) hue-rotate(0deg);
+	}
+}
+
+@keyframes jeopardyVignettePulse {
+
+	0%,
+	100% {
+		opacity: 0.28;
+	}
+
+	50% {
+		opacity: 0.52;
+	}
+}
+
+@keyframes jeopardyRevealShake {
+	0% {
+		transform: translate3d(0, 0, 0);
+	}
+
+	20% {
+		transform: translate3d(-2px, 1px, 0);
+	}
+
+	40% {
+		transform: translate3d(2px, -1px, 0);
+	}
+
+	60% {
+		transform: translate3d(-2px, -1px, 0);
+	}
+
+	80% {
+		transform: translate3d(2px, 1px, 0);
+	}
+
+	100% {
+		transform: translate3d(0, 0, 0);
+	}
+}
+
+@keyframes jeopardyLockInPulse {
+	0% {
+		transform: scale(1);
+		filter: brightness(1);
+	}
+
+	45% {
+		transform: scale(1.018);
+		filter: brightness(1.28);
+	}
+
+	100% {
+		transform: scale(1);
+		filter: brightness(1);
+	}
+}
+
 body.game-type-quiz.quiz-jeopardy-question .clock {
 	isolation: isolate;
 }
@@ -724,6 +813,28 @@ body.game-type-quiz.quiz-jeopardy-result-wrong .clock {
 	isolation: isolate;
 }
 
+body.game-type-quiz.quiz-jeopardy-reveal-shake .clock {
+	animation: jeopardyRevealShake 170ms linear 1;
+}
+
+body.game-type-quiz.quiz-jeopardy-lock-in .clock {
+	animation: jeopardyLockInPulse 220ms ease-out 1;
+}
+
+body.game-type-quiz:is(.quiz-jeopardy-question, .quiz-jeopardy-result-correct, .quiz-jeopardy-result-wrong) .clock::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	pointer-events: none;
+	z-index: 9;
+	background: radial-gradient(circle at center,
+			rgba(2, 6, 23, 0) 44%,
+			rgba(37, 99, 235, 0.18) 72%,
+			rgba(2, 6, 23, 0.5) 100%);
+	animation: jeopardyVignettePulse 1.15s ease-in-out infinite;
+}
+
 /* The ::after fills the clock area; the mask punches out the interior,
    leaving only a 3px-wide border strip visible — the snake rides that strip. */
 body.game-type-quiz:is(.quiz-jeopardy-question, .quiz-jeopardy-result-correct, .quiz-jeopardy-result-wrong) .clock::after {
@@ -731,7 +842,7 @@ body.game-type-quiz:is(.quiz-jeopardy-question, .quiz-jeopardy-result-correct, .
 	position: absolute;
 	inset: 0;
 	border-radius: inherit;
-	padding: 3px;
+	padding: 5px;
 	background: conic-gradient(from var(--jeopardy-angle),
 			transparent 0%,
 			transparent 72%,
@@ -749,7 +860,7 @@ body.game-type-quiz:is(.quiz-jeopardy-question, .quiz-jeopardy-result-correct, .
 	mask-composite: exclude;
 	pointer-events: none;
 	z-index: 10;
-	animation: jeopardyBorderChase 1.4s linear infinite;
+	animation: jeopardyBorderChase 1.15s linear infinite, jeopardyBorderFlashChaos 0.52s steps(1, end) infinite;
 }
 
 body.game-type-quiz.quiz-jeopardy-result-correct .clock::after {
@@ -763,6 +874,7 @@ body.game-type-quiz.quiz-jeopardy-result-correct .clock::after {
 			#4ade80 93%,
 			rgba(74, 222, 128, 0) 98%,
 			transparent 100%);
+	animation: jeopardyBorderChase 1s linear infinite;
 }
 
 body.game-type-quiz.quiz-jeopardy-result-wrong .clock::after {
@@ -776,6 +888,16 @@ body.game-type-quiz.quiz-jeopardy-result-wrong .clock::after {
 			#f97316 93%,
 			rgba(249, 115, 22, 0) 98%,
 			transparent 100%);
+	animation: jeopardyBorderChase 1s linear infinite;
+}
+
+body.game-type-quiz.quiz-jeopardy-timer-critical .clock::after {
+	animation-duration: 0.58s, 0.24s;
+}
+
+body.game-type-quiz.quiz-jeopardy-timer-critical .clock::before {
+	animation-duration: 0.58s;
+	opacity: 0.62;
 }
 
 body.game-type-quiz.quiz-jeopardy-question .quizHUD {
@@ -794,11 +916,101 @@ body.game-type-quiz.quiz-jeopardy-result-wrong .quizHUD {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
+	body.game-type-quiz.quiz-jeopardy-reveal-shake .clock,
+	body.game-type-quiz.quiz-jeopardy-lock-in .clock {
+		animation: none;
+	}
+
+	body.game-type-quiz:is(.quiz-jeopardy-question, .quiz-jeopardy-result-correct, .quiz-jeopardy-result-wrong) .clock::before {
+		animation: none;
+		opacity: 0.3;
+	}
+
 	body.game-type-quiz:is(.quiz-jeopardy-question, .quiz-jeopardy-result-correct, .quiz-jeopardy-result-wrong) .clock::after {
 		animation: none;
 		background: conic-gradient(from 0deg,
 				transparent 0%, #3b82f6 10%, transparent 20%);
 	}
+}
+
+/* =========================================================================
+   Virtual keyboard compact mode
+   Activates when body.vkb-visible is set (by JS, via visualViewport API)
+   during a binary-to-decimal quiz question on a touch device.
+   The clock bits are scaled down to fit the visual viewport above the keyboard.
+   --vkb-available-height is set by JS to window.visualViewport.height.
+   ========================================================================= */
+
+/* How much room is left above the keyboard (accounting for the quizHUD) */
+/* Pull the page content to the top of the visual viewport so the clock
+   sits just above the keyboard-pinned quizHUD with no dead gap. */
+body.vkb-visible.game-type-quiz {
+	--vkb-shell-height: var(--vkb-available-height, 100dvh);
+	/* Reserve exactly quizHUD height (+ breathing room) so there's no overlap and no large dead gap. */
+	--vkb-hud-clearance: calc(var(--vkb-hud-height, 88px) + 10px);
+	/* Body is a grid with place-items:center by default; override while keyboard is open. */
+	place-items: start center;
+}
+
+body.vkb-visible.game-type-quiz .appShell {
+	height: var(--vkb-shell-height);
+	min-height: 0;
+	align-content: start;
+	padding-top: max(env(safe-area-inset-top, 0px), 4px);
+	padding-bottom: var(--vkb-hud-clearance);
+}
+
+/* Dock the quizHUD just above the keyboard */
+body.vkb-visible.game-type-quiz .quizHUD {
+	bottom: calc(var(--vkb-keyboard-height, 0px) + 6px);
+}
+
+/* Keep tips away from bit columns while keyboard is visible in quiz mode. */
+body.vkb-visible.game-type-quiz .tipHUD {
+	top: max(env(safe-area-inset-top, 0px) + 8px, 8px);
+	left: max(env(safe-area-inset-left, 0px) + 8px, 8px);
+	right: auto;
+	transform: translateY(0);
+	max-width: min(18rem, calc(100vw - 16px));
+	align-items: flex-start;
+	text-align: left;
+	padding: 8px 12px 10px;
+	gap: 6px;
+}
+
+body.vkb-visible.game-type-quiz .tipHUD[aria-hidden="false"].tip-visible {
+	transform: translateY(0);
+}
+
+body.vkb-visible.game-type-quiz .tipHUD[data-tip-label]::before {
+	margin-right: 0;
+}
+
+body.vkb-visible.game-type-quiz.quiz-type-binary-to-decimal {
+	/* Reserve space for the fixed HUD + breathing room above the keyboard */
+	--vkb-clock-budget: calc(var(--vkb-available-height, 100dvh) - var(--vkb-hud-clearance));
+
+	/*
+	 * Compress bit geometry so the whole clock column fits.
+	 * In 6-bit mode there are 6 bits + 5 gaps per column, so we solve:
+	 *   6 * bit-size + 5 * bit-gap = vkb-clock-budget
+	 * We approximate bit-gap ≈ bit-size * 0.08 for the clamp floor.
+	 * Use a conservative scale factor to avoid being too tight.
+	 */
+	--vkb-bit-size: clamp(1.6rem, calc((var(--vkb-clock-budget) - 0.5rem) / 7), 3.2rem);
+	--vkb-bit-gap: clamp(0.1rem, calc(var(--vkb-bit-size) * 0.08), 0.22rem);
+	--vkb-clock-gap: clamp(0.5rem, calc(var(--vkb-bit-size) * 0.5), 1.2rem);
+	--vkb-group-gap: clamp(0.2rem, calc(var(--vkb-bit-size) * 0.22), 0.5rem);
+}
+
+body.vkb-visible.game-type-quiz.quiz-type-binary-to-decimal .clock {
+	--bit-size: var(--vkb-bit-size);
+	--bit-gap: var(--vkb-bit-gap);
+	--clock-gap: var(--vkb-clock-gap);
+	--group-gap: var(--vkb-group-gap);
+	min-height: 0;
+	margin-bottom: 4px;
 }
 
 /* =========================================================================
@@ -964,4 +1176,32 @@ body.game-type-quiz .tipHUD[data-tip-label]::before {
 	opacity: 1;
 	transform: translateX(-50%) translateY(0);
 	pointer-events: auto;
+}
+
+/* Mobile (all orientations): keep tipHUD on the left to avoid covering bit columns. */
+@media (pointer: coarse) {
+	.tipHUD {
+		top: max(env(safe-area-inset-top, 0px) + 8px, 8px);
+		left: max(env(safe-area-inset-left, 0px) + 8px, 8px);
+		right: auto;
+		transform: translateY(-8px);
+		max-width: min(18rem, calc(100vw - 16px));
+		text-align: left;
+	}
+
+	.tipHUD[aria-hidden="false"].tip-visible {
+		transform: translateY(0);
+	}
+
+	body.game-type-quiz .tipHUD {
+		transform: translateY(0);
+		align-items: flex-start;
+		text-align: left;
+		padding: 8px 12px 10px;
+		gap: 6px;
+	}
+
+	body.game-type-quiz .tipHUD[data-tip-label]::before {
+		margin-right: 0;
+	}
 }
